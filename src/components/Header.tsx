@@ -3,7 +3,11 @@ import { useAuth } from '../AuthContext';
 import { logout } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 
-export default function Header() {
+interface HeaderProps {
+  onMenuClick: () => void;
+}
+
+export default function Header({ onMenuClick }: HeaderProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -15,7 +19,10 @@ export default function Header() {
   return (
     <header className="h-16 flex items-center justify-between px-4 md:px-8 bg-background border-b border-gray-200">
       <div className="flex items-center">
-        <button className="md:hidden mr-4 text-gray-500 hover:text-gray-700">
+        <button 
+          onClick={onMenuClick}
+          className="md:hidden mr-4 text-gray-500 hover:text-gray-700"
+        >
           <Menu className="h-6 w-6" />
         </button>
         <h1 className="text-xl font-bold text-text-primary tracking-tight">Roommate OS</h1>
