@@ -1,0 +1,183 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user of the roommate OS app.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "fullName": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "avatarUrl": { "type": "string", "format": "uri" },
+        "phoneNumber": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "fullName", "email", "createdAt"]
+    },
+    "Apartment": {
+      "title": "Apartment",
+      "description": "An apartment shared by roommates.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "photoUrl": { "type": "string", "format": "uri" },
+        "inviteCode": { "type": "string" },
+        "createdBy": { "type": "string", "description": "UID of the creator" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "inviteCode", "createdBy", "createdAt"]
+    },
+    "ApartmentMember": {
+      "title": "Apartment Member",
+      "description": "A user's membership in an apartment.",
+      "type": "object",
+      "properties": {
+        "apartmentId": { "type": "string" },
+        "userId": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "member"] },
+        "status": { "type": "string", "enum": ["active", "inactive"] },
+        "joinedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["apartmentId", "userId", "role", "status", "joinedAt"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "A shared expense in the apartment.",
+      "type": "object",
+      "properties": {
+        "apartmentId": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "amount": { "type": "number" },
+        "paidByUserId": { "type": "string" },
+        "splitMethod": { "type": "string", "enum": ["equal", "custom"] },
+        "expenseDate": { "type": "string", "format": "date-time" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["apartmentId", "title", "category", "amount", "paidByUserId", "splitMethod", "expenseDate", "createdAt"]
+    },
+    "ExpenseSplit": {
+      "title": "Expense Split",
+      "description": "A user's share of an expense.",
+      "type": "object",
+      "properties": {
+        "expenseId": { "type": "string" },
+        "userId": { "type": "string" },
+        "amountOwed": { "type": "number" },
+        "paymentStatus": { "type": "string", "enum": ["paid", "unpaid"] },
+        "paidAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["expenseId", "userId", "amountOwed", "paymentStatus"]
+    },
+    "Chore": {
+      "title": "Chore",
+      "description": "A task to be done in the apartment.",
+      "type": "object",
+      "properties": {
+        "apartmentId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "assignedToUserId": { "type": "string" },
+        "dueDate": { "type": "string", "format": "date-time" },
+        "recurrence": { "type": "string", "enum": ["none", "daily", "weekly", "monthly"] },
+        "status": { "type": "string", "enum": ["pending", "completed"] },
+        "completedAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["apartmentId", "title", "status", "createdAt"]
+    },
+    "GroceryItem": {
+      "title": "Grocery Item",
+      "description": "An item needed for the apartment.",
+      "type": "object",
+      "properties": {
+        "apartmentId": { "type": "string" },
+        "name": { "type": "string" },
+        "quantity": { "type": "string" },
+        "category": { "type": "string" },
+        "addedByUserId": { "type": "string" },
+        "purchasedByUserId": { "type": "string" },
+        "status": { "type": "string", "enum": ["needed", "purchased"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["apartmentId", "name", "addedByUserId", "status", "createdAt"]
+    },
+    "CalendarEvent": {
+      "title": "Calendar Event",
+      "description": "An event scheduled for the apartment.",
+      "type": "object",
+      "properties": {
+        "apartmentId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "eventType": { "type": "string" },
+        "startDatetime": { "type": "string", "format": "date-time" },
+        "endDatetime": { "type": "string", "format": "date-time" },
+        "createdByUserId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["apartmentId", "title", "startDatetime", "createdByUserId", "createdAt"]
+    },
+    "Announcement": {
+      "title": "Announcement",
+      "description": "An announcement for the apartment.",
+      "type": "object",
+      "properties": {
+        "apartmentId": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "isUrgent": { "type": "boolean" },
+        "authorId": { "type": "string" },
+        "authorUid": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["apartmentId", "title", "content", "isUrgent", "authorId", "authorUid", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles."
+    },
+    "/apartments/{apartmentId}": {
+      "schema": { "$ref": "#/entities/Apartment" },
+      "description": "Apartments."
+    },
+    "/apartmentMembers/{memberId}": {
+      "schema": { "$ref": "#/entities/ApartmentMember" },
+      "description": "Memberships linking users to apartments."
+    },
+    "/expenses/{expenseId}": {
+      "schema": { "$ref": "#/entities/Expense" },
+      "description": "Expenses for apartments."
+    },
+    "/expenseSplits/{splitId}": {
+      "schema": { "$ref": "#/entities/ExpenseSplit" },
+      "description": "Splits for expenses."
+    },
+    "/chores/{choreId}": {
+      "schema": { "$ref": "#/entities/Chore" },
+      "description": "Chores for apartments."
+    },
+    "/groceries/{groceryId}": {
+      "schema": { "$ref": "#/entities/GroceryItem" },
+      "description": "Grocery items for apartments."
+    },
+    "/calendarEvents/{eventId}": {
+      "schema": { "$ref": "#/entities/CalendarEvent" },
+      "description": "Calendar events for apartments."
+    },
+    "/announcements/{announcementId}": {
+      "schema": { "$ref": "#/entities/Announcement" },
+      "description": "Announcements for apartments."
+    }
+  }
+}

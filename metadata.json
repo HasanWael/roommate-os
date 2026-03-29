@@ -1,0 +1,5 @@
+{
+  "name": "Roommate OS",
+  "description": "A responsive web platform for students in shared apartments to manage rent, chores, groceries, and communication, featuring a shared TV dashboard.",
+  "requestFramePermissions": []
+}

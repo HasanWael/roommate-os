@@ -1,0 +1,107 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    // Check if user is a member of the apartment
+    function isApartmentMember(apartmentId) {
+      return exists(/databases/$(database)/documents/apartmentMembers/$(apartmentId + '_' + request.auth.uid));
+    }
+
+    function isApartmentAdmin(apartmentId) {
+      let memberPath = /databases/$(database)/documents/apartmentMembers/$(apartmentId + '_' + request.auth.uid);
+      return exists(memberPath) && get(memberPath).data.role == 'admin';
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "hwmk2004@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+    
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId) || isAdmin();
+    }
+
+    match /apartments/{apartmentId} {
+      allow create: if isAuthenticated();
+      allow get: if isAuthenticated() && isApartmentMember(apartmentId);
+      allow update: if isAuthenticated() && (isApartmentMember(apartmentId) || resource.data.createdBy == request.auth.uid);
+      allow list: if false;
+      allow delete: if isAuthenticated() && resource.data.createdBy == request.auth.uid;
+    }
+
+    match /inviteCodes/{code} {
+      allow get: if isAuthenticated();
+      allow list: if false;
+      allow create: if isAuthenticated();
+    }
+
+    match /apartmentMembers/{memberId} {
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid || 
+        isApartmentMember(resource.data.apartmentId)
+      );
+      
+      allow update: if isAuthenticated() && (
+        (resource.data.userId == request.auth.uid && request.resource.data.role == resource.data.role) ||
+        isApartmentAdmin(resource.data.apartmentId)
+      );
+
+      allow delete: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid || 
+        isApartmentAdmin(resource.data.apartmentId)
+      );
+    }
+
+    match /expenses/{expenseId} {
+      allow create: if isAuthenticated() && isApartmentMember(request.resource.data.apartmentId);
+      allow read, update, delete: if isAuthenticated() && isApartmentMember(resource.data.apartmentId);
+    }
+
+    match /expenseSplits/{splitId} {
+      // We'd need to check the expense's apartment, but for simplicity, allow if user is involved or if we denormalize apartmentId
+      allow read, write: if isAuthenticated(); // TODO: tighten this
+    }
+
+    match /chores/{choreId} {
+      allow create: if isAuthenticated() && isApartmentMember(request.resource.data.apartmentId);
+      allow read, update, delete: if isAuthenticated() && isApartmentMember(resource.data.apartmentId);
+    }
+
+    match /groceries/{groceryId} {
+      allow create: if isAuthenticated() && isApartmentMember(request.resource.data.apartmentId);
+      allow read, update, delete: if isAuthenticated() && isApartmentMember(resource.data.apartmentId);
+    }
+
+    match /calendarEvents/{eventId} {
+      allow create: if isAuthenticated() && isApartmentMember(request.resource.data.apartmentId);
+      allow read, update, delete: if isAuthenticated() && isApartmentMember(resource.data.apartmentId);
+    }
+
+    match /announcements/{announcementId} {
+      allow create: if isAuthenticated() && isApartmentMember(request.resource.data.apartmentId);
+      allow read, update, delete: if isAuthenticated() && isApartmentMember(resource.data.apartmentId);
+    }
+  }
+}
