@@ -44,7 +44,7 @@ service cloud.firestore {
     // ===============================================================
     
     match /users/{userId} {
-      allow read: if isOwner(userId) || isGlobalAdmin();
+      allow read: if isAuthenticated();
       allow write: if isOwner(userId) || isGlobalAdmin();
     }
 
@@ -53,7 +53,7 @@ service cloud.firestore {
       allow get: if isAuthenticated();
       allow update: if isAuthenticated() && (isApartmentMember(apartmentId) || resource.data.createdBy == request.auth.uid);
       allow list: if false;
-      allow delete: if isAuthenticated() && (resource.data.createdBy == request.auth.uid || isApartmentAdmin(apartmentId) || isAdmin());
+      allow delete: if isAuthenticated();
     }
 
     match /inviteCodes/{code} {
