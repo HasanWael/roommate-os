@@ -116,7 +116,14 @@ export default function Auth() {
       
       // Check if already a member
       const memberRef = doc(db, 'apartmentMembers', `${aptId}_${user.uid}`);
-      const memberSnap = await getDoc(memberRef);
+      let memberSnap;
+      try {
+        memberSnap = await getDoc(memberRef);
+      } catch (err) {
+        handleFirestoreError(err, OperationType.GET, `apartmentMembers/${aptId}_${user.uid}`);
+        setError('Failed to check membership status.');
+        return;
+      }
       
       if (memberSnap.exists() && memberSnap.data().status === 'active') {
         console.log('User is already an active member of this apartment');
@@ -136,9 +143,9 @@ export default function Auth() {
           userId: user.uid,
           fullName: user.displayName || 'New User',
           avatarUrl: user.photoURL,
-          role: 'member',
+          role: memberSnap.exists() ? memberSnap.data().role : 'member',
           status: 'active',
-          joinedAt: new Date().toISOString()
+          joinedAt: memberSnap.exists() ? memberSnap.data().joinedAt : new Date().toISOString()
         });
         console.log('Membership record created successfully');
       } catch (err) {
