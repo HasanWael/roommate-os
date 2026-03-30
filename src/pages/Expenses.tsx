@@ -121,7 +121,7 @@ export default function Expenses() {
               />
             </div>
             <div className="w-32">
-              <label className="block text-sm font-medium text-text-secondary mb-1">Amount ($)</label>
+              <label className="block text-sm font-medium text-text-secondary mb-1">Amount (EGP)</label>
               <input 
                 type="number" 
                 step="0.01"
@@ -170,7 +170,7 @@ export default function Expenses() {
         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
           <h2 className="font-bold text-text-primary">Recent Expenses</h2>
           <div className="text-sm font-medium text-text-secondary">
-            Total Pending: <span className="text-danger font-bold">${totalPending.toFixed(2)}</span>
+            Total Pending: <span className="text-danger font-bold">EGP {totalPending.toFixed(2)}</span>
           </div>
         </div>
         
@@ -217,7 +217,7 @@ export default function Expenses() {
               
               <div className="flex items-center gap-6">
                 <div className="text-right">
-                  <div className="font-bold text-xl text-text-primary">${expense.amount.toFixed(2)}</div>
+                  <div className="font-bold text-xl text-text-primary">EGP {expense.amount.toFixed(2)}</div>
                   <div className="text-sm text-text-secondary mt-1 flex items-center justify-end space-x-1">
                     <Circle className="h-4 w-4 text-orange-500" /><span className="text-orange-600 font-medium">Pending</span>
                   </div>
