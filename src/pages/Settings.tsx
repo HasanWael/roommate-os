@@ -83,6 +83,32 @@ export default function Settings() {
 
       <div className="space-y-8">
         {/* Danger Zone */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="p-6 border-b border-gray-100">
+            <h2 className="font-bold text-text-primary">Invitation</h2>
+          </div>
+          <div className="p-6 space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-2">
+                Invite Code
+              </label>
+              <div className="flex items-center space-x-2">
+                <code className="bg-gray-100 px-4 py-2 rounded-lg font-mono text-lg">{apartment.inviteCode}</code>
+                <button
+                  onClick={() => {
+                    const link = `${window.location.origin}/auth?inviteCode=${apartment.inviteCode}`;
+                    navigator.clipboard.writeText(link);
+                    alert('Invite link copied to clipboard!');
+                  }}
+                  className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors"
+                >
+                  Copy Invite Link
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="bg-white rounded-2xl shadow-sm border border-red-100 overflow-hidden">
           <div className="p-6 bg-red-50 border-b border-red-100 flex items-center">
             <AlertTriangle className="text-red-600 mr-3 h-5 w-5" />

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { loginWithGoogle, db } from '../firebase';
 import { collection, doc, setDoc, getDoc, writeBatch } from 'firebase/firestore';
@@ -52,11 +52,22 @@ function ApartmentCard({ membership, onSelect }: { membership: any, onSelect: ()
 }
 export default function Auth() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, apartmentId, setApartmentId, memberships } = useAuth();
   const [apartmentName, setApartmentName] = useState('');
   const [address, setAddress] = useState('');
   const [inviteCode, setInviteCode] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const code = params.get('inviteCode');
+    if (code) {
+      const codeArray = code.toUpperCase().split('').slice(0, 6);
+      const newCode = [...Array(6)].map((_, i) => codeArray[i] || '');
+      setInviteCode(newCode);
+    }
+  }, [location]);
 
   const handleLogin = async () => {
     try {
@@ -303,6 +314,25 @@ export default function Auth() {
                         const nextInput = document.getElementById(`code-${idx + 1}`);
                         nextInput?.focus();
                       }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Backspace' && !inviteCode[idx] && idx > 0) {
+                        const prevInput = document.getElementById(`code-${idx - 1}`);
+                        prevInput?.focus();
+                      }
+                    }}
+                    onPaste={(e) => {
+                      e.preventDefault();
+                      const pastedData = e.clipboardData.getData('text').slice(0, 6).toUpperCase();
+                      const newCode = [...inviteCode];
+                      for (let i = 0; i < pastedData.length; i++) {
+                        if (i + idx < 6) {
+                          newCode[i + idx] = pastedData[i];
+                        }
+                      }
+                      setInviteCode(newCode);
+                      const nextFocus = Math.min(idx + pastedData.length, 6) - 1;
+                      document.getElementById(`code-${nextFocus}`)?.focus();
                     }}
                     id={`code-${idx}`}
                     className="w-12 h-14 bg-white border-transparent rounded-lg text-center text-xl font-bold focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all shadow-sm"
