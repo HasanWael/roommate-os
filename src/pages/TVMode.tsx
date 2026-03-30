@@ -181,8 +181,8 @@ export default function TVMode() {
               {expenses.slice(0, 3).map((exp: any) => (
                 <li key={exp.id} className="bg-[#1A1A1A] p-6 rounded-2xl">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-xl font-medium">{exp.title}</span>
-                    <span className="text-2xl font-bold">${exp.amount.toFixed(2)}</span>
+                    <span className="text-xl font-medium">{exp.title || 'No Title'}</span>
+                    <span className="text-2xl font-bold">${exp.amount?.toFixed(2) || '0.00'}</span>
                   </div>
                   <div className="text-gray-400 text-lg">Added: {exp.createdAt ? format(exp.createdAt.toDate(), 'MMM d') : 'Just now'}</div>
                 </li>
