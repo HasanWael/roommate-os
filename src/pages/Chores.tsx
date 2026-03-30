@@ -182,6 +182,15 @@ export default function Chores() {
                     <Circle className="h-6 w-6 text-gray-400" />
                   )}
                 </button>
+                <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+                  {(() => {
+                    const assigned = members.find(m => m.userId === chore.assignedToUserId);
+                    if (assigned?.user?.avatarUrl) {
+                      return <img src={assigned.user.avatarUrl} alt={getAssignedUserName(chore.assignedToUserId)} className="h-full w-full object-cover" />;
+                    }
+                    return <CheckSquare className="h-5 w-5 text-gray-400" />;
+                  })()}
+                </div>
                 <div>
                   <h3 className={`font-bold text-lg ${chore.status === 'completed' ? 'text-gray-400 line-through' : 'text-text-primary'}`}>
                     {chore.title}

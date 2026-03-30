@@ -47,7 +47,7 @@ export default function Calendar() {
         endDatetime: new Date(newEventDate).toISOString(), // Simplified for MVP
         eventType: newEventType,
         assignedToUserId: assignedToUserId || null,
-        createdBy: user.displayName?.split(' ')[0] || 'Roommate',
+        createdBy: user.displayName || 'Roommate',
         createdByUserId: user.uid,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
@@ -174,11 +174,26 @@ export default function Calendar() {
                 </div>
                 <div>
                   <h3 className="font-bold text-text-primary text-lg">{event.title}</h3>
-                  <p className="text-sm text-text-secondary flex items-center mt-1">
-                    <Clock className="h-4 w-4 mr-1" />
-                    {event.startDatetime ? format(new Date(event.startDatetime), 'h:mm a') : ''}
-                    {event.assignedToUserId && ` • For: ${getAssignedUserName(event.assignedToUserId)}`}
-                  </p>
+                  <div className="flex items-center mt-1 space-x-2">
+                    <p className="text-sm text-text-secondary flex items-center">
+                      <Clock className="h-4 w-4 mr-1" />
+                      {event.startDatetime ? format(new Date(event.startDatetime), 'h:mm a') : ''}
+                    </p>
+                    {event.assignedToUserId && (
+                      <div className="flex items-center space-x-1 border-l border-gray-200 pl-2">
+                        <div className="h-4 w-4 rounded-full bg-primary text-white flex items-center justify-center text-[8px] font-bold overflow-hidden">
+                          {(() => {
+                            const assigned = members.find(m => m.userId === event.assignedToUserId);
+                            if (assigned?.user?.avatarUrl) {
+                              return <img src={assigned.user.avatarUrl} alt={getAssignedUserName(event.assignedToUserId)} className="h-full w-full object-cover" />;
+                            }
+                            return getAssignedUserName(event.assignedToUserId).charAt(0);
+                          })()}
+                        </div>
+                        <span className="text-sm text-text-secondary">For: {getAssignedUserName(event.assignedToUserId)}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
               

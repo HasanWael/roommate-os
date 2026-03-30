@@ -43,10 +43,6 @@ export default function Header({ onMenuClick }: HeaderProps) {
             <Bell className="h-5 w-5" />
             <span className="absolute top-2 right-2 h-2.5 w-2.5 bg-danger rounded-full ring-2 ring-white"></span>
           </button>
-          
-          <button className="p-2 text-gray-500 hover:text-primary hover:bg-primary/5 rounded-xl transition-all">
-            <Settings className="h-5 w-5" />
-          </button>
         </div>
         
         <div className="h-10 w-[1px] bg-gray-200 mx-2 hidden md:block"></div>

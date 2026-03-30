@@ -39,7 +39,7 @@ export default function DashboardShowerWidget() {
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const slots = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as ShowerSlot[];
-      const current = slots.find(s => isBefore(parseISO(s.startTime), new Date()) && isAfter(parseISO(s.endTime), new Date()));
+      const current = slots.find(s => s.status === 'active' || (s.status === 'scheduled' && isBefore(parseISO(s.startTime), new Date()) && isAfter(parseISO(s.endTime), new Date())));
       setActiveSlot(current || null);
     }, (error) => {
       handleFirestoreError(error, OperationType.GET, 'showerSlots');

@@ -85,7 +85,10 @@ export default function Dashboard() {
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-5xl font-extrabold text-text-primary tracking-tight">
-            Good morning, <span className="text-primary">{user?.displayName?.split(' ')[0] || 'Roommate'}</span>.
+            Good morning, <span className="text-primary">{(() => {
+              const currentUserMember = members.find(m => m.userId === user?.uid);
+              return currentUserMember?.user?.fullName || user?.displayName || 'Roommate';
+            })()}</span>.
           </h1>
           <p className="text-text-secondary mt-3 text-xl max-w-2xl">
             Everything in <span className="font-semibold text-text-primary">{apartment?.name || 'your apartment'}</span> is running smoothly. 
@@ -96,10 +99,14 @@ export default function Dashboard() {
           {members.slice(0, 5).map((member) => (
             <div 
               key={member.userId} 
-              className="h-12 w-12 rounded-full border-4 border-background bg-primary text-white flex items-center justify-center font-bold text-lg shadow-sm"
+              className="h-12 w-12 rounded-full border-4 border-background bg-primary text-white flex items-center justify-center font-bold text-lg shadow-sm overflow-hidden"
               title={member.user?.fullName}
             >
-              {getMemberInitials(member.userId)}
+              {member.user?.avatarUrl ? (
+                <img src={member.user.avatarUrl} alt={member.user.fullName} className="h-full w-full object-cover" />
+              ) : (
+                getMemberInitials(member.userId)
+              )}
             </div>
           ))}
           {members.length > 5 && (
@@ -240,11 +247,19 @@ export default function Dashboard() {
                   "{announcements[0].content}"
                 </p>
                 <div className="flex items-center">
-                  <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-xs font-bold mr-3">
-                    {getMemberInitials(announcements[0].authorId)}
+                  <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-xs font-bold mr-3 overflow-hidden">
+                    {(() => {
+                      const author = members.find(m => m.userId === announcements[0].authorId);
+                      if (author?.user?.avatarUrl) {
+                        return <img src={author.user.avatarUrl} alt={author.user.fullName} className="h-full w-full object-cover" />;
+                      }
+                      return getMemberInitials(announcements[0].authorId);
+                    })()}
                   </div>
                   <div>
-                    <p className="text-sm font-bold">Posted by Roommate</p>
+                    <p className="text-sm font-bold">
+                      Posted by {members.find(m => m.userId === announcements[0].authorId)?.user?.fullName || 'Roommate'}
+                    </p>
                     <p className="text-xs opacity-50">{announcements[0].createdAt ? announcements[0].createdAt.toDate().toLocaleDateString() : 'Just now'}</p>
                   </div>
                 </div>

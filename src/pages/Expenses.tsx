@@ -50,7 +50,7 @@ export default function Expenses() {
         apartmentId,
         title: newExpenseTitle,
         amount: parseFloat(newExpenseAmount),
-        paidBy: user.displayName?.split(' ')[0] || 'Roommate',
+        paidBy: user.displayName || 'Roommate',
         paidByUserId: user.uid,
         splitAmong: splitAmong.length > 0 ? splitAmong : [user.uid],
         createdAt: serverTimestamp(),
@@ -145,6 +145,13 @@ export default function Expenses() {
                     onChange={() => toggleSplitMember(member.userId)}
                     className="rounded text-primary focus:ring-primary"
                   />
+                  <div className="h-6 w-6 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-bold overflow-hidden">
+                    {member.user?.avatarUrl ? (
+                      <img src={member.user.avatarUrl} alt={member.user.fullName} className="h-full w-full object-cover" />
+                    ) : (
+                      member.user?.fullName?.charAt(0) || '?'
+                    )}
+                  </div>
                   <span className="text-sm font-medium text-text-primary">{member.user?.fullName || 'Unknown'}</span>
                 </label>
               ))}
@@ -171,17 +178,40 @@ export default function Expenses() {
           {expenses.map((expense) => (
             <div key={expense.id} className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
               <div className="flex items-center space-x-4">
-                <div className="h-12 w-12 rounded-full bg-blue-50 flex items-center justify-center">
-                  <Receipt className="h-6 w-6 text-primary" />
+                <div className="h-12 w-12 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden">
+                  {(() => {
+                    const payer = members.find(m => m.userId === expense.paidByUserId);
+                    if (payer?.user?.avatarUrl) {
+                      return <img src={payer.user.avatarUrl} alt={expense.paidBy} className="h-full w-full object-cover" />;
+                    }
+                    return <Receipt className="h-6 w-6 text-primary" />;
+                  })()}
                 </div>
                 <div>
                   <h3 className="font-bold text-text-primary text-lg">{expense.title}</h3>
                   <p className="text-sm text-text-secondary">
-                    {expense.createdAt ? format(expense.createdAt.toDate(), 'MMM d, yyyy') : 'Just now'} • Paid by {expense.paidBy}
+                    {expense.createdAt ? format(expense.createdAt.toDate(), 'MMM d, yyyy') : 'Just now'} • Paid by {(() => {
+                      const payer = members.find(m => m.userId === expense.paidByUserId);
+                      return payer?.user?.fullName || expense.paidBy;
+                    })()}
                   </p>
-                  <p className="text-xs text-text-secondary mt-1">
-                    Split among {expense.splitAmong?.length || 1} people
-                  </p>
+                  <div className="text-xs text-text-secondary mt-1 flex items-center gap-1">
+                    Split among {expense.splitAmong?.length || 1} people:
+                    <div className="flex -space-x-2 ml-1">
+                      {expense.splitAmong?.map((userId: string) => {
+                        const member = members.find(m => m.userId === userId);
+                        return (
+                          <div key={userId} className="h-5 w-5 rounded-full border border-white bg-primary text-[8px] text-white flex items-center justify-center overflow-hidden" title={member?.user?.fullName}>
+                            {member?.user?.avatarUrl ? (
+                              <img src={member.user.avatarUrl} alt={member.user.fullName} className="h-full w-full object-cover" />
+                            ) : (
+                              member?.user?.fullName?.charAt(0) || '?'
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               </div>
               

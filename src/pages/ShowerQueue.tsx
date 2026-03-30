@@ -69,11 +69,11 @@ export default function ShowerQueue() {
     return () => unsubscribe();
   }, [apartment]);
 
-  const activeSlot = slots.find(s => (s.status === 'active' || s.status === 'scheduled') && isBefore(parseISO(s.startTime), nowTime) && isAfter(parseISO(s.endTime), nowTime));
+  const activeSlot = slots.find(s => s.status === 'active' || (s.status === 'scheduled' && isBefore(parseISO(s.startTime), nowTime) && isAfter(parseISO(s.endTime), nowTime)));
   const myActiveSlot = slots.find(s => s.userId === user?.uid && (s.status === 'active' || s.status === 'scheduled'));
   
-  const upNextSlots = slots.filter(s => s.status === 'scheduled' && s.mode === 'now' && isToday(parseISO(s.startTime)) && (!activeSlot || s.id !== activeSlot.id));
-  const scheduledSlots = slots.filter(s => s.status === 'scheduled' && s.mode === 'advance' && (isToday(parseISO(s.startTime)) || isTomorrow(parseISO(s.startTime))));
+  const upNextSlots = slots.filter(s => s.status === 'scheduled' && s.mode === 'now' && (!activeSlot || s.id !== activeSlot.id));
+  const scheduledSlots = slots.filter(s => s.status === 'scheduled' && s.mode === 'advance');
 
   const handleJoinQueue = async () => {
     if (!user || !apartment) return;
@@ -300,7 +300,7 @@ export default function ShowerQueue() {
                     <div>
                       <p className="font-bold text-text-primary">{slot.userName}</p>
                       <p className="text-sm text-text-secondary">
-                        {isToday(parseISO(slot.startTime)) ? 'Today' : 'Tomorrow'} at {format(parseISO(slot.startTime), 'h:mm a')} • {slot.duration} mins
+                        {isToday(parseISO(slot.startTime)) ? 'Today' : isTomorrow(parseISO(slot.startTime)) ? 'Tomorrow' : format(parseISO(slot.startTime), 'MMM d')} at {format(parseISO(slot.startTime), 'h:mm a')} • {slot.duration} mins
                       </p>
                     </div>
                   </div>

@@ -3,11 +3,13 @@ import { ShoppingCart, Plus, CheckCircle2, Circle, Trash2 } from 'lucide-react';
 import { useAuth } from '../AuthContext';
 import { db } from '../firebase';
 import { collection, query, where, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, orderBy } from 'firebase/firestore';
+import { useMembers } from '../hooks/useMembers';
 import { toast } from 'sonner';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 
 export default function Groceries() {
   const { user, apartmentId } = useAuth();
+  const { members } = useMembers();
   const [groceries, setGroceries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
@@ -41,7 +43,7 @@ export default function Groceries() {
         name: newItemName,
         quantity: parseInt(newItemQuantity, 10) || 1,
         status: 'needed',
-        addedBy: user.displayName?.split(' ')[0] || 'Roommate',
+        addedBy: user.displayName || 'Roommate',
         addedByUserId: user.uid,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
@@ -151,12 +153,24 @@ export default function Groceries() {
                     <div className="h-4 w-4 rounded-full bg-transparent"></div>
                   )}
                 </button>
+                <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+                  {(() => {
+                    const adder = members.find(m => m.userId === item.addedByUserId);
+                    if (adder?.user?.avatarUrl) {
+                      return <img src={adder.user.avatarUrl} alt={item.addedBy} className="h-full w-full object-cover" />;
+                    }
+                    return <ShoppingCart className="h-4 w-4 text-gray-400" />;
+                  })()}
+                </div>
                 <div>
                   <h3 className={`font-bold text-lg ${item.status === 'purchased' ? 'text-gray-400 line-through' : 'text-text-primary'}`}>
                     {item.name}
                   </h3>
                   <p className="text-sm text-text-secondary">
-                    Qty: {item.quantity} • Added by {item.addedBy}
+                    Qty: {item.quantity} • Added by {(() => {
+                      const adder = members.find(m => m.userId === item.addedByUserId);
+                      return adder?.user?.fullName || item.addedBy;
+                    })()}
                   </p>
                 </div>
               </div>

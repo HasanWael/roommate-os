@@ -4,11 +4,13 @@ import { format } from 'date-fns';
 import { useAuth } from '../AuthContext';
 import { db } from '../firebase';
 import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp, orderBy } from 'firebase/firestore';
+import { useMembers } from '../hooks/useMembers';
 import { toast } from 'sonner';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 
 export default function Announcements() {
   const { user, apartmentId } = useAuth();
+  const { members } = useMembers();
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
@@ -43,7 +45,7 @@ export default function Announcements() {
         title: newTitle,
         content: newContent,
         isUrgent,
-        authorId: user.displayName?.split(' ')[0] || 'Roommate',
+        authorId: user.displayName || 'Roommate',
         authorUid: user.uid,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
@@ -158,10 +160,19 @@ export default function Announcements() {
               
               <div className="mt-6 flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <div className="h-6 w-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
-                    {announcement.authorId ? announcement.authorId.charAt(0).toUpperCase() : '?'}
+                  <div className="h-6 w-6 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-bold overflow-hidden">
+                    {(() => {
+                      const author = members.find(m => m.userId === announcement.authorUid);
+                      if (author?.user?.avatarUrl) {
+                        return <img src={author.user.avatarUrl} alt={announcement.authorId} className="h-full w-full object-cover" />;
+                      }
+                      return announcement.authorId ? announcement.authorId.charAt(0).toUpperCase() : '?';
+                    })()}
                   </div>
-                  <span className="text-sm text-text-secondary">Posted by {announcement.authorId}</span>
+                  <span className="text-sm text-text-secondary">Posted by {(() => {
+                    const author = members.find(m => m.userId === announcement.authorUid);
+                    return author?.user?.fullName || announcement.authorId;
+                  })()}</span>
                 </div>
                 {announcement.isUrgent && (
                   <span className="text-xs font-bold px-2 py-1 bg-red-100 text-red-700 rounded-full uppercase tracking-wider">
