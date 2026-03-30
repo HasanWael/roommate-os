@@ -4,6 +4,7 @@ import { useAuth } from '../AuthContext';
 import { db } from '../firebase';
 import { collection, query, where, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, orderBy } from 'firebase/firestore';
 import { toast } from 'sonner';
+import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 
 export default function Groceries() {
   const { user, apartmentId } = useAuth();
@@ -50,7 +51,7 @@ export default function Groceries() {
       setIsAdding(false);
       toast.success('Item added to grocery list.');
     } catch (error) {
-      console.error("Error adding grocery item: ", error);
+      handleFirestoreError(error, OperationType.WRITE, 'groceries');
       toast.error('Failed to add item.');
     }
   };
@@ -64,7 +65,7 @@ export default function Groceries() {
       });
       toast.success(`Item marked as ${newStatus}.`);
     } catch (error) {
-      console.error("Error updating grocery item: ", error);
+      handleFirestoreError(error, OperationType.WRITE, `groceries/${itemId}`);
       toast.error('Failed to update item status.');
     }
   };
@@ -75,7 +76,7 @@ export default function Groceries() {
       await deleteDoc(doc(db, 'groceries', itemId));
       toast.success('Item deleted.');
     } catch (error) {
-      console.error("Error deleting grocery item: ", error);
+      handleFirestoreError(error, OperationType.DELETE, `groceries/${itemId}`);
       toast.error('Failed to delete item.');
     }
   };

@@ -32,23 +32,31 @@ export default function Members() {
     // Listen to apartment members
     const q = query(collection(db, 'apartmentMembers'), where('apartmentId', '==', apartmentId));
     const unsubscribe = onSnapshot(q, async (snapshot) => {
+      console.log('Members snapshot received, docs:', snapshot.docs.length);
       const memberDocs = snapshot.docs;
-      const memberData = await Promise.all(memberDocs.map(async (memberDoc) => {
-        const data = memberDoc.data();
-        try {
-          const userDoc = await getDoc(doc(db, 'users', data.userId));
-          return {
-            id: memberDoc.id,
-            ...data,
-            user: userDoc.exists() ? userDoc.data() : null
-          };
-        } catch (error) {
-          handleFirestoreError(error, OperationType.GET, `users/${data.userId}`);
-          return { id: memberDoc.id, ...data, user: null };
-        }
-      }));
-      setMembers(memberData);
-      setLoading(prev => prev ? false : prev);
+      try {
+        const memberData = await Promise.all(memberDocs.map(async (memberDoc) => {
+          const data = memberDoc.data();
+          try {
+            const userDoc = await getDoc(doc(db, 'users', data.userId));
+            if (!userDoc.exists()) {
+              console.warn(`User document not found for userId: ${data.userId}`);
+            }
+            return {
+              id: memberDoc.id,
+              ...data,
+              user: userDoc.exists() ? userDoc.data() : null
+            };
+          } catch (error) {
+            handleFirestoreError(error, OperationType.GET, `users/${data.userId}`);
+            return { id: memberDoc.id, ...data, user: null };
+          }
+        }));
+        setMembers(memberData);
+        setLoading(prev => prev ? false : prev);
+      } catch (err) {
+        console.error('Error processing member data:', err);
+      }
     }, (error) => {
       handleFirestoreError(error, OperationType.GET, 'apartmentMembers');
     });

@@ -6,6 +6,7 @@ import { db } from '../firebase';
 import { collection, query, where, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, orderBy } from 'firebase/firestore';
 import { useMembers } from '../hooks/useMembers';
 import { toast } from 'sonner';
+import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 
 export default function Chores() {
   const { user, apartmentId } = useAuth();
@@ -61,7 +62,7 @@ export default function Chores() {
       setIsAdding(false);
       toast.success('Chore added successfully.');
     } catch (error) {
-      console.error("Error adding chore: ", error);
+      handleFirestoreError(error, OperationType.WRITE, 'chores');
       toast.error('Failed to add chore.');
     }
   };
@@ -75,7 +76,7 @@ export default function Chores() {
       });
       toast.success(`Chore marked as ${newStatus}.`);
     } catch (error) {
-      console.error("Error updating chore: ", error);
+      handleFirestoreError(error, OperationType.WRITE, `chores/${choreId}`);
       toast.error('Failed to update chore status.');
     }
   };
@@ -86,7 +87,7 @@ export default function Chores() {
       await deleteDoc(doc(db, 'chores', choreId));
       toast.success('Chore deleted.');
     } catch (error) {
-      console.error("Error deleting chore: ", error);
+      handleFirestoreError(error, OperationType.DELETE, `chores/${choreId}`);
       toast.error('Failed to delete chore.');
     }
   };

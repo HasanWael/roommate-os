@@ -5,6 +5,7 @@ import { useAuth } from '../AuthContext';
 import { db } from '../firebase';
 import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp, orderBy } from 'firebase/firestore';
 import { toast } from 'sonner';
+import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 
 export default function Announcements() {
   const { user, apartmentId } = useAuth();
@@ -53,7 +54,7 @@ export default function Announcements() {
       setIsAdding(false);
       toast.success('Announcement posted.');
     } catch (error) {
-      console.error("Error adding announcement: ", error);
+      handleFirestoreError(error, OperationType.WRITE, 'announcements');
       toast.error('Failed to post announcement.');
     }
   };
@@ -64,7 +65,7 @@ export default function Announcements() {
       await deleteDoc(doc(db, 'announcements', announcementId));
       toast.success('Announcement deleted.');
     } catch (error) {
-      console.error("Error deleting announcement: ", error);
+      handleFirestoreError(error, OperationType.DELETE, `announcements/${announcementId}`);
       toast.error('Failed to delete announcement.');
     }
   };

@@ -6,6 +6,7 @@ import { db } from '../firebase';
 import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp, orderBy } from 'firebase/firestore';
 import { useMembers } from '../hooks/useMembers';
 import { toast } from 'sonner';
+import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 
 export default function Expenses() {
   const { user, apartmentId } = useAuth();
@@ -47,7 +48,7 @@ export default function Expenses() {
     try {
       await addDoc(collection(db, 'expenses'), {
         apartmentId,
-        description: newExpenseTitle,
+        title: newExpenseTitle,
         amount: parseFloat(newExpenseAmount),
         paidBy: user.displayName?.split(' ')[0] || 'Roommate',
         paidByUserId: user.uid,
@@ -61,7 +62,7 @@ export default function Expenses() {
       setIsAdding(false);
       toast.success('Expense added successfully.');
     } catch (error) {
-      console.error("Error adding expense: ", error);
+      handleFirestoreError(error, OperationType.WRITE, 'expenses');
       toast.error('Failed to add expense.');
     }
   };
@@ -72,7 +73,7 @@ export default function Expenses() {
       await deleteDoc(doc(db, 'expenses', expenseId));
       toast.success('Expense deleted.');
     } catch (error) {
-      console.error("Error deleting expense: ", error);
+      handleFirestoreError(error, OperationType.DELETE, `expenses/${expenseId}`);
       toast.error('Failed to delete expense.');
     }
   };
@@ -174,7 +175,7 @@ export default function Expenses() {
                   <Receipt className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-text-primary text-lg">{expense.description}</h3>
+                  <h3 className="font-bold text-text-primary text-lg">{expense.title}</h3>
                   <p className="text-sm text-text-secondary">
                     {expense.createdAt ? format(expense.createdAt.toDate(), 'MMM d, yyyy') : 'Just now'} • Paid by {expense.paidBy}
                   </p>

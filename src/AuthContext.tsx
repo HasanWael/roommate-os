@@ -114,10 +114,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         membershipUnsubscribeRef.current = onSnapshot(q, (snapshot) => {
-          console.log('Membership snapshot received, empty:', snapshot.empty, 'hasPendingWrites:', snapshot.metadata.hasPendingWrites);
+          console.log('Membership snapshot received, empty:', snapshot.empty, 'hasPendingWrites:', snapshot.metadata.hasPendingWrites, 'docs:', snapshot.docs.length);
+          
           if (!snapshot.empty) {
-            const newAptId = snapshot.docs[0].data().apartmentId;
+            // If we have multiple memberships, try to find one that matches current apartmentId
+            // or just pick the most recent one (joinedAt)
+            const memberships = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as any));
+            memberships.sort((a: any, b: any) => new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime());
+            
+            const newAptId = memberships[0].apartmentId;
             console.log('Found apartmentId in snapshot:', newAptId);
+            
             setApartmentId(prev => {
               if (prev === newAptId) return prev;
               console.log('Updating apartmentId from snapshot:', newAptId);
@@ -131,6 +138,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (!snapshot.metadata.hasPendingWrites) {
               setApartmentId(prev => {
                 if (prev === null) return null;
+                // If we just manually set it (e.g. in Auth.tsx), we might want to wait a bit
+                // before clearing it if the snapshot is empty but we expect a doc.
                 console.log('Setting apartmentId to null from snapshot (no pending writes)');
                 return null;
               });

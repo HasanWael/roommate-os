@@ -79,29 +79,48 @@ export default function Auth() {
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-    console.log('Joining apartment with code:', inviteCode.join(''));
+    const code = inviteCode.join('').trim().toUpperCase();
+    if (code.length < 6) {
+      setError('Please enter the full 6-digit code.');
+      return;
+    }
+    
+    console.log('Joining apartment with code:', code);
+    setError('');
+    
     try {
-      const code = inviteCode.join('');
       const inviteRef = doc(db, 'inviteCodes', code);
       let inviteSnap;
       try {
         inviteSnap = await getDoc(inviteRef);
       } catch (err) {
         handleFirestoreError(err, OperationType.GET, `inviteCodes/${code}`);
+        setError('Failed to verify invite code.');
         return;
       }
       
       if (!inviteSnap.exists()) {
         console.log('Invalid invite code');
-        setError('Invalid invite code.');
+        setError('Invalid invite code. Please check and try again.');
         return;
       }
 
       const aptId = inviteSnap.data().apartmentId;
       console.log('Found apartmentId:', aptId);
       
+      // Check if already a member
       const memberRef = doc(db, 'apartmentMembers', `${aptId}_${user.uid}`);
+      const memberSnap = await getDoc(memberRef);
+      
+      if (memberSnap.exists() && memberSnap.data().status === 'active') {
+        console.log('User is already an active member of this apartment');
+        setApartmentId(aptId);
+        navigate('/dashboard');
+        return;
+      }
+
       try {
+        console.log('Creating/Updating membership record...');
         await setDoc(memberRef, {
           apartmentId: aptId,
           userId: user.uid,
@@ -111,8 +130,11 @@ export default function Auth() {
           status: 'active',
           joinedAt: new Date().toISOString()
         });
+        console.log('Membership record created successfully');
       } catch (err) {
         handleFirestoreError(err, OperationType.WRITE, `apartmentMembers/${aptId}_${user.uid}`);
+        setError('Failed to join apartment. Please try again.');
+        return;
       }
 
       console.log('Setting apartmentId in context:', aptId);
@@ -121,7 +143,7 @@ export default function Auth() {
       navigate('/dashboard');
     } catch (err) {
       console.error('Error joining apartment:', err);
-      setError('Failed to join apartment.');
+      setError('An unexpected error occurred. Please try again.');
     }
   };
 
