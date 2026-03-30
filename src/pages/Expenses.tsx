@@ -7,6 +7,7 @@ import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc, serverTim
 import { useMembers } from '../hooks/useMembers';
 import { toast } from 'sonner';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function Expenses() {
   const { user, apartmentId } = useAuth();
@@ -17,6 +18,7 @@ export default function Expenses() {
   const [newExpenseTitle, setNewExpenseTitle] = useState('');
   const [newExpenseAmount, setNewExpenseAmount] = useState('');
   const [splitAmong, setSplitAmong] = useState<string[]>([]);
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (user && splitAmong.length === 0) {
@@ -67,14 +69,20 @@ export default function Expenses() {
     }
   };
 
-  const deleteExpense = async (expenseId: string) => {
-    if (!window.confirm('Are you sure you want to delete this expense?')) return;
+  const confirmDelete = (expenseId: string) => {
+    setItemToDelete(expenseId);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!itemToDelete) return;
     try {
-      await deleteDoc(doc(db, 'expenses', expenseId));
+      await deleteDoc(doc(db, 'expenses', itemToDelete));
       toast.success('Expense deleted.');
     } catch (error) {
-      handleFirestoreError(error, OperationType.DELETE, `expenses/${expenseId}`);
+      handleFirestoreError(error, OperationType.DELETE, `expenses/${itemToDelete}`);
       toast.error('Failed to delete expense.');
+    } finally {
+      setItemToDelete(null);
     }
   };
 
@@ -223,7 +231,7 @@ export default function Expenses() {
                   </div>
                 </div>
                 <button 
-                  onClick={() => deleteExpense(expense.id)}
+                  onClick={() => confirmDelete(expense.id)}
                   className="text-gray-400 hover:text-red-500 transition-colors p-2"
                   title="Delete expense"
                 >
@@ -237,6 +245,14 @@ export default function Expenses() {
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={!!itemToDelete}
+        title="Delete Expense"
+        message="Are you sure you want to delete this expense? This action cannot be undone."
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setItemToDelete(null)}
+      />
     </div>
   );
 }

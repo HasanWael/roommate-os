@@ -7,6 +7,7 @@ import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc, serverTim
 import { useMembers } from '../hooks/useMembers';
 import { toast } from 'sonner';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function Announcements() {
   const { user, apartmentId } = useAuth();
@@ -17,6 +18,7 @@ export default function Announcements() {
   const [newTitle, setNewTitle] = useState('');
   const [newContent, setNewContent] = useState('');
   const [isUrgent, setIsUrgent] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (!apartmentId) return;
@@ -61,14 +63,20 @@ export default function Announcements() {
     }
   };
 
-  const deleteAnnouncement = async (announcementId: string) => {
-    if (!window.confirm('Are you sure you want to delete this announcement?')) return;
+  const confirmDelete = (announcementId: string) => {
+    setItemToDelete(announcementId);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!itemToDelete) return;
     try {
-      await deleteDoc(doc(db, 'announcements', announcementId));
+      await deleteDoc(doc(db, 'announcements', itemToDelete));
       toast.success('Announcement deleted.');
     } catch (error) {
-      handleFirestoreError(error, OperationType.DELETE, `announcements/${announcementId}`);
+      handleFirestoreError(error, OperationType.DELETE, `announcements/${itemToDelete}`);
       toast.error('Failed to delete announcement.');
+    } finally {
+      setItemToDelete(null);
     }
   };
 
@@ -144,7 +152,7 @@ export default function Announcements() {
                   {announcement.createdAt ? format(announcement.createdAt.toDate(), 'MMM d, yyyy h:mm a') : 'Just now'}
                 </div>
                 <button 
-                  onClick={() => deleteAnnouncement(announcement.id)}
+                  onClick={() => confirmDelete(announcement.id)}
                   className="text-gray-400 hover:text-red-500 transition-colors p-1"
                   title="Delete announcement"
                 >
@@ -187,6 +195,14 @@ export default function Announcements() {
           <div className="p-8 text-center text-text-secondary bg-white rounded-2xl border border-gray-100">No announcements found.</div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={!!itemToDelete}
+        title="Delete Announcement"
+        message="Are you sure you want to delete this announcement? This action cannot be undone."
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setItemToDelete(null)}
+      />
     </div>
   );
 }

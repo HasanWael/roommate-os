@@ -6,6 +6,7 @@ import { collection, query, where, onSnapshot, addDoc, updateDoc, deleteDoc, doc
 import { useMembers } from '../hooks/useMembers';
 import { toast } from 'sonner';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function Groceries() {
   const { user, apartmentId } = useAuth();
@@ -13,8 +14,10 @@ export default function Groceries() {
   const [groceries, setGroceries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
+  const [completingItems, setCompletingItems] = useState<Set<string>>(new Set());
   const [newItemName, setNewItemName] = useState('');
   const [newItemQuantity, setNewItemQuantity] = useState('1');
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (!apartmentId) return;
@@ -58,28 +61,44 @@ export default function Groceries() {
     }
   };
 
-  const toggleItemStatus = async (itemId: string, currentStatus: string) => {
-    try {
-      const newStatus = currentStatus === 'purchased' ? 'needed' : 'purchased';
-      await updateDoc(doc(db, 'groceries', itemId), {
-        status: newStatus,
-        updatedAt: serverTimestamp()
-      });
-      toast.success(`Item marked as ${newStatus}.`);
-    } catch (error) {
-      handleFirestoreError(error, OperationType.WRITE, `groceries/${itemId}`);
-      toast.error('Failed to update item status.');
-    }
+  const toggleItemStatus = async (itemId: string) => {
+    if (completingItems.has(itemId)) return;
+    
+    // Start animation
+    setCompletingItems(prev => new Set(prev).add(itemId));
+    
+    // Wait for animation to play
+    setTimeout(async () => {
+      try {
+        await deleteDoc(doc(db, 'groceries', itemId));
+        toast.success('Item purchased and removed.');
+      } catch (error) {
+        handleFirestoreError(error, OperationType.DELETE, `groceries/${itemId}`);
+        toast.error('Failed to complete item.');
+      } finally {
+        setCompletingItems(prev => {
+          const next = new Set(prev);
+          next.delete(itemId);
+          return next;
+        });
+      }
+    }, 600);
   };
 
-  const deleteItem = async (itemId: string) => {
-    if (!window.confirm('Are you sure you want to delete this item?')) return;
+  const confirmDelete = (itemId: string) => {
+    setItemToDelete(itemId);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!itemToDelete) return;
     try {
-      await deleteDoc(doc(db, 'groceries', itemId));
+      await deleteDoc(doc(db, 'groceries', itemToDelete));
       toast.success('Item deleted.');
     } catch (error) {
-      handleFirestoreError(error, OperationType.DELETE, `groceries/${itemId}`);
+      handleFirestoreError(error, OperationType.DELETE, `groceries/${itemToDelete}`);
       toast.error('Failed to delete item.');
+    } finally {
+      setItemToDelete(null);
     }
   };
 
@@ -140,15 +159,18 @@ export default function Groceries() {
         </div>
         
         <div className="divide-y divide-gray-100">
-          {groceries.map((item) => (
-            <div key={item.id} className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
+          {groceries.filter(g => g.status !== 'purchased').map((item) => {
+            const isCompleting = completingItems.has(item.id);
+            return (
+            <div key={item.id} className={`p-6 flex items-center justify-between transition-all duration-500 ${isCompleting ? 'bg-gray-50 opacity-60 scale-[0.99]' : 'hover:bg-gray-50'}`}>
               <div className="flex items-center space-x-4">
                 <button 
-                  onClick={() => toggleItemStatus(item.id, item.status)}
+                  onClick={() => toggleItemStatus(item.id)}
                   className="h-8 w-8 rounded-full border-2 border-gray-300 hover:border-primary flex items-center justify-center transition-colors"
+                  disabled={isCompleting}
                 >
-                  {item.status === 'purchased' ? (
-                    <CheckCircle2 className="h-6 w-6 text-green-500" />
+                  {isCompleting || item.status === 'purchased' ? (
+                    <CheckCircle2 className="h-6 w-6 text-green-500 transition-all duration-500 scale-110" />
                   ) : (
                     <div className="h-4 w-4 rounded-full bg-transparent"></div>
                   )}
@@ -163,10 +185,10 @@ export default function Groceries() {
                   })()}
                 </div>
                 <div>
-                  <h3 className={`font-bold text-lg ${item.status === 'purchased' ? 'text-gray-400 line-through' : 'text-text-primary'}`}>
+                  <h3 className={`font-bold text-lg transition-all duration-500 ${isCompleting || item.status === 'purchased' ? 'text-gray-400 line-through' : 'text-text-primary'}`}>
                     {item.name}
                   </h3>
-                  <p className="text-sm text-text-secondary">
+                  <p className={`text-sm transition-all duration-500 ${isCompleting ? 'text-gray-400' : 'text-text-secondary'}`}>
                     Qty: {item.quantity} • Added by {(() => {
                       const adder = members.find(m => m.userId === item.addedByUserId);
                       return adder?.user?.fullName || item.addedBy;
@@ -176,26 +198,34 @@ export default function Groceries() {
               </div>
               
               <div className="flex items-center gap-4">
-                <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${
-                  item.status === 'purchased' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider transition-all duration-500 ${
+                  isCompleting || item.status === 'purchased' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                 }`}>
-                  {item.status === 'purchased' ? 'Purchased' : 'Needed'}
+                  {isCompleting ? 'Purchasing...' : (item.status === 'purchased' ? 'Purchased' : 'Needed')}
                 </span>
                 <button 
-                  onClick={() => deleteItem(item.id)}
-                  className="text-gray-400 hover:text-red-500 transition-colors p-2"
+                  onClick={() => confirmDelete(item.id)}
+                  className={`text-gray-400 hover:text-red-500 transition-colors p-2 ${isCompleting ? 'opacity-0 pointer-events-none' : ''}`}
                   title="Delete item"
                 >
                   <Trash2 className="h-5 w-5" />
                 </button>
               </div>
             </div>
-          ))}
-          {groceries.length === 0 && (
+          )})}
+          {groceries.filter(g => g.status !== 'purchased').length === 0 && (
             <div className="p-8 text-center text-text-secondary">No groceries needed.</div>
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={!!itemToDelete}
+        title="Delete Grocery Item"
+        message="Are you sure you want to delete this item? This action cannot be undone."
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setItemToDelete(null)}
+      />
     </div>
   );
 }

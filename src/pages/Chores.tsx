@@ -7,6 +7,7 @@ import { collection, query, where, onSnapshot, addDoc, updateDoc, deleteDoc, doc
 import { useMembers } from '../hooks/useMembers';
 import { toast } from 'sonner';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function Chores() {
   const { user, apartmentId } = useAuth();
@@ -14,9 +15,11 @@ export default function Chores() {
   const [chores, setChores] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
+  const [completingChores, setCompletingChores] = useState<Set<string>>(new Set());
   const [newChoreTitle, setNewChoreTitle] = useState('');
   const [newChoreDueDate, setNewChoreDueDate] = useState('');
   const [assignedToUserId, setAssignedToUserId] = useState('');
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (user?.uid && !assignedToUserId) {
@@ -67,28 +70,44 @@ export default function Chores() {
     }
   };
 
-  const toggleChoreStatus = async (choreId: string, currentStatus: string) => {
-    try {
-      const newStatus = currentStatus === 'completed' ? 'pending' : 'completed';
-      await updateDoc(doc(db, 'chores', choreId), {
-        status: newStatus,
-        updatedAt: serverTimestamp()
-      });
-      toast.success(`Chore marked as ${newStatus}.`);
-    } catch (error) {
-      handleFirestoreError(error, OperationType.WRITE, `chores/${choreId}`);
-      toast.error('Failed to update chore status.');
-    }
+  const toggleChoreStatus = async (choreId: string) => {
+    if (completingChores.has(choreId)) return;
+    
+    // Start animation
+    setCompletingChores(prev => new Set(prev).add(choreId));
+    
+    // Wait for animation to play
+    setTimeout(async () => {
+      try {
+        await deleteDoc(doc(db, 'chores', choreId));
+        toast.success('Chore completed and removed.');
+      } catch (error) {
+        handleFirestoreError(error, OperationType.DELETE, `chores/${choreId}`);
+        toast.error('Failed to complete chore.');
+      } finally {
+        setCompletingChores(prev => {
+          const next = new Set(prev);
+          next.delete(choreId);
+          return next;
+        });
+      }
+    }, 600);
   };
 
-  const deleteChore = async (choreId: string) => {
-    if (!window.confirm('Are you sure you want to delete this chore?')) return;
+  const confirmDelete = (choreId: string) => {
+    setItemToDelete(choreId);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!itemToDelete) return;
     try {
-      await deleteDoc(doc(db, 'chores', choreId));
+      await deleteDoc(doc(db, 'chores', itemToDelete));
       toast.success('Chore deleted.');
     } catch (error) {
-      handleFirestoreError(error, OperationType.DELETE, `chores/${choreId}`);
+      handleFirestoreError(error, OperationType.DELETE, `chores/${itemToDelete}`);
       toast.error('Failed to delete chore.');
+    } finally {
+      setItemToDelete(null);
     }
   };
 
@@ -169,15 +188,18 @@ export default function Chores() {
         </div>
         
         <div className="divide-y divide-gray-100">
-          {chores.map((chore) => (
-            <div key={chore.id} className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
+          {chores.filter(c => c.status !== 'completed').map((chore) => {
+            const isCompleting = completingChores.has(chore.id);
+            return (
+            <div key={chore.id} className={`p-6 flex items-center justify-between transition-all duration-500 ${isCompleting ? 'bg-gray-50 opacity-60 scale-[0.99]' : 'hover:bg-gray-50'}`}>
               <div className="flex items-center space-x-4">
                 <button 
-                  onClick={() => toggleChoreStatus(chore.id, chore.status)}
+                  onClick={() => toggleChoreStatus(chore.id)}
                   className="h-10 w-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+                  disabled={isCompleting}
                 >
-                  {chore.status === 'completed' ? (
-                    <CheckCircle2 className="h-6 w-6 text-green-500" />
+                  {isCompleting || chore.status === 'completed' ? (
+                    <CheckCircle2 className="h-6 w-6 text-green-500 transition-all duration-500 scale-110" />
                   ) : (
                     <Circle className="h-6 w-6 text-gray-400" />
                   )}
@@ -192,36 +214,44 @@ export default function Chores() {
                   })()}
                 </div>
                 <div>
-                  <h3 className={`font-bold text-lg ${chore.status === 'completed' ? 'text-gray-400 line-through' : 'text-text-primary'}`}>
+                  <h3 className={`font-bold text-lg transition-all duration-500 ${isCompleting || chore.status === 'completed' ? 'text-gray-400 line-through' : 'text-text-primary'}`}>
                     {chore.title}
                   </h3>
-                  <p className="text-sm text-text-secondary">
+                  <p className={`text-sm transition-all duration-500 ${isCompleting ? 'text-gray-400' : 'text-text-secondary'}`}>
                     Due: {chore.dueDate ? format(new Date(chore.dueDate), 'MMM d, yyyy') : 'No date'} • Assigned to: {getAssignedUserName(chore.assignedToUserId)}
                   </p>
                 </div>
               </div>
               
               <div className="flex items-center gap-4">
-                <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${
-                  chore.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-text-primary'
+                <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider transition-all duration-500 ${
+                  isCompleting || chore.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-text-primary'
                 }`}>
-                  {chore.status}
+                  {isCompleting ? 'Completing...' : chore.status}
                 </span>
                 <button 
-                  onClick={() => deleteChore(chore.id)}
-                  className="text-gray-400 hover:text-red-500 transition-colors p-2"
+                  onClick={() => confirmDelete(chore.id)}
+                  className={`text-gray-400 hover:text-red-500 transition-colors p-2 ${isCompleting ? 'opacity-0 pointer-events-none' : ''}`}
                   title="Delete chore"
                 >
                   <Trash2 className="h-5 w-5" />
                 </button>
               </div>
             </div>
-          ))}
-          {chores.length === 0 && (
+          )})}
+          {chores.filter(c => c.status !== 'completed').length === 0 && (
             <div className="p-8 text-center text-text-secondary">No chores found.</div>
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={!!itemToDelete}
+        title="Delete Chore"
+        message="Are you sure you want to delete this chore? This action cannot be undone."
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setItemToDelete(null)}
+      />
     </div>
   );
 }

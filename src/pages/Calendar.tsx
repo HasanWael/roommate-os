@@ -5,6 +5,9 @@ import { useAuth } from '../AuthContext';
 import { db } from '../firebase';
 import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp, orderBy } from 'firebase/firestore';
 import { useMembers } from '../hooks/useMembers';
+import { toast } from 'sonner';
+import { handleFirestoreError, OperationType } from '../lib/firestore-error';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function Calendar() {
   const { user, apartmentId } = useAuth();
@@ -16,6 +19,7 @@ export default function Calendar() {
   const [newEventDate, setNewEventDate] = useState('');
   const [newEventType, setNewEventType] = useState('general');
   const [assignedToUserId, setAssignedToUserId] = useState('');
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (!apartmentId) return;
@@ -62,12 +66,20 @@ export default function Calendar() {
     }
   };
 
-  const deleteEvent = async (eventId: string) => {
-    if (!window.confirm('Are you sure you want to delete this event?')) return;
+  const confirmDelete = (eventId: string) => {
+    setItemToDelete(eventId);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!itemToDelete) return;
     try {
-      await deleteDoc(doc(db, 'calendarEvents', eventId));
+      await deleteDoc(doc(db, 'calendarEvents', itemToDelete));
+      toast.success('Event deleted.');
     } catch (error) {
-      console.error("Error deleting event: ", error);
+      handleFirestoreError(error, OperationType.DELETE, `calendarEvents/${itemToDelete}`);
+      toast.error('Failed to delete event.');
+    } finally {
+      setItemToDelete(null);
     }
   };
 
@@ -202,7 +214,7 @@ export default function Calendar() {
                   {event.eventType}
                 </span>
                 <button 
-                  onClick={() => deleteEvent(event.id)}
+                  onClick={() => confirmDelete(event.id)}
                   className="text-gray-400 hover:text-red-500 transition-colors p-2"
                   title="Delete event"
                 >
@@ -216,6 +228,14 @@ export default function Calendar() {
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={!!itemToDelete}
+        title="Delete Event"
+        message="Are you sure you want to delete this event? This action cannot be undone."
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setItemToDelete(null)}
+      />
     </div>
   );
 }

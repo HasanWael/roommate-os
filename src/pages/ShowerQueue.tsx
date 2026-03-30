@@ -6,6 +6,7 @@ import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 import { format, addMinutes, isBefore, isAfter, parseISO, differenceInSeconds, isToday, isTomorrow, startOfDay, endOfDay } from 'date-fns';
 import { Droplets, Clock, Calendar as CalendarIcon, X, Plus, Play } from 'lucide-react';
 import { toast } from 'sonner';
+import ConfirmModal from '../components/ConfirmModal';
 
 interface ShowerSlot {
   id: string;
@@ -29,6 +30,7 @@ export default function ShowerQueue() {
   const [advanceTime, setAdvanceTime] = useState<string>('');
   const [advanceDate, setAdvanceDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
   const [nowTime, setNowTime] = useState<Date>(new Date());
+  const [pendingBufferConflict, setPendingBufferConflict] = useState<{startTime: Date, endTime: Date} | null>(null);
 
   const hotWaterBuffer = apartment?.hotWaterBuffer ?? 20;
 
@@ -75,6 +77,29 @@ export default function ShowerQueue() {
   const upNextSlots = slots.filter(s => s.status === 'scheduled' && s.mode === 'now' && (!activeSlot || s.id !== activeSlot.id));
   const scheduledSlots = slots.filter(s => s.status === 'scheduled' && s.mode === 'advance');
 
+  const executeBooking = async (startTime: Date, endTime: Date) => {
+    if (!user || !apartment) return;
+    try {
+      await addDoc(collection(db, 'showerSlots'), {
+        apartmentId: apartment.id,
+        userId: user.uid,
+        userName: user.displayName || 'Roommate',
+        duration,
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString(),
+        status: isBefore(startTime, addMinutes(new Date(), 1)) ? 'active' : 'scheduled',
+        mode,
+        createdAt: new Date().toISOString()
+      });
+      setIsModalOpen(false);
+      setPendingBufferConflict(null);
+      toast.success('Shower slot booked!');
+    } catch (error) {
+      handleFirestoreError(error, OperationType.CREATE, 'showerSlots');
+      toast.error('Failed to book slot');
+    }
+  };
+
   const handleJoinQueue = async () => {
     if (!user || !apartment) return;
 
@@ -93,16 +118,29 @@ export default function ShowerQueue() {
       }
       endTime = addMinutes(startTime, duration);
 
-      // Check for conflicts for advance booking
-      const hasConflict = slots.some(s => {
-        if (s.status !== 'active' && s.status !== 'scheduled') return false;
+      let directConflict = false;
+      let bufferConflict = false;
+
+      slots.forEach(s => {
+        if (s.status !== 'active' && s.status !== 'scheduled') return;
         const sStart = parseISO(s.startTime);
-        const sEnd = addMinutes(parseISO(s.endTime), hotWaterBuffer); // Include buffer
-        return (isBefore(startTime, sEnd) && isAfter(endTime, sStart));
+        const sEnd = parseISO(s.endTime);
+        const sBufferEnd = addMinutes(sEnd, hotWaterBuffer);
+
+        if (isBefore(startTime, sEnd) && isAfter(endTime, sStart)) {
+          directConflict = true;
+        } else if (isBefore(startTime, sBufferEnd) && isAfter(endTime, sEnd)) {
+          bufferConflict = true;
+        }
       });
 
-      if (hasConflict) {
-        toast.error('This time slot conflicts with an existing booking or buffer period.');
+      if (directConflict) {
+        toast.error('This time slot directly conflicts with an existing booking.');
+        return;
+      }
+
+      if (bufferConflict) {
+        setPendingBufferConflict({ startTime, endTime });
         return;
       }
     } else {
@@ -130,24 +168,7 @@ export default function ShowerQueue() {
       endTime = addMinutes(startTime, duration);
     }
 
-    try {
-      await addDoc(collection(db, 'showerSlots'), {
-        apartmentId: apartment.id,
-        userId: user.uid,
-        userName: user.displayName || 'Roommate',
-        duration,
-        startTime: startTime.toISOString(),
-        endTime: endTime.toISOString(),
-        status: isBefore(startTime, addMinutes(new Date(), 1)) ? 'active' : 'scheduled',
-        mode,
-        createdAt: new Date().toISOString()
-      });
-      setIsModalOpen(false);
-      toast.success('Shower slot booked!');
-    } catch (error) {
-      handleFirestoreError(error, OperationType.CREATE, 'showerSlots');
-      toast.error('Failed to book slot');
-    }
+    await executeBooking(startTime, endTime);
   };
 
   const handleCancel = async (slotId: string) => {
@@ -399,6 +420,20 @@ export default function ShowerQueue() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!pendingBufferConflict}
+        title="Hot Water Warning"
+        message={`This slot overlaps with the ${hotWaterBuffer}-minute hot water recovery period of a previous shower. You might have a cold shower. Do you want to proceed anyway?`}
+        confirmText="Book Anyway"
+        cancelText="Cancel"
+        onConfirm={() => {
+          if (pendingBufferConflict) {
+            executeBooking(pendingBufferConflict.startTime, pendingBufferConflict.endTime);
+          }
+        }}
+        onCancel={() => setPendingBufferConflict(null)}
+      />
     </div>
   );
 }
