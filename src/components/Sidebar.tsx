@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Receipt, CheckSquare, ShoppingCart, CalendarDays, Megaphone, Users, Tv, X } from 'lucide-react';
+import { useAuth } from '../AuthContext';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -7,6 +8,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const { apartment } = useAuth();
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Bills', path: '/expenses', icon: Receipt },
@@ -22,8 +24,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     `}>
       <div className="p-6 flex justify-between items-center">
         <div>
-          <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Apartment 4B</h2>
-          <p className="text-sm font-medium text-text-primary">The Living Blueprint</p>
+          <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+            {apartment?.name || 'My Apartment'}
+          </h2>
+          <p className="text-sm font-medium text-text-primary">Roommate OS</p>
         </div>
         <button onClick={onClose} className="md:hidden text-gray-400 hover:text-gray-600">
           <X className="h-5 w-5" />

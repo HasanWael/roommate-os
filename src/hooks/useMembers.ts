@@ -14,18 +14,26 @@ export function useMembers() {
     if (!apartmentId) return;
 
     const q = query(collection(db, 'apartmentMembers'), where('apartmentId', '==', apartmentId));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const memberData = snapshot.docs.map((memberDoc) => {
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
+      const memberDocs = snapshot.docs;
+      const memberData = await Promise.all(memberDocs.map(async (memberDoc) => {
         const data = memberDoc.data();
-        return {
-          id: memberDoc.id,
-          ...data,
-          user: {
-            fullName: data.fullName || 'Unknown User',
-            avatarUrl: data.avatarUrl || null
-          }
-        };
-      });
+        try {
+          const userDoc = await getDoc(doc(db, 'users', data.userId));
+          return {
+            id: memberDoc.id,
+            ...data,
+            user: userDoc.exists() ? userDoc.data() : { fullName: 'Unknown User', avatarUrl: null }
+          };
+        } catch (error) {
+          handleFirestoreError(error, OperationType.GET, `users/${data.userId}`);
+          return { 
+            id: memberDoc.id, 
+            ...data, 
+            user: { fullName: 'Unknown User', avatarUrl: null } 
+          };
+        }
+      }));
       
       setMembers(prev => {
         const prevStr = JSON.stringify(prev);

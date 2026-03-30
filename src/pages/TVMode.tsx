@@ -7,10 +7,9 @@ import { collection, query, where, onSnapshot, doc, getDoc, orderBy, limit } fro
 import { useMembers } from '../hooks/useMembers';
 
 export default function TVMode() {
-  const { apartmentId } = useAuth();
+  const { apartmentId, apartment } = useAuth();
   const { members } = useMembers();
   const [time, setTime] = useState(new Date());
-  const [apartment, setApartment] = useState<any>(null);
   const [expenses, setExpenses] = useState<any[]>([]);
   const [chores, setChores] = useState<any[]>([]);
   const [groceries, setGroceries] = useState<any[]>([]);
@@ -25,15 +24,6 @@ export default function TVMode() {
 
   useEffect(() => {
     if (!apartmentId) return;
-
-    // Fetch Apartment Details
-    const aptRef = doc(db, 'apartments', apartmentId);
-    const unsubApt = onSnapshot(aptRef, (doc) => {
-      if (doc.exists()) {
-        const data = doc.data();
-        setApartment((prev: any) => JSON.stringify(prev) !== JSON.stringify(data) ? data : prev);
-      }
-    });
 
     // Fetch Expenses
     const qExpenses = query(collection(db, 'expenses'), where('apartmentId', '==', apartmentId), orderBy('createdAt', 'desc'), limit(5));
@@ -67,7 +57,6 @@ export default function TVMode() {
     });
 
     return () => {
-      unsubApt();
       unsubExpenses();
       unsubChores();
       unsubGroceries();
@@ -92,7 +81,7 @@ export default function TVMode() {
       <header className="flex justify-between items-center mb-12">
         <div>
           <h1 className="text-5xl font-bold tracking-tight mb-2">{apartment?.name || 'Your Apartment'}</h1>
-          <p className="text-xl text-gray-400">The Living Blueprint</p>
+          <p className="text-xl text-gray-400">Roommate OS</p>
         </div>
         <div className="text-right">
           <h2 className="text-6xl font-bold tracking-tighter">{format(time, 'HH:mm')}</h2>
@@ -192,7 +181,7 @@ export default function TVMode() {
               {expenses.slice(0, 3).map((exp: any) => (
                 <li key={exp.id} className="bg-[#1A1A1A] p-6 rounded-2xl">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-xl font-medium">{exp.description}</span>
+                    <span className="text-xl font-medium">{exp.title}</span>
                     <span className="text-2xl font-bold">${exp.amount.toFixed(2)}</span>
                   </div>
                   <div className="text-gray-400 text-lg">Added: {exp.createdAt ? format(exp.createdAt.toDate(), 'MMM d') : 'Just now'}</div>

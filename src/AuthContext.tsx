@@ -20,6 +20,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   apartmentId: string | null;
+  apartment: any | null;
   setApartmentId: (id: string | null) => void;
 }
 
@@ -27,6 +28,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   apartmentId: null,
+  apartment: null,
   setApartmentId: () => {},
 });
 
@@ -36,7 +38,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [apartmentId, setApartmentId] = useState<string | null>(null);
+  const [apartment, setApartment] = useState<any | null>(null);
   const membershipUnsubscribeRef = React.useRef<(() => void) | null>(null);
+  const apartmentUnsubscribeRef = React.useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    if (apartmentId) {
+      const aptRef = doc(db, 'apartments', apartmentId);
+      apartmentUnsubscribeRef.current = onSnapshot(aptRef, (snapshot) => {
+        if (snapshot.exists()) {
+          setApartment({ id: snapshot.id, ...snapshot.data() });
+        } else {
+          setApartment(null);
+        }
+      }, (error) => {
+        handleFirestoreError(error, OperationType.GET, `apartments/${apartmentId}`);
+      });
+    } else {
+      setApartment(null);
+      if (apartmentUnsubscribeRef.current) {
+        apartmentUnsubscribeRef.current();
+        apartmentUnsubscribeRef.current = null;
+      }
+    }
+    return () => {
+      if (apartmentUnsubscribeRef.current) {
+        apartmentUnsubscribeRef.current();
+      }
+    };
+  }, [apartmentId]);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
@@ -138,8 +168,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     loading,
     apartmentId,
+    apartment,
     setApartmentId
-  }), [user, loading, apartmentId]);
+  }), [user, loading, apartmentId, apartment]);
 
   return (
     <AuthContext.Provider value={contextValue}>

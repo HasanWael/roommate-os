@@ -7,9 +7,8 @@ import { useMembers } from '../hooks/useMembers';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 
 export default function Dashboard() {
-  const { user, apartmentId } = useAuth();
+  const { user, apartmentId, apartment } = useAuth();
   const { members } = useMembers();
-  const [apartment, setApartment] = useState<any>(null);
   const [expenses, setExpenses] = useState<any[]>([]);
   const [chores, setChores] = useState<any[]>([]);
   const [groceries, setGroceries] = useState<any[]>([]);
@@ -19,17 +18,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!apartmentId) return;
-
-    // Fetch Apartment Details
-    const aptRef = doc(db, 'apartments', apartmentId);
-    const unsubApt = onSnapshot(aptRef, (doc) => {
-      if (doc.exists()) {
-        const data = doc.data();
-        setApartment((prev: any) => JSON.stringify(prev) !== JSON.stringify(data) ? data : prev);
-      }
-    }, (error) => {
-      handleFirestoreError(error, OperationType.GET, `apartments/${apartmentId}`);
-    });
 
     // Fetch Expenses
     const qExpenses = query(collection(db, 'expenses'), where('apartmentId', '==', apartmentId), orderBy('createdAt', 'desc'), limit(5));
@@ -73,7 +61,6 @@ export default function Dashboard() {
     });
 
     return () => {
-      unsubApt();
       unsubExpenses();
       unsubChores();
       unsubGroceries();
@@ -116,7 +103,7 @@ export default function Dashboard() {
           <div className="mt-auto">
             {expenses.slice(0, 1).map(expense => (
               <div key={expense.id} className="flex justify-between text-sm font-medium mb-2">
-                <span>{expense.description}</span>
+                <span>{expense.title}</span>
                 <span className="font-bold">${expense.amount.toFixed(2)}</span>
               </div>
             ))}
