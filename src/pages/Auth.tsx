@@ -1,34 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { LayoutDashboard, Users, AlertCircle, LogOut } from 'lucide-react';
 import { useAuth } from '../AuthContext';
-import { loginWithGoogle, db } from '../firebase';
+import { loginWithGoogle, logout, db } from '../firebase';
 import { collection, doc, setDoc, getDoc, writeBatch } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 
 function ApartmentCard({ membership, onSelect }: { membership: any, onSelect: () => void }) {
-  const [name, setName] = React.useState(membership.apartmentName || '');
-  const [loading, setLoading] = React.useState(!membership.apartmentName);
+  const { user } = useAuth();
+  const [apartmentData, setApartmentData] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    if (!membership.apartmentName) {
-      const fetchName = async () => {
-        try {
-          const snap = await getDoc(doc(db, 'apartments', membership.apartmentId));
-          if (snap.exists()) {
-            setName(snap.data().name);
-          } else {
-            setName('Unknown Apartment');
-          }
-        } catch (err) {
-          console.error('Error fetching apartment name:', err);
-          setName('Apartment');
-        } finally {
-          setLoading(false);
+    const fetchApartment = async () => {
+      try {
+        const snap = await getDoc(doc(db, 'apartments', membership.apartmentId));
+        if (snap.exists()) {
+          setApartmentData(snap.data());
         }
-      };
-      fetchName();
-    }
+      } catch (err) {
+        console.error('Error fetching apartment:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchApartment();
   }, [membership]);
+
+  const isCreator = apartmentData?.createdBy === user?.uid;
 
   return (
     <button
@@ -41,11 +40,11 @@ function ApartmentCard({ membership, onSelect }: { membership: any, onSelect: ()
             <span className="h-4 w-24 bg-gray-100 animate-pulse rounded" />
           </span>
         ) : (
-          name || 'Apartment'
+          apartmentData?.name || 'Apartment'
         )}
       </h3>
       <p className="text-xs text-text-secondary mt-1">
-        Joined {new Date(membership.joinedAt).toLocaleDateString()}
+        {isCreator ? 'Created' : 'Joined'} {new Date(membership.joinedAt).toLocaleDateString()}
       </p>
     </button>
   );
@@ -74,6 +73,15 @@ export default function Auth() {
       await loginWithGoogle();
     } catch (err) {
       setError('Failed to log in with Google.');
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/auth');
+    } catch (err) {
+      setError('Failed to log out.');
     }
   };
 
@@ -222,39 +230,73 @@ export default function Auth() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-sm text-center">
-          <h1 className="text-3xl font-bold text-text-primary tracking-tight mb-2">Roommate OS</h1>
-          <p className="text-text-secondary mb-8">Sign in to manage your shared living space.</p>
-          {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative overflow-hidden">
+        {/* Background Accents */}
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/10 rounded-full blur-[120px]"></div>
+
+        <div className="max-w-md w-full bg-white p-10 rounded-[2.5rem] shadow-2xl shadow-primary/5 text-center relative z-10 border border-gray-100">
+          <div className="h-20 w-20 bg-gradient-to-br from-primary to-indigo-600 rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-xl shadow-primary/20 rotate-3">
+            <LayoutDashboard className="h-10 w-10 text-white" />
+          </div>
+          <h1 className="text-4xl font-black text-text-primary tracking-tighter mb-3">Roommate OS</h1>
+          <p className="text-text-secondary mb-10 text-lg">The digital backbone for your shared living space.</p>
+          
+          {error && (
+            <div className="bg-danger/10 text-danger p-4 rounded-2xl mb-6 text-sm font-medium flex items-center justify-center">
+              <AlertCircle className="h-4 w-4 mr-2" />
+              {error}
+            </div>
+          )}
+          
           <button 
             onClick={handleLogin}
-            className="w-full bg-text-primary hover:bg-black text-white font-bold py-3 rounded-lg transition-colors uppercase tracking-wider"
+            className="w-full bg-text-primary hover:bg-black text-white font-bold py-4 rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center space-x-3 text-lg"
           >
-            Sign in with Google
+            <img src="https://www.google.com/favicon.ico" className="h-5 w-5" alt="Google" />
+            <span>Continue with Google</span>
           </button>
+          
+          <p className="mt-8 text-xs text-text-secondary uppercase tracking-widest font-bold opacity-50">
+            Secure • Real-time • Collaborative
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-5xl">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 md:p-8">
+      <div className="w-full max-w-6xl">
         <header className="flex justify-between items-center mb-16">
-          <h1 className="text-xl font-bold text-text-primary tracking-tight">Roommate OS</h1>
-          <div className="flex items-center space-x-4">
-            <span className="text-sm font-medium">{user.displayName}</span>
-            <img src={user.photoURL || ''} alt="Avatar" className="h-8 w-8 rounded-full" />
+          <h1 className="text-3xl font-black text-primary tracking-tighter">Roommate OS</h1>
+          <div className="flex items-center space-x-4 bg-white p-2 pr-4 rounded-full shadow-sm border border-gray-100">
+            <img src={user.photoURL || ''} alt="Avatar" className="h-10 w-10 rounded-full ring-2 ring-primary/10" />
+            <span className="text-sm font-bold text-text-primary">{user.displayName}</span>
+            <button 
+              onClick={handleLogout}
+              className="p-2 text-gray-400 hover:text-danger hover:bg-danger/5 rounded-xl transition-all"
+              title="Logout"
+            >
+              <LogOut className="h-5 w-5" />
+            </button>
           </div>
         </header>
 
-        {error && <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-8 text-center">{error}</div>}
+        {error && (
+          <div className="bg-danger/10 text-danger p-6 rounded-3xl mb-12 text-center font-bold shadow-sm flex items-center justify-center">
+            <AlertCircle className="h-5 w-5 mr-3" />
+            {error}
+          </div>
+        )}
 
         {memberships.length > 0 && (
-          <div className="mb-16">
-            <p className="text-xs font-bold text-text-secondary uppercase tracking-wider mb-4">Your Apartments</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="mb-20">
+            <div className="flex items-center mb-6">
+              <div className="h-1 w-8 bg-primary rounded-full mr-3"></div>
+              <p className="text-xs font-black text-text-secondary uppercase tracking-widest">Your Active Spaces</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {memberships.map((m) => (
                 <ApartmentCard 
                   key={m.id} 
@@ -266,82 +308,77 @@ export default function Auth() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
           {/* Create Apartment */}
-          <div>
-            <p className="text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Option 01</p>
-            <h2 className="text-4xl font-bold text-text-primary tracking-tight mb-4">Create Apartment</h2>
-            <p className="text-text-secondary mb-8">Establish a new digital blueprint for your shared living space.</p>
+          <div className="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-100 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+              <LayoutDashboard className="h-32 w-32 -rotate-12" />
+            </div>
+            <p className="text-xs font-black text-primary uppercase tracking-widest mb-4">Option 01</p>
+            <h2 className="text-4xl font-black text-text-primary tracking-tighter mb-4">Create Space</h2>
+            <p className="text-text-secondary mb-10 text-lg leading-relaxed">Establish a new digital blueprint for your apartment and invite your crew.</p>
 
-            <form onSubmit={handleCreate} className="space-y-6">
+            <form onSubmit={handleCreate} className="space-y-8">
               <div>
-                <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-2">Apartment Name</label>
+                <label className="block text-xs font-black text-text-primary uppercase tracking-widest mb-3">Apartment Name</label>
                 <input
                   type="text"
                   placeholder="e.g. The Penthouse 4B"
                   value={apartmentName}
                   onChange={(e) => setApartmentName(e.target.value)}
-                  className="w-full bg-gray-200 border-transparent rounded-lg px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                  className="w-full bg-gray-100 border-2 border-transparent rounded-2xl px-6 py-4 text-sm font-medium focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all"
                   required
                 />
               </div>
-              <button type="submit" className="w-full bg-text-primary hover:bg-black text-white font-bold py-3 rounded-lg text-sm transition-colors uppercase tracking-wider">
+              <button type="submit" className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-4 rounded-2xl text-lg transition-all shadow-xl shadow-primary/20 active:scale-95">
                 Initialize Space
               </button>
             </form>
           </div>
 
           {/* Join Existing */}
-          <div>
-            <p className="text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Option 02</p>
-            <h2 className="text-4xl font-bold text-text-primary tracking-tight mb-4">Join Existing</h2>
-            <p className="text-text-secondary mb-8">Enter an invite code provided by your future roommates.</p>
+          <div className="bg-gray-900 p-10 rounded-[2.5rem] shadow-2xl text-white relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+              <Users className="h-32 w-32 rotate-12" />
+            </div>
+            <p className="text-xs font-black text-secondary uppercase tracking-widest mb-4">Option 02</p>
+            <h2 className="text-4xl font-black tracking-tighter mb-4">Join Crew</h2>
+            <p className="text-white/60 mb-10 text-lg leading-relaxed">Enter a unique invite code provided by your future roommates to connect.</p>
 
-            <div className="bg-gray-100 p-8 rounded-2xl">
-              <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-4 text-center">Invitation Code</label>
-              <div className="flex justify-center space-x-2 mb-8">
-                {inviteCode.map((digit, idx) => (
-                  <input
-                    key={idx}
-                    type="text"
-                    maxLength={1}
-                    value={digit}
-                    onChange={(e) => {
-                      const newCode = [...inviteCode];
-                      newCode[idx] = e.target.value.toUpperCase();
-                      setInviteCode(newCode);
-                      if (e.target.value && idx < 5) {
-                        const nextInput = document.getElementById(`code-${idx + 1}`);
-                        nextInput?.focus();
-                      }
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Backspace' && !inviteCode[idx] && idx > 0) {
-                        const prevInput = document.getElementById(`code-${idx - 1}`);
-                        prevInput?.focus();
-                      }
-                    }}
-                    onPaste={(e) => {
-                      e.preventDefault();
-                      const pastedData = e.clipboardData.getData('text').slice(0, 6).toUpperCase();
-                      const newCode = [...inviteCode];
-                      for (let i = 0; i < pastedData.length; i++) {
-                        if (i + idx < 6) {
-                          newCode[i + idx] = pastedData[i];
+            <div className="space-y-8">
+              <div>
+                <label className="block text-xs font-black text-white/60 uppercase tracking-widest mb-4 text-center">6-Digit Invitation Code</label>
+                <div className="flex justify-center space-x-3 mb-10">
+                  {inviteCode.map((digit, idx) => (
+                    <input
+                      key={idx}
+                      type="text"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => {
+                        const newCode = [...inviteCode];
+                        newCode[idx] = e.target.value.toUpperCase();
+                        setInviteCode(newCode);
+                        if (e.target.value && idx < 5) {
+                          const nextInput = document.getElementById(`code-${idx + 1}`);
+                          nextInput?.focus();
                         }
-                      }
-                      setInviteCode(newCode);
-                      const nextFocus = Math.min(idx + pastedData.length, 6) - 1;
-                      document.getElementById(`code-${nextFocus}`)?.focus();
-                    }}
-                    id={`code-${idx}`}
-                    className="w-12 h-14 bg-white border-transparent rounded-lg text-center text-xl font-bold focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all shadow-sm"
-                  />
-                ))}
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Backspace' && !inviteCode[idx] && idx > 0) {
+                          const prevInput = document.getElementById(`code-${idx - 1}`);
+                          prevInput?.focus();
+                        }
+                      }}
+                      id={`code-${idx}`}
+                      className="w-12 h-16 bg-white/10 border-2 border-transparent rounded-2xl text-center text-2xl font-black focus:bg-white/20 focus:ring-4 focus:ring-secondary/20 focus:border-secondary outline-none transition-all text-white"
+                    />
+                  ))}
+                </div>
+                <button onClick={handleJoin} className="w-full bg-secondary hover:bg-secondary/90 text-white font-bold py-4 rounded-2xl text-lg transition-all shadow-xl shadow-secondary/20 active:scale-95">
+                  Connect to Hub
+                </button>
               </div>
-              <button onClick={handleJoin} className="w-full bg-gray-200 hover:bg-gray-300 text-text-primary font-bold py-3 rounded-lg text-sm transition-colors uppercase tracking-wider">
-                Connect to Hub
-              </button>
             </div>
           </div>
         </div>

@@ -81,132 +81,177 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
-      <header>
-        <h1 className="text-4xl font-bold text-text-primary tracking-tight">Good morning, {user?.displayName?.split(' ')[0] || 'Roommate'}.</h1>
-        <p className="text-text-secondary mt-2 text-lg">Everything in {apartment?.name || 'your apartment'} is running smoothly. Here's what requires your attention today.</p>
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-5xl font-extrabold text-text-primary tracking-tight">
+            Good morning, <span className="text-primary">{user?.displayName?.split(' ')[0] || 'Roommate'}</span>.
+          </h1>
+          <p className="text-text-secondary mt-3 text-xl max-w-2xl">
+            Everything in <span className="font-semibold text-text-primary">{apartment?.name || 'your apartment'}</span> is running smoothly. 
+            Here's what requires your attention today.
+          </p>
+        </div>
+        <div className="flex -space-x-3">
+          {members.slice(0, 5).map((member) => (
+            <div 
+              key={member.userId} 
+              className="h-12 w-12 rounded-full border-4 border-background bg-primary text-white flex items-center justify-center font-bold text-lg shadow-sm"
+              title={member.user?.fullName}
+            >
+              {getMemberInitials(member.userId)}
+            </div>
+          ))}
+          {members.length > 5 && (
+            <div className="h-12 w-12 rounded-full border-4 border-background bg-gray-200 text-text-secondary flex items-center justify-center font-bold shadow-sm">
+              +{members.length - 5}
+            </div>
+          )}
+        </div>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Bills Card */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col">
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-2 bg-gray-100 rounded-lg">
-              <Receipt className="h-6 w-6 text-text-primary" />
+        <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 flex flex-col transform transition-transform hover:scale-[1.01]">
+          <div className="flex justify-between items-start mb-6">
+            <div className="p-3 bg-warning-light rounded-2xl border border-warning-light">
+              <Receipt className="h-8 w-8 text-warning-dark" />
             </div>
-            <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider">
+            <span className="bg-warning-light text-warning-dark text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-widest">
               {expenses.length} Pending
             </span>
           </div>
-          <h3 className="text-xl font-bold text-text-primary">Bills & Expenses</h3>
-          <p className="text-text-secondary text-sm mb-6">Pending: ${expenses.reduce((sum, e) => sum + e.amount, 0).toFixed(2)}</p>
+          <h3 className="text-2xl font-bold mb-1 text-text-primary">Bills & Expenses</h3>
+          <p className="text-text-secondary text-sm mb-8">Total outstanding: <span className="font-bold text-text-primary">${expenses.reduce((sum, e) => sum + e.amount, 0).toFixed(2)}</span></p>
           
-          <div className="mt-auto">
-            {expenses.slice(0, 1).map(expense => (
-              <div key={expense.id} className="flex justify-between text-sm font-medium mb-2">
-                <span>{expense.title}</span>
-                <span className="font-bold">${expense.amount.toFixed(2)}</span>
+          <div className="mt-auto space-y-4">
+            {expenses.slice(0, 2).map(expense => (
+              <div key={expense.id} className="flex justify-between items-center text-sm bg-warning-light/30 p-3 rounded-xl border border-warning-light/50">
+                <span className="font-medium text-text-primary">{expense.title}</span>
+                <span className="font-bold text-warning-dark">${expense.amount.toFixed(2)}</span>
               </div>
             ))}
-            <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-              <div className="bg-text-primary h-1.5 rounded-full" style={{ width: '70%' }}></div>
-            </div>
+            {expenses.length === 0 && <p className="text-sm text-success font-bold">All bills paid! 🎉</p>}
           </div>
         </div>
 
         {/* Chores Card */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col">
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-2 bg-gray-100 rounded-lg">
-              <CheckSquare className="h-6 w-6 text-text-primary" />
+        <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 flex flex-col transform transition-transform hover:scale-[1.01]">
+          <div className="flex justify-between items-start mb-6">
+            <div className="p-3 bg-info-light rounded-2xl border border-info-light">
+              <CheckSquare className="h-8 w-8 text-info-dark" />
             </div>
-            <span className="bg-gray-200 text-text-primary text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider">
-              {chores.length} Pending
+            <span className="bg-info-light text-info-dark text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-widest">
+              {chores.length} Active
             </span>
           </div>
-          <h3 className="text-xl font-bold text-text-primary">Assigned Chores</h3>
-          <p className="text-text-secondary text-sm mb-6">Next: {chores[0]?.title || 'None'}</p>
+          <h3 className="text-2xl font-bold mb-1 text-text-primary">Weekly Chores</h3>
+          <p className="text-text-secondary text-sm mb-8">Next up: <span className="font-bold text-text-primary">{chores[0]?.title || 'All caught up'}</span></p>
           
-          <div className="mt-auto flex -space-x-2">
-            {chores.slice(0, 3).map((chore, i) => (
-              <div key={chore.id} className={`h-8 w-8 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-bold ${i === 0 ? 'bg-blue-500' : i === 1 ? 'bg-green-500' : 'bg-purple-500'}`} title={chore.title}>
-                {getMemberInitials(chore.assignedToUserId)}
-              </div>
-            ))}
-            {chores.length > 3 && (
-              <div className="h-8 w-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-text-secondary text-xs font-bold">+{chores.length - 3}</div>
-            )}
+          <div className="mt-auto">
+            <div className="flex items-center justify-between mb-2 text-sm text-text-secondary">
+              <span>Overall Progress</span>
+              <span className="font-bold text-success-dark">{Math.round((1 - (chores.length / 10)) * 100)}%</span>
+            </div>
+            <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+              <div className="bg-success h-3 rounded-full shadow-sm transition-all duration-500" style={{ width: `${Math.max(10, (1 - (chores.length / 10)) * 100)}%` }}></div>
+            </div>
           </div>
         </div>
 
         {/* Groceries Card */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col">
-          <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider mb-4">Groceries Needs</h3>
+        <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 flex flex-col transform transition-transform hover:scale-[1.01]">
+          <div className="flex justify-between items-start mb-6">
+            <div className="p-3 bg-success-light rounded-2xl border border-success-light">
+              <ShoppingCart className="h-8 w-8 text-success-dark" />
+            </div>
+            <span className="bg-success-light text-success-dark text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-widest">
+              {groceries.length} Items
+            </span>
+          </div>
+          <h3 className="text-2xl font-bold mb-1 text-text-primary">Grocery List</h3>
+          <p className="text-text-secondary text-sm mb-6">{groceries.length} items needed this week</p>
+          
           <ul className="space-y-3 mb-6 flex-1">
             {groceries.slice(0, 3).map(item => (
-              <li key={item.id} className="flex justify-between items-center text-sm">
-                <div className="flex items-center">
-                  <span className="h-2 w-2 rounded-full bg-gray-300 mr-3"></span>
-                  <span className="font-medium">{item.name}</span>
-                </div>
-                <span className="text-xs text-text-secondary">Needed</span>
+              <li key={item.id} className="flex justify-between items-center text-sm bg-success-light/30 p-2 px-3 rounded-lg border border-success-light/50">
+                <span className="font-medium text-text-primary">{item.name}</span>
+                <CheckCircle2 className="h-4 w-4 text-success-dark opacity-60" />
               </li>
             ))}
             {groceries.length === 0 && (
-              <li className="text-sm text-text-secondary">No groceries needed.</li>
+              <li className="text-sm text-success-dark font-medium italic">Fridge is full!</li>
             )}
           </ul>
-          <button className="w-full bg-gray-100 hover:bg-gray-200 text-text-primary font-bold py-2 rounded-lg text-sm transition-colors">
-            ADD TO LIST
+          <button className="w-full bg-primary text-white hover:bg-primary-dark font-bold py-3 rounded-2xl text-sm transition-all shadow-lg active:scale-95">
+            ADD ITEMS
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Schedule */}
-        <div className="lg:col-span-2 bg-gray-100 rounded-2xl p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold text-text-primary">Upcoming Schedule</h3>
-            <button className="text-sm font-bold text-text-primary uppercase tracking-wider border-b-2 border-text-primary pb-0.5">View Full Calendar</button>
+        <div className="lg:col-span-2 bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+          <div className="flex justify-between items-center mb-8">
+            <h3 className="text-2xl font-bold text-text-primary">Upcoming Events</h3>
+            <button className="text-sm font-bold text-primary hover:text-primary-dark transition-colors flex items-center">
+              FULL CALENDAR
+              <CalendarDays className="ml-2 h-4 w-4" />
+            </button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {events.slice(0, 3).map(event => (
-              <div key={event.id}>
-                <p className="text-xs font-bold text-text-secondary uppercase tracking-wider mb-1">
+              <div key={event.id} className="group cursor-pointer">
+                <div className="text-xs font-bold text-primary uppercase tracking-widest mb-2 bg-primary/10 inline-block px-2 py-1 rounded">
                   {new Date(event.startDatetime).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' })}
-                </p>
-                <h4 className="font-bold text-text-primary">{event.title}</h4>
-                <p className="text-sm text-text-secondary">
+                </div>
+                <h4 className="font-bold text-text-primary text-lg group-hover:text-primary transition-colors">{event.title}</h4>
+                <p className="text-sm text-text-secondary flex items-center mt-1">
+                  <span className="w-2 h-2 rounded-full bg-primary mr-2"></span>
                   {new Date(event.startDatetime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                  {event.location ? ` • ${event.location}` : ''}
                 </p>
               </div>
             ))}
             {events.length === 0 && (
-              <p className="text-sm text-text-secondary col-span-3">No upcoming events.</p>
+              <div className="col-span-3 py-12 text-center bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+                <CalendarDays className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-text-secondary font-medium">No upcoming events scheduled.</p>
+              </div>
             )}
           </div>
         </div>
 
         {/* Announcements */}
-        <div className="bg-text-primary text-white rounded-2xl p-6 flex flex-col justify-center">
-          <div className="flex items-center text-xs font-bold uppercase tracking-wider mb-4 opacity-80">
-            <Megaphone className="h-4 w-4 mr-2" />
-            Latest Announcement
+        <div className="bg-text-primary text-white rounded-3xl p-8 flex flex-col relative overflow-hidden shadow-2xl">
+          <div className="absolute top-0 right-0 p-8 opacity-10">
+            <Megaphone className="h-32 w-32 rotate-12" />
           </div>
-          {announcements.length > 0 ? (
-            <>
-              <p className="text-lg font-medium leading-tight mb-4">
-                "{announcements[0].content}"
-              </p>
-              <p className="text-sm opacity-60">— Posted by {announcements[0].authorId}, {announcements[0].createdAt ? announcements[0].createdAt.toDate().toLocaleDateString() : 'Just now'}</p>
-            </>
-          ) : (
-            <p className="text-lg font-medium leading-tight mb-4">No recent announcements.</p>
-          )}
+          <div className="relative z-10">
+            <div className="flex items-center text-xs font-bold uppercase tracking-widest mb-6 text-primary">
+              <Megaphone className="h-5 w-5 mr-3" />
+              Latest Update
+            </div>
+            {announcements.length > 0 ? (
+              <>
+                <p className="text-2xl font-bold leading-tight mb-8">
+                  "{announcements[0].content}"
+                </p>
+                <div className="flex items-center">
+                  <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-xs font-bold mr-3">
+                    {getMemberInitials(announcements[0].authorId)}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold">Posted by Roommate</p>
+                    <p className="text-xs opacity-50">{announcements[0].createdAt ? announcements[0].createdAt.toDate().toLocaleDateString() : 'Just now'}</p>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <p className="text-xl font-medium opacity-60">No recent announcements from the crew.</p>
+            )}
+          </div>
         </div>
       </div>
-
     </div>
   );
 }

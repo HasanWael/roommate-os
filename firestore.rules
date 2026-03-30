@@ -22,14 +22,20 @@ service cloud.firestore {
     }
 
     function isApartmentAdmin(apartmentId) {
-      let memberPath = /databases/$(database)/documents/apartmentMembers/$(apartmentId + '_' + request.auth.uid);
-      return exists(memberPath) && get(memberPath).data.role == 'admin';
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/apartmentMembers/$(apartmentId + '_' + request.auth.uid)) && 
+             get(/databases/$(database)/documents/apartmentMembers/$(apartmentId + '_' + request.auth.uid)).data.role == 'admin';
+    }
+
+    function isApartmentCreator(apartmentId) {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/apartments/$(apartmentId)) && 
+             get(/databases/$(database)/documents/apartments/$(apartmentId)).data.createdBy == request.auth.uid;
     }
 
     function isGlobalAdmin() {
       return isAuthenticated() && 
-             request.auth.token.email == "hwmk2004@gmail.com" && 
-             request.auth.token.email_verified == true;
+             request.auth.token.email == "hwmk2004@gmail.com";
     }
 
     function isAdmin() {
@@ -51,64 +57,62 @@ service cloud.firestore {
     match /apartments/{apartmentId} {
       allow create: if isAuthenticated();
       allow get: if isAuthenticated();
-      allow update: if isAuthenticated() && (isApartmentMember(apartmentId) || resource.data.createdBy == request.auth.uid);
-      allow list: if false;
-      allow delete: if isAuthenticated();
+      allow update: if isAuthenticated() && (isApartmentMember(apartmentId) || resource.data.createdBy == request.auth.uid || isGlobalAdmin());
+      allow list: if isAuthenticated();
+      allow delete: if isAuthenticated() && (resource.data.createdBy == request.auth.uid || isApartmentAdmin(apartmentId) || isGlobalAdmin());
     }
 
     match /inviteCodes/{code} {
       allow get: if isAuthenticated();
-      allow list: if false;
+      allow list: if isAuthenticated();
       allow create: if isAuthenticated();
-      allow delete: if isAuthenticated() && (isApartmentAdmin(resource.data.apartmentId) || isAdmin());
+      allow delete: if isAuthenticated() && (isApartmentAdmin(resource.data.apartmentId) || isApartmentCreator(resource.data.apartmentId) || isGlobalAdmin());
     }
 
     match /apartmentMembers/{memberId} {
       allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
-      
       allow read: if isAuthenticated();
-      
       allow update: if isAuthenticated() && (
         (memberId.matches(".*_" + request.auth.uid) && request.resource.data.role == resource.data.role) ||
         isApartmentAdmin(resource.data.apartmentId) ||
-        isAdmin()
+        isApartmentCreator(resource.data.apartmentId) ||
+        isGlobalAdmin()
       );
-
       allow delete: if isAuthenticated() && (
         memberId.matches(".*_" + request.auth.uid) || 
         isApartmentAdmin(resource.data.apartmentId) ||
-        isAdmin()
+        isApartmentCreator(resource.data.apartmentId) ||
+        isGlobalAdmin()
       );
     }
 
     match /expenses/{expenseId} {
       allow create: if isAuthenticated() && isApartmentMember(request.resource.data.apartmentId);
-      allow read, update, delete: if isAuthenticated() && (isApartmentMember(resource.data.apartmentId) || isAdmin());
+      allow read, update, delete: if isAuthenticated() && (isApartmentMember(resource.data.apartmentId) || isApartmentAdmin(resource.data.apartmentId) || isApartmentCreator(resource.data.apartmentId) || isGlobalAdmin());
     }
 
     match /expenseSplits/{splitId} {
-      // We'd need to check the expense's apartment, but for simplicity, allow if user is involved or if we denormalize apartmentId
-      allow read, write: if isAuthenticated() || isAdmin(); // TODO: tighten this
+      allow read, write: if isAuthenticated() || isGlobalAdmin();
     }
 
     match /chores/{choreId} {
       allow create: if isAuthenticated() && isApartmentMember(request.resource.data.apartmentId);
-      allow read, update, delete: if isAuthenticated() && (isApartmentMember(resource.data.apartmentId) || isAdmin());
+      allow read, update, delete: if isAuthenticated() && (isApartmentMember(resource.data.apartmentId) || isApartmentAdmin(resource.data.apartmentId) || isApartmentCreator(resource.data.apartmentId) || isGlobalAdmin());
     }
 
     match /groceries/{groceryId} {
       allow create: if isAuthenticated() && isApartmentMember(request.resource.data.apartmentId);
-      allow read, update, delete: if isAuthenticated() && (isApartmentMember(resource.data.apartmentId) || isAdmin());
+      allow read, update, delete: if isAuthenticated() && (isApartmentMember(resource.data.apartmentId) || isApartmentAdmin(resource.data.apartmentId) || isApartmentCreator(resource.data.apartmentId) || isGlobalAdmin());
     }
 
     match /calendarEvents/{eventId} {
       allow create: if isAuthenticated() && isApartmentMember(request.resource.data.apartmentId);
-      allow read, update, delete: if isAuthenticated() && (isApartmentMember(resource.data.apartmentId) || isAdmin());
+      allow read, update, delete: if isAuthenticated() && (isApartmentMember(resource.data.apartmentId) || isApartmentAdmin(resource.data.apartmentId) || isApartmentCreator(resource.data.apartmentId) || isGlobalAdmin());
     }
 
     match /announcements/{announcementId} {
       allow create: if isAuthenticated() && isApartmentMember(request.resource.data.apartmentId);
-      allow read, update, delete: if isAuthenticated() && (isApartmentMember(resource.data.apartmentId) || isAdmin());
+      allow read, update, delete: if isAuthenticated() && (isApartmentMember(resource.data.apartmentId) || isApartmentAdmin(resource.data.apartmentId) || isApartmentCreator(resource.data.apartmentId) || isGlobalAdmin());
     }
   }
 }

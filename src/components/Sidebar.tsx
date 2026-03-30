@@ -31,27 +31,24 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     `}>
       <div className="p-6 flex justify-between items-center">
         <div>
-          <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-            {apartment?.name || 'My Apartment'}
-          </h2>
-          <p className="text-sm font-medium text-text-primary">Roommate OS</p>
+          <p className="text-xl font-black text-text-primary tracking-tighter">Roommate OS</p>
         </div>
-        <button onClick={onClose} className="md:hidden text-gray-400 hover:text-gray-600">
-          <X className="h-5 w-5" />
+        <button onClick={onClose} className="md:hidden text-gray-400 hover:text-primary transition-colors">
+          <X className="h-6 w-6" />
         </button>
       </div>
       
-      <nav className="flex-1 px-4 space-y-1">
+      <nav className="flex-1 px-4 space-y-2">
         {navItems.map((item) => (
           <NavLink
             key={item.name}
             to={item.path}
             onClick={onClose}
             className={({ isActive }) =>
-              `flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
+              `flex items-center px-4 py-3.5 text-sm font-bold rounded-2xl transition-all duration-200 ${
                 isActive
-                  ? 'bg-gray-200 text-text-primary'
-                  : 'text-text-secondary hover:bg-gray-100 hover:text-text-primary'
+                  ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-[1.02]'
+                  : 'text-text-secondary hover:bg-primary/5 hover:text-primary'
               }`
             }
           >

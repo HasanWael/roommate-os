@@ -1,26 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;800&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
   
-  --color-primary: #4A90E2;
-  --color-secondary: #50E3C2;
-  --color-accent: #F5A623;
-  --color-background: #F4F4F4;
-  --color-tv-dark: #1B1B1B;
-  --color-surface: #FFFFFF;
-  --color-text-primary: #1A1A1A;
-  --color-text-secondary: #6B7280;
-  --color-danger: #EF4444;
+  --color-primary: #2563eb;
+  --color-primary-dark: #1d4ed8;
+  --color-primary-light: #dbeafe;
+  
+  --color-secondary: #6366f1;
+  --color-secondary-dark: #4f46e5;
+  --color-secondary-light: #e0e7ff;
+  
+  --color-tertiary: #8b5cf6;
+  
+  --color-success: #10b981;
+  --color-success-dark: #059669;
+  --color-success-light: #d1fae5;
+  
+  --color-danger: #ef4444;
+  --color-danger-dark: #dc2626;
+  --color-danger-light: #fee2e2;
+  
+  --color-warning: #f59e0b;
+  --color-warning-dark: #d97706;
+  --color-warning-light: #fef3c7;
+  
+  --color-info: #0ea5e9;
+  --color-info-dark: #0284c7;
+  --color-info-light: #e0f2fe;
+  
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94a3b8;
+  
+  --color-tv-dark: #020617;
 }
 
 body {
   background-color: var(--color-background);
   color: var(--color-text-primary);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
 }
 
 .tv-mode {
   background-color: var(--color-tv-dark);
-  color: var(--color-surface);
+  color: #ffffff;
+}
+
+.card-gradient-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #60a5fa 100%);
+}
+
+.card-gradient-secondary {
+  background: linear-gradient(135deg, #475569 0%, #94a3b8 100%);
+}
+
+.card-gradient-accent {
+  background: linear-gradient(135deg, #3b82f6 0%, #93c5fd 100%);
 }

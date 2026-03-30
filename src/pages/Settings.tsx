@@ -14,7 +14,7 @@ export default function Settings() {
   const [error, setError] = useState('');
 
   const currentMembership = memberships.find(m => m.apartmentId === apartment?.id);
-  const isAdmin = apartment?.createdBy === user?.uid || currentMembership?.role === 'admin' || user?.email === 'hwmk2004@gmail.com';
+  const isAdmin = apartment && (apartment.createdBy === user?.uid || currentMembership?.role === 'admin' || user?.email === 'hwmk2004@gmail.com');
 
   const handleDeleteApartment = async () => {
     if (!isAdmin || !apartment || !user) return;
@@ -64,6 +64,17 @@ export default function Settings() {
       setIsDeleting(false);
     }
   };
+
+  if (!apartment || !user) {
+    return (
+      <div className="p-8 max-w-2xl mx-auto">
+        <h1 className="text-3xl font-bold text-text-primary mb-6">Settings</h1>
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+          <p className="text-text-secondary">No apartment selected.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAdmin) {
     return (
