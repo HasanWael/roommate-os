@@ -66,11 +66,7 @@ service cloud.firestore {
     match /apartmentMembers/{memberId} {
       allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
       
-      allow read: if isAuthenticated() && (
-        (resource == null && memberId.matches(".*_" + request.auth.uid)) ||
-        (resource != null && resource.data.userId == request.auth.uid) || 
-        isApartmentMember(resource.data.apartmentId)
-      );
+      allow read: if isAuthenticated();
       
       allow update: if isAuthenticated() && (
         (memberId.matches(".*_" + request.auth.uid) && request.resource.data.role == resource.data.role) ||
