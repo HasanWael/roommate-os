@@ -11,6 +11,7 @@ import Calendar from './pages/Calendar';
 import Announcements from './pages/Announcements';
 import Members from './pages/Members';
 import Settings from './pages/Settings';
+import ShowerQueue from './pages/ShowerQueue';
 import { useAuth } from './AuthContext';
 
 export default function App() {
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="groceries" element={<Groceries />} />
           <Route path="calendar" element={<Calendar />} />
           <Route path="announcements" element={<Announcements />} />
+          <Route path="shower-queue" element={<ShowerQueue />} />
           <Route path="members" element={<Members />} />
           <Route path="settings" element={<Settings />} />
         </Route>

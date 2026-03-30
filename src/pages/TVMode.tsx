@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { Cloud, Droplets, Wind, Receipt, CheckSquare, ShoppingCart, Megaphone, CalendarDays } from 'lucide-react';
+import { Receipt, CheckSquare, ShoppingCart, Megaphone, CalendarDays, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../AuthContext';
-import { db } from '../firebase';
+import { db, loginWithGoogle, logout } from '../firebase';
 import { collection, query, where, onSnapshot, doc, getDoc, orderBy, limit } from 'firebase/firestore';
 import { useMembers } from '../hooks/useMembers';
 
 export default function TVMode() {
-  const { apartmentId, apartment } = useAuth();
+  const { user, apartmentId, apartment, memberships, setApartmentId } = useAuth();
   const { members } = useMembers();
   const [time, setTime] = useState(new Date());
   const [expenses, setExpenses] = useState<any[]>([]);
@@ -16,6 +16,7 @@ export default function TVMode() {
   const [events, setEvents] = useState<any[]>([]);
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -91,138 +92,188 @@ export default function TVMode() {
     return '?';
   };
 
-  if (loading) return <div className="tv-mode min-h-screen flex items-center justify-center text-2xl font-display font-black tracking-tighter">INITIALIZING COMMAND CENTER...</div>;
+  if (loading) return <div className="tv-mode min-h-screen flex items-center justify-center text-2xl font-bold">Loading Command Screen...</div>;
 
   if (!apartmentId) {
     return (
-      <div className="tv-mode min-h-screen flex flex-col items-center justify-center p-12 text-center">
-        <h1 className="text-6xl font-black tracking-tighter mb-8 opacity-20">NO COMMAND CENTER ACTIVE</h1>
-        <p className="text-2xl font-bold text-white/40 uppercase tracking-widest">Please select an apartment to view TV Mode</p>
+      <div className="tv-mode min-h-screen w-screen flex flex-col items-center justify-center text-center bg-tv-dark">
+        <div className="max-w-2xl w-full p-8">
+          <h1 className="text-7xl font-bold tracking-tighter mb-4 opacity-20">COMMAND CENTER</h1>
+          <div className="h-1.5 w-32 bg-primary rounded-full mx-auto mb-12"></div>
+          
+          {!user ? (
+            <div className="space-y-8">
+              <p className="text-3xl font-bold text-white/40 uppercase tracking-widest mb-12">Authentication Required</p>
+              <button 
+                onClick={() => loginWithGoogle()}
+                className="bg-white text-black font-bold py-6 px-12 rounded-3xl text-2xl transition-all hover:scale-105 active:scale-95 shadow-2xl flex items-center justify-center space-x-4 mx-auto"
+              >
+                <img src="https://www.google.com/favicon.ico" className="h-8 w-8" alt="Google" />
+                <span>Login to Roommate OS</span>
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-12">
+              <p className="text-3xl font-bold text-white/40 uppercase tracking-widest">Select an Active Space</p>
+              
+              {memberships.length > 0 ? (
+                <div className="grid grid-cols-1 gap-6">
+                  {memberships.map((m) => (
+                    <button
+                      key={m.id}
+                      onClick={() => setApartmentId(m.apartmentId)}
+                      className="bg-[#2A2A2A] border border-gray-800 p-8 rounded-[2.5rem] hover:bg-[#333333] transition-all text-left group flex justify-between items-center"
+                    >
+                      <div>
+                        <h3 className="text-4xl font-bold tracking-tighter group-hover:text-primary transition-colors">
+                          {m.apartmentName || 'Unnamed Apartment'}
+                        </h3>
+                        <p className="text-xl text-gray-400 font-bold uppercase tracking-widest mt-2">
+                          {m.role} • Joined {format(new Date(m.joinedAt), 'MMM yyyy')}
+                        </p>
+                      </div>
+                      <div className="h-16 w-16 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                        <LayoutDashboard className="h-8 w-8" />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-8">
+                  <p className="text-2xl text-gray-500 font-bold uppercase tracking-widest italic">No apartments found for this account.</p>
+                  <button 
+                    onClick={() => window.location.href = '/auth'}
+                    className="bg-primary text-white font-bold py-6 px-12 rounded-3xl text-2xl transition-all hover:scale-105 active:scale-95 shadow-2xl"
+                  >
+                    Setup New Space
+                  </button>
+                </div>
+              )}
+              
+              <div className="pt-12 border-t border-gray-800">
+                <div className="flex items-center justify-center space-x-4">
+                  <img src={user.photoURL || ''} className="h-12 w-12 rounded-full border-2 border-primary/30" alt="User" />
+                  <span className="text-xl font-bold text-gray-400">{user.displayName}</span>
+                  <button onClick={() => logout()} className="text-danger text-lg font-bold uppercase tracking-widest ml-4 hover:underline">Logout</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-tv-dark text-white p-8 font-sans overflow-hidden">
-      <div className="max-w-[1600px] mx-auto scale-[0.98] origin-top transition-transform duration-700">
+    <div className="tv-mode min-h-screen w-screen flex flex-col overflow-hidden">
+      <div className="flex flex-col flex-1 scale-[0.98] origin-top">
         {/* Header */}
-        <div className="flex justify-between items-center mb-12">
+        <header className="flex justify-between items-center mb-12 px-8 pt-8">
           <div>
-            <h1 className="text-6xl font-display font-black tracking-tighter text-white">
-              {apartment?.name || 'Apartment'}
-            </h1>
-            <p className="text-text-muted text-2xl mt-2 font-medium">
-              {format(time, 'EEEE, MMMM do')}
-            </p>
+            <h1 className="text-5xl font-extrabold tracking-tight mb-2 text-white">{apartment?.name || 'Your Apartment'}</h1>
+            <p className="text-xl text-slate-400 font-medium">Roommate OS</p>
           </div>
           <div className="text-right">
-            <div className="text-8xl font-display font-bold tracking-tight text-white leading-none">
-              {format(time, 'HH:mm')}
-            </div>
-            <div className="text-text-muted text-xl font-medium uppercase tracking-[0.3em] mt-2">
-              {format(time, 'ss')} SECONDS
-            </div>
+            <h2 className="text-6xl font-extrabold tracking-tighter text-white">{format(time, 'HH:mm')}</h2>
+            <p className="text-2xl text-slate-400 font-medium">{format(time, 'EEEE, MMMM do')}</p>
           </div>
-        </div>
+        </header>
 
-        <div className="grid grid-cols-3 gap-10">
-          {/* Left Column: Announcements & Chores */}
-          <div className="col-span-2 space-y-10">
-            {/* Announcements */}
-            <div className="bg-white/5 backdrop-blur-2xl rounded-[3rem] p-12 border border-white/10 shadow-2xl relative overflow-hidden">
-              <div className="absolute -top-10 -right-10 opacity-5">
-                <Megaphone className="h-64 w-64 rotate-12" />
-              </div>
-              <div className="flex items-center space-x-6 mb-10 relative z-10">
-                <div className="p-4 bg-primary/20 rounded-3xl">
-                  <Megaphone className="h-10 w-10 text-primary" />
-                </div>
-                <h2 className="text-4xl font-display font-bold tracking-tight">Announcements</h2>
-              </div>
-              <div className="space-y-8 relative z-10">
-                {announcements.length > 0 ? (
-                  announcements.map(announcement => (
-                    <div key={announcement.id} className="bg-white/5 p-10 rounded-[2.5rem] border border-white/5 hover:bg-white/10 transition-all">
-                      <h3 className="text-3xl font-bold mb-4 text-white">{announcement.title}</h3>
-                      <p className="text-gray-300 text-2xl leading-relaxed font-medium">{announcement.content}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-text-muted text-2xl italic font-medium">No recent announcements</p>
-                )}
-              </div>
+        <div className="grid grid-cols-4 gap-8 flex-1 px-8 pb-8">
+          {/* Chores */}
+          <div className="bg-slate-900 rounded-3xl p-8 border border-slate-800 flex flex-col">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-xl font-bold text-slate-400 uppercase tracking-wider">Pending Chores</h3>
+              <CheckSquare className="h-8 w-8 text-white" />
             </div>
-
-            {/* Chores Grid */}
-            <div className="bg-white/5 backdrop-blur-2xl rounded-[3rem] p-12 border border-white/10 shadow-2xl">
-              <div className="flex items-center justify-between mb-10">
-                <div className="flex items-center space-x-6">
-                  <div className="p-4 bg-info/20 rounded-3xl">
-                    <CheckSquare className="h-10 w-10 text-info" />
-                  </div>
-                  <h2 className="text-4xl font-display font-bold tracking-tight">Active Chores</h2>
-                </div>
-                <div className="text-2xl font-bold text-success flex items-center bg-success/10 px-6 py-2 rounded-full border border-success/20">
-                  {Math.round((1 - (chores.length / 10)) * 100)}% COMPLETE
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-8">
-                {chores.map(chore => (
-                  <div key={chore.id} className="bg-white/5 p-8 rounded-[2rem] border border-white/5 flex items-center justify-between group hover:bg-white/10 transition-all">
-                    <div>
-                      <h3 className="text-2xl font-bold text-white">{chore.title}</h3>
-                      <p className="text-text-muted text-lg mt-1 font-bold uppercase tracking-widest">
-                        {chore.assignedToName || 'Anyone'}
-                      </p>
-                    </div>
-                    <div className="h-14 w-14 rounded-2xl bg-info/20 flex items-center justify-center text-info text-xl font-black border border-info/30">
+            <ul className="space-y-6">
+              {chores.slice(0, 10).map((chore: any) => (
+                <li key={chore.id} className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="h-8 w-8 rounded-full bg-secondary flex items-center justify-center text-white text-xs font-bold mr-3">
                       {getMemberInitials(chore.assignedToUserId)}
                     </div>
+                    <span className="text-2xl font-semibold text-white">{chore.title}</span>
                   </div>
-                ))}
-                {chores.length === 0 && <p className="col-span-2 text-center text-success text-2xl font-bold py-10">All chores completed! 🎉</p>}
-              </div>
-            </div>
+                  <span className="text-lg text-slate-400 font-medium">{chore.dueDate ? format(new Date(chore.dueDate), 'MMM d') : 'No date'}</span>
+                </li>
+              ))}
+              {chores.length === 0 && <li className="text-xl text-slate-500 font-medium">No pending chores!</li>}
+            </ul>
           </div>
 
-          {/* Right Column: Bills & Groceries */}
-          <div className="space-y-10">
-            {/* Bills */}
-            <div className="bg-white/5 backdrop-blur-2xl rounded-[3rem] p-12 border border-white/10 shadow-2xl">
-              <div className="flex items-center space-x-6 mb-10">
-                <div className="p-4 bg-warning/20 rounded-3xl">
-                  <Receipt className="h-10 w-10 text-warning" />
-                </div>
-                <h2 className="text-4xl font-display font-bold tracking-tight">Pending Bills</h2>
-              </div>
-              <div className="space-y-6">
-                {expenses.map(expense => (
-                  <div key={expense.id} className="flex justify-between items-center p-8 bg-warning/10 rounded-[2.5rem] border border-warning/20 shadow-lg">
-                    <span className="text-2xl font-bold text-white">{expense.title}</span>
-                    <span className="text-3xl font-display font-black text-warning">${expense.amount.toFixed(2)}</span>
+          {/* Groceries */}
+          <div className="bg-slate-900 rounded-3xl p-8 border border-slate-800 flex flex-col">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-xl font-bold text-slate-400 uppercase tracking-wider">Grocery List</h3>
+              <ShoppingCart className="h-8 w-8 text-white" />
+            </div>
+            <ul className="space-y-6">
+              {groceries.slice(0, 10).map((item: any) => (
+                <li key={item.id} className="flex items-center">
+                  <span className="h-3 w-3 rounded-full bg-secondary mr-4"></span>
+                  <span className="text-2xl font-semibold text-white">{item.name}</span>
+                </li>
+              ))}
+              {groceries.length === 0 && <li className="text-xl text-slate-500 font-medium">List is empty</li>}
+            </ul>
+          </div>
+
+          {/* Bills */}
+          <div className="bg-slate-900 rounded-3xl p-8 border border-slate-800 flex flex-col">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-xl font-bold text-slate-400 uppercase tracking-wider">Upcoming Bills</h3>
+              <Receipt className="h-8 w-8 text-white" />
+            </div>
+            <ul className="space-y-6">
+              {expenses.slice(0, 8).map((exp: any) => (
+                <li key={exp.id} className="bg-slate-950 p-6 rounded-2xl">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xl font-semibold text-white">{exp.title || 'No Title'}</span>
+                    <span className="text-2xl font-extrabold text-white">${exp.amount?.toFixed(2) || '0.00'}</span>
                   </div>
-                ))}
-                {expenses.length === 0 && <p className="text-success text-2xl font-bold text-center py-6">All bills paid! 💸</p>}
+                  <div className="text-slate-400 text-lg font-medium">Added: {exp.createdAt ? format(exp.createdAt.toDate(), 'MMM d') : 'Just now'}</div>
+                </li>
+              ))}
+              {expenses.length === 0 && <li className="text-xl text-slate-500 font-medium">No upcoming bills!</li>}
+            </ul>
+          </div>
+
+          {/* Announcements + Schedule */}
+          <div className="space-y-8 flex flex-col">
+            {/* Announcements */}
+            <div className="bg-primary text-white rounded-3xl p-8 flex-1 flex flex-col justify-center">
+              <div className="flex items-center text-sm font-bold uppercase tracking-wider mb-6 opacity-80">
+                <Megaphone className="h-6 w-6 mr-3" />
+                Latest Announcement
               </div>
+              {announcements.length > 0 ? (
+                <>
+                  <p className="text-3xl font-semibold leading-tight mb-6">
+                    "{announcements[0].content}"
+                  </p>
+                  <p className="text-lg opacity-80 font-medium">— Posted by Roommate</p>
+                </>
+              ) : (
+                <p className="text-3xl font-semibold leading-tight mb-6">No recent announcements.</p>
+              )}
             </div>
 
-            {/* Groceries */}
-            <div className="bg-white/5 backdrop-blur-2xl rounded-[3rem] p-12 border border-white/10 shadow-2xl flex-1">
-              <div className="flex items-center space-x-6 mb-10">
-                <div className="p-4 bg-success/20 rounded-3xl">
-                  <ShoppingCart className="h-10 w-10 text-success" />
-                </div>
-                <h2 className="text-4xl font-display font-bold tracking-tight">Grocery List</h2>
+            {/* Schedule */}
+            <div className="bg-slate-900 rounded-3xl p-8 border border-slate-800 flex-1">
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-xl font-bold text-slate-400 uppercase tracking-wider">Schedule</h3>
+                <CalendarDays className="h-8 w-8 text-white" />
               </div>
-              <div className="grid grid-cols-1 gap-6">
-                {groceries.map(item => (
-                  <div key={item.id} className="flex items-center space-x-6 p-6 bg-white/5 rounded-[1.5rem] border border-white/5 hover:bg-white/10 transition-all">
-                    <div className="h-4 w-4 rounded-full bg-success shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
-                    <span className="text-2xl font-medium text-white">{item.name}</span>
-                  </div>
+              <ul className="space-y-6">
+                {events.slice(0, 5).map((event: any) => (
+                  <li key={event.id} className="flex flex-col">
+                    <span className="text-slate-400 text-lg font-medium mb-1">{event.startDatetime ? format(new Date(event.startDatetime), 'MMM d, h:mm a') : 'No date'}</span>
+                    <span className="text-2xl font-semibold text-white">{event.title}</span>
+                  </li>
                 ))}
-                {groceries.length === 0 && <p className="text-text-muted text-2xl italic text-center py-6">List is empty</p>}
-              </div>
+                {events.length === 0 && <li className="text-xl text-slate-500 font-medium">No upcoming events!</li>}
+              </ul>
             </div>
           </div>
         </div>

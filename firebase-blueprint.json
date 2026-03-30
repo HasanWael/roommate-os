@@ -24,6 +24,7 @@
         "photoUrl": { "type": "string", "format": "uri" },
         "inviteCode": { "type": "string" },
         "createdBy": { "type": "string", "description": "UID of the creator" },
+        "hotWaterBuffer": { "type": "number", "description": "Buffer in minutes between showers" },
         "createdAt": { "type": "string", "format": "date-time" },
         "updatedAt": { "type": "string", "format": "date-time" }
       },
@@ -140,6 +141,23 @@
         "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["apartmentId", "title", "content", "isUrgent", "authorId", "authorUid", "createdAt"]
+    },
+    "ShowerSlot": {
+      "title": "Shower Slot",
+      "description": "A booked or active shower slot.",
+      "type": "object",
+      "properties": {
+        "apartmentId": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "duration": { "type": "number", "description": "Duration in minutes" },
+        "startTime": { "type": "string", "format": "date-time" },
+        "endTime": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["active", "scheduled", "completed", "cancelled"] },
+        "mode": { "type": "string", "enum": ["now", "advance"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["apartmentId", "userId", "userName", "duration", "startTime", "endTime", "status", "mode", "createdAt"]
     }
   },
   "firestore": {
@@ -178,6 +196,10 @@
     "/announcements/{announcementId}": {
       "schema": { "$ref": "#/entities/Announcement" },
       "description": "Announcements for apartments."
+    },
+    "/showerSlots/{slotId}": {
+      "schema": { "$ref": "#/entities/ShowerSlot" },
+      "description": "Shower slots for apartments."
     }
   }
 }

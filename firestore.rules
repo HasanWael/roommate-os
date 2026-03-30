@@ -114,5 +114,10 @@ service cloud.firestore {
       allow create: if isAuthenticated() && isApartmentMember(request.resource.data.apartmentId);
       allow read, update, delete: if isAuthenticated() && (isApartmentMember(resource.data.apartmentId) || isApartmentAdmin(resource.data.apartmentId) || isApartmentCreator(resource.data.apartmentId) || isGlobalAdmin());
     }
+
+    match /showerSlots/{slotId} {
+      allow create: if isAuthenticated() && isApartmentMember(request.resource.data.apartmentId);
+      allow read, update, delete: if isAuthenticated() && (isApartmentMember(resource.data.apartmentId) || isApartmentAdmin(resource.data.apartmentId) || isApartmentCreator(resource.data.apartmentId) || isGlobalAdmin());
+    }
   }
 }

@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Receipt, CheckSquare, ShoppingCart, CalendarDays, Megaphone, Users, Tv, X, LogOut, Repeat, Settings } from 'lucide-react';
+import { LayoutDashboard, Receipt, CheckSquare, ShoppingCart, CalendarDays, Megaphone, Users, Tv, X, LogOut, Repeat, Settings, Droplets } from 'lucide-react';
 import { useAuth } from '../AuthContext';
 
 interface SidebarProps {
@@ -12,6 +12,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { apartment, setApartmentId } = useAuth();
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'Shower Queue', path: '/shower-queue', icon: Droplets },
     { name: 'Bills', path: '/expenses', icon: Receipt },
     { name: 'Chores', path: '/chores', icon: CheckSquare },
     { name: 'Groceries', path: '/groceries', icon: ShoppingCart },

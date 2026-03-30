@@ -5,6 +5,7 @@ import { db } from '../firebase';
 import { collection, query, where, onSnapshot, doc, getDoc, orderBy, limit } from 'firebase/firestore';
 import { useMembers } from '../hooks/useMembers';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
+import DashboardShowerWidget from '../components/DashboardShowerWidget';
 
 export default function Dashboard() {
   const { user, apartmentId, apartment } = useAuth();
@@ -108,6 +109,8 @@ export default function Dashboard() {
           )}
         </div>
       </header>
+
+      <DashboardShowerWidget />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Bills Card */}

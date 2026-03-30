@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { db } from '../firebase';
-import { doc, deleteDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
+import { doc, deleteDoc, collection, query, where, getDocs, writeBatch, updateDoc } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
-import { AlertTriangle, Trash2 } from 'lucide-react';
+import { AlertTriangle, Trash2, Save } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -12,9 +13,33 @@ export default function Settings() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [confirmName, setConfirmName] = useState('');
   const [error, setError] = useState('');
+  const [hotWaterBuffer, setHotWaterBuffer] = useState<number>(20);
+  const [isSavingBuffer, setIsSavingBuffer] = useState(false);
+
+  useEffect(() => {
+    if (apartment?.hotWaterBuffer !== undefined) {
+      setHotWaterBuffer(apartment.hotWaterBuffer);
+    }
+  }, [apartment]);
 
   const currentMembership = memberships.find(m => m.apartmentId === apartment?.id);
   const isAdmin = apartment && (apartment.createdBy === user?.uid || currentMembership?.role === 'admin' || user?.email === 'hwmk2004@gmail.com');
+
+  const handleSaveBuffer = async () => {
+    if (!isAdmin || !apartment) return;
+    setIsSavingBuffer(true);
+    try {
+      await updateDoc(doc(db, 'apartments', apartment.id), {
+        hotWaterBuffer: Number(hotWaterBuffer)
+      });
+      toast.success('Hot water buffer updated successfully');
+    } catch (err) {
+      handleFirestoreError(err, OperationType.UPDATE, `apartments/${apartment.id}`);
+      toast.error('Failed to update hot water buffer');
+    } finally {
+      setIsSavingBuffer(false);
+    }
+  };
 
   const handleDeleteApartment = async () => {
     if (!isAdmin || !apartment || !user) return;
@@ -114,6 +139,40 @@ export default function Settings() {
                   className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors"
                 >
                   Copy Invite Link
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="p-6 border-b border-gray-100">
+            <h2 className="font-bold text-text-primary">Shower Queue Settings</h2>
+          </div>
+          <div className="p-6 space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-2">
+                Hot Water Buffer (Minutes)
+              </label>
+              <p className="text-sm text-text-secondary mb-4">
+                The mandatory gap between consecutive shower slots to allow hot water to replenish.
+              </p>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="number"
+                  min="0"
+                  max="120"
+                  value={hotWaterBuffer}
+                  onChange={(e) => setHotWaterBuffer(Number(e.target.value))}
+                  className="w-32 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                />
+                <button
+                  onClick={handleSaveBuffer}
+                  disabled={isSavingBuffer || hotWaterBuffer === apartment.hotWaterBuffer || (hotWaterBuffer === 20 && apartment.hotWaterBuffer === undefined)}
+                  className="bg-primary text-white px-4 py-3 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  {isSavingBuffer ? 'Saving...' : 'Save'}
                 </button>
               </div>
             </div>
