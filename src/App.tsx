@@ -10,6 +10,7 @@ import Groceries from './pages/Groceries';
 import Calendar from './pages/Calendar';
 import Announcements from './pages/Announcements';
 import Members from './pages/Members';
+import Settings from './pages/Settings';
 import { useAuth } from './AuthContext';
 
 export default function App() {
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="calendar" element={<Calendar />} />
           <Route path="announcements" element={<Announcements />} />
           <Route path="members" element={<Members />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
         
         <Route path="*" element={<Navigate to="/" replace />} />

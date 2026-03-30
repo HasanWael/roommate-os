@@ -5,6 +5,51 @@ import { loginWithGoogle, db } from '../firebase';
 import { collection, doc, setDoc, getDoc, writeBatch } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 
+function ApartmentCard({ membership, onSelect }: { membership: any, onSelect: () => void }) {
+  const [name, setName] = React.useState(membership.apartmentName || '');
+  const [loading, setLoading] = React.useState(!membership.apartmentName);
+
+  React.useEffect(() => {
+    if (!membership.apartmentName) {
+      const fetchName = async () => {
+        try {
+          const snap = await getDoc(doc(db, 'apartments', membership.apartmentId));
+          if (snap.exists()) {
+            setName(snap.data().name);
+          } else {
+            setName('Unknown Apartment');
+          }
+        } catch (err) {
+          console.error('Error fetching apartment name:', err);
+          setName('Apartment');
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchName();
+    }
+  }, [membership]);
+
+  return (
+    <button
+      onClick={onSelect}
+      className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:border-primary transition-all text-left group"
+    >
+      <h3 className="font-bold text-text-primary group-hover:text-primary transition-colors">
+        {loading ? (
+          <span className="flex items-center space-x-2">
+            <span className="h-4 w-24 bg-gray-100 animate-pulse rounded" />
+          </span>
+        ) : (
+          name || 'Apartment'
+        )}
+      </h3>
+      <p className="text-xs text-text-secondary mt-1">
+        Joined {new Date(membership.joinedAt).toLocaleDateString()}
+      </p>
+    </button>
+  );
+}
 export default function Auth() {
   const navigate = useNavigate();
   const { user, apartmentId, setApartmentId, memberships } = useAuth();
@@ -200,14 +245,11 @@ export default function Auth() {
             <p className="text-xs font-bold text-text-secondary uppercase tracking-wider mb-4">Your Apartments</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {memberships.map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => handleSelectApartment(m.apartmentId)}
-                  className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:border-primary transition-all text-left group"
-                >
-                  <h3 className="font-bold text-text-primary group-hover:text-primary transition-colors">{m.apartmentName || 'Apartment'}</h3>
-                  <p className="text-xs text-text-secondary mt-1">Joined {new Date(m.joinedAt).toLocaleDateString()}</p>
-                </button>
+                <ApartmentCard 
+                  key={m.id} 
+                  membership={m} 
+                  onSelect={() => handleSelectApartment(m.apartmentId)} 
+                />
               ))}
             </div>
           </div>
