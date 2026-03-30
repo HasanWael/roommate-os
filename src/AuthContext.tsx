@@ -21,6 +21,7 @@ interface AuthContextType {
   loading: boolean;
   apartmentId: string | null;
   apartment: any | null;
+  memberships: any[];
   setApartmentId: (id: string | null) => void;
 }
 
@@ -29,6 +30,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   apartmentId: null,
   apartment: null,
+  memberships: [],
   setApartmentId: () => {},
 });
 
@@ -39,6 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [apartmentId, setApartmentId] = useState<string | null>(null);
   const [apartment, setApartment] = useState<any | null>(null);
+  const [memberships, setMemberships] = useState<any[]>([]);
   const membershipUnsubscribeRef = React.useRef<(() => void) | null>(null);
   const apartmentUnsubscribeRef = React.useRef<(() => void) | null>(null);
 
@@ -114,50 +117,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         membershipUnsubscribeRef.current = onSnapshot(q, (snapshot) => {
-          console.log('Membership snapshot received, empty:', snapshot.empty, 'hasPendingWrites:', snapshot.metadata.hasPendingWrites, 'docs:', snapshot.docs.length);
+          console.log('Membership snapshot received, empty:', snapshot.empty, 'docs:', snapshot.docs.length);
           
+          const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as any));
+          docs.sort((a: any, b: any) => new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime());
+          setMemberships(docs);
+
           if (!snapshot.empty) {
-            // If we have multiple memberships, try to find one that matches current apartmentId
-            // or just pick the most recent one (joinedAt)
-            const memberships = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as any));
-            memberships.sort((a: any, b: any) => new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime());
-            
-            const newAptId = memberships[0].apartmentId;
-            console.log('Found apartmentId in snapshot:', newAptId);
+            const newAptId = docs[0].apartmentId;
             
             setApartmentId(prev => {
-              if (prev === newAptId) return prev;
+              // If we already have an apartmentId set, and it's one of our active memberships, 
+              // we should probably keep it instead of jumping to the "most recent" one
+              // unless we don't have one yet.
+              if (prev) {
+                const exists = docs.some((m: any) => m.apartmentId === prev);
+                if (exists) return prev;
+              }
+              
               console.log('Updating apartmentId from snapshot:', newAptId);
               return newAptId;
             });
           } else {
-            console.log('No membership found in snapshot');
-            // Only set to null if there are no pending writes. 
-            // If there are pending writes, it means a local write is in progress 
-            // and we should trust the manual setApartmentId or wait for the next snapshot.
             if (!snapshot.metadata.hasPendingWrites) {
-              setApartmentId(prev => {
-                if (prev === null) return null;
-                // If we just manually set it (e.g. in Auth.tsx), we might want to wait a bit
-                // before clearing it if the snapshot is empty but we expect a doc.
-                console.log('Setting apartmentId to null from snapshot (no pending writes)');
-                return null;
-              });
-            } else {
-              console.log('Snapshot is empty but has pending writes, ignoring null update');
+              setApartmentId(null);
             }
           }
-          setLoading(prev => {
-            if (!prev) return false;
-            console.log('Setting loading to false');
-            return false;
-          });
+          setLoading(false);
         }, (error) => {
           handleFirestoreError(error, OperationType.GET, 'apartmentMembers');
+          setLoading(false);
         });
       } else {
-        setApartmentId(prev => prev !== null ? null : prev);
-        setLoading(prev => prev ? false : prev);
+        setApartmentId(null);
+        setMemberships([]);
+        setLoading(false);
         if (membershipUnsubscribeRef.current) {
           membershipUnsubscribeRef.current();
           membershipUnsubscribeRef.current = null;
@@ -178,8 +172,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     apartmentId,
     apartment,
+    memberships,
     setApartmentId
-  }), [user, loading, apartmentId, apartment]);
+  }), [user, loading, apartmentId, apartment, memberships]);
 
   return (
     <AuthContext.Provider value={contextValue}>

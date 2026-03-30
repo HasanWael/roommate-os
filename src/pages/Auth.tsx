@@ -7,7 +7,7 @@ import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { user, apartmentId, setApartmentId } = useAuth();
+  const { user, apartmentId, setApartmentId, memberships } = useAuth();
   const [apartmentName, setApartmentName] = useState('');
   const [address, setAddress] = useState('');
   const [inviteCode, setInviteCode] = useState(['', '', '', '', '', '']);
@@ -19,6 +19,11 @@ export default function Auth() {
     } catch (err) {
       setError('Failed to log in with Google.');
     }
+  };
+
+  const handleSelectApartment = (id: string) => {
+    setApartmentId(id);
+    navigate('/dashboard');
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -51,6 +56,7 @@ export default function Auth() {
       const memberRef = doc(db, 'apartmentMembers', `${newAptRef.id}_${user.uid}`);
       batch.set(memberRef, {
         apartmentId: newAptRef.id,
+        apartmentName: apartmentName,
         userId: user.uid,
         fullName: user.displayName || 'New User',
         avatarUrl: user.photoURL,
@@ -120,9 +126,13 @@ export default function Auth() {
       }
 
       try {
+        const aptSnap = await getDoc(doc(db, 'apartments', aptId));
+        const aptName = aptSnap.exists() ? aptSnap.data().name : 'Apartment';
+
         console.log('Creating/Updating membership record...');
         await setDoc(memberRef, {
           apartmentId: aptId,
+          apartmentName: aptName,
           userId: user.uid,
           fullName: user.displayName || 'New User',
           avatarUrl: user.photoURL,
@@ -177,6 +187,24 @@ export default function Auth() {
         </header>
 
         {error && <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-8 text-center">{error}</div>}
+
+        {memberships.length > 0 && (
+          <div className="mb-16">
+            <p className="text-xs font-bold text-text-secondary uppercase tracking-wider mb-4">Your Apartments</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {memberships.map((m) => (
+                <button
+                  key={m.id}
+                  onClick={() => handleSelectApartment(m.apartmentId)}
+                  className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:border-primary transition-all text-left group"
+                >
+                  <h3 className="font-bold text-text-primary group-hover:text-primary transition-colors">{m.apartmentName || 'Apartment'}</h3>
+                  <p className="text-xs text-text-secondary mt-1">Joined {new Date(m.joinedAt).toLocaleDateString()}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24">
           {/* Create Apartment */}

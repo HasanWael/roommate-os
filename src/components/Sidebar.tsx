@@ -1,5 +1,5 @@
-import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Receipt, CheckSquare, ShoppingCart, CalendarDays, Megaphone, Users, Tv, X } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, Receipt, CheckSquare, ShoppingCart, CalendarDays, Megaphone, Users, Tv, X, LogOut, Repeat } from 'lucide-react';
 import { useAuth } from '../AuthContext';
 
 interface SidebarProps {
@@ -8,7 +8,8 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
-  const { apartment } = useAuth();
+  const navigate = useNavigate();
+  const { apartment, setApartmentId } = useAuth();
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Bills', path: '/expenses', icon: Receipt },
@@ -16,6 +17,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     { name: 'Groceries', path: '/groceries', icon: ShoppingCart },
     { name: 'Calendar', path: '/calendar', icon: CalendarDays },
   ];
+
+  const handleSwitchApartment = () => {
+    setApartmentId(null);
+    onClose();
+    navigate('/auth');
+  };
 
   return (
     <aside className={`
@@ -80,6 +87,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           <Tv className="mr-3 h-5 w-5" />
           TV Mode
         </NavLink>
+        <button 
+          onClick={handleSwitchApartment}
+          className="w-full flex items-center px-4 py-3 text-sm font-medium text-text-secondary hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          <Repeat className="mr-3 h-5 w-5" />
+          Switch Apartment
+        </button>
       </div>
     </aside>
   );
