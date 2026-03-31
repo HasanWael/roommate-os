@@ -7,11 +7,12 @@ interface EmptyStateProps {
   description: string;
   actionLabel?: string;
   onAction?: () => void;
+  compact?: boolean;
 }
 
-export default function EmptyState({ icon: Icon, title, description, actionLabel, onAction }: EmptyStateProps) {
+export default function EmptyState({ icon: Icon, title, description, actionLabel, onAction, compact }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 text-center">
+    <div className={`flex flex-col items-center justify-center ${compact ? 'py-6' : 'py-12'} text-center`}>
       <div className="bg-gray-50 p-4 rounded-full mb-4">
         <Icon className="h-8 w-8 text-gray-400" />
       </div>

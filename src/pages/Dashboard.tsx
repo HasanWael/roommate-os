@@ -142,13 +142,13 @@ export default function Dashboard() {
     <div className="max-w-6xl mx-auto space-y-8">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-5xl font-extrabold text-text-primary tracking-tight">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-text-primary tracking-tight">
             {t('dashboard.greeting')}, <span className="text-primary">{(() => {
               const currentUserMember = members.find(m => m.userId === user?.uid);
               return currentUserMember?.user?.fullName || user?.displayName || t('dashboard.roommate');
             })()}</span>.
           </h1>
-          <p className="text-text-secondary mt-3 text-xl max-w-2xl">
+          <p className="text-text-secondary mt-2 md:mt-3 text-lg md:text-xl max-w-2xl leading-relaxed">
             {t('dashboard.statusText1')} <span className="font-semibold text-text-primary">{apartment?.name || t('dashboard.yourApartment')}</span> {t('dashboard.statusText2')}
           </p>
         </div>
@@ -183,12 +183,12 @@ export default function Dashboard() {
             <div className="p-3 bg-warning-light rounded-2xl border border-warning-light">
               <Receipt className="h-8 w-8 text-warning-dark" />
             </div>
-            <span className="bg-warning-light text-warning-dark text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-widest">
+            <span className="bg-warning-light text-warning-dark text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 md:py-1.5 rounded-full uppercase tracking-widest">
               {expenses.length} {t('dashboard.pending')}
             </span>
           </div>
-          <h3 className="text-2xl font-bold mb-1 text-text-primary">{t('dashboard.billsTitle')}</h3>
-          <p className="text-text-secondary text-sm mb-8">{t('dashboard.totalOutstanding')}: <span className="font-bold text-text-primary">EGP {formatCurrency(expenses.reduce((sum, e) => sum + e.amount, 0), 2)}</span></p>
+          <h3 className="text-xl md:text-2xl font-bold mb-1 text-text-primary">{t('dashboard.billsTitle')}</h3>
+          <p className="text-text-secondary text-xs md:text-sm mb-6 md:mb-8">{t('dashboard.totalOutstanding')}: <span className="font-bold text-text-primary">EGP {formatCurrency(expenses.reduce((sum, e) => sum + e.amount, 0), 2)}</span></p>
           
           <div className="mt-auto space-y-4">
             {expenses.slice(0, 2).map(expense => (
@@ -211,12 +211,12 @@ export default function Dashboard() {
             <div className="p-3 bg-info-light rounded-2xl border border-info-light">
               <CheckSquare className="h-8 w-8 text-info-dark" />
             </div>
-            <span className="bg-info-light text-info-dark text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-widest">
+            <span className="bg-info-light text-info-dark text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 md:py-1.5 rounded-full uppercase tracking-widest">
               {pendingChores.length} {t('dashboard.active')}
             </span>
           </div>
-          <h3 className="text-2xl font-bold mb-1 text-text-primary">{t('dashboard.choresTitle')}</h3>
-          <p className="text-text-secondary text-sm mb-6">{t('dashboard.nextUp')}: <span className="font-bold text-text-primary">{nextUpText}</span></p>
+          <h3 className="text-xl md:text-2xl font-bold mb-1 text-text-primary">{t('dashboard.choresTitle')}</h3>
+          <p className="text-text-secondary text-xs md:text-sm mb-4 md:mb-6">{t('dashboard.nextUp')}: <span className="font-bold text-text-primary">{nextUpText}</span></p>
           
           <div className="space-y-3 mb-6 flex-1">
             {pendingChores.slice(0, 3).map(chore => {
@@ -278,12 +278,12 @@ export default function Dashboard() {
             <div className="p-3 bg-success-light rounded-2xl border border-success-light">
               <ShoppingCart className="h-8 w-8 text-success-dark" />
             </div>
-            <span className="bg-success-light text-success-dark text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-widest">
+            <span className="bg-success-light text-success-dark text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 md:py-1.5 rounded-full uppercase tracking-widest">
               {neededGroceries.length} {t('dashboard.items')}
             </span>
           </div>
-          <h3 className="text-2xl font-bold mb-1 text-text-primary">{t('dashboard.groceriesTitle')}</h3>
-          <p className="text-text-secondary text-sm mb-6">{neededGroceries.length} {t('dashboard.itemsNeeded')}</p>
+          <h3 className="text-xl md:text-2xl font-bold mb-1 text-text-primary">{t('dashboard.groceriesTitle')}</h3>
+          <p className="text-text-secondary text-xs md:text-sm mb-4 md:mb-6">{neededGroceries.length} {t('dashboard.itemsNeeded')}</p>
           
           <ul className="space-y-3 mb-6 flex-1">
             {neededGroceries.slice(0, 3).map(item => {
@@ -338,10 +338,10 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Schedule */}
-        <div className="lg:col-span-3 bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-          <div className="flex justify-between items-center mb-8">
-            <h3 className="text-2xl font-bold text-text-primary">{t('dashboard.upcomingEvents')}</h3>
-            <button className="text-sm font-bold text-primary hover:text-primary-dark transition-colors flex items-center uppercase">
+        <div className="lg:col-span-3 bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100">
+          <div className="flex justify-between items-center mb-6 md:mb-8">
+            <h3 className="text-xl md:text-2xl font-bold text-text-primary">{t('dashboard.upcomingEvents')}</h3>
+            <button className="text-[10px] md:text-sm font-bold text-primary hover:text-primary-dark transition-colors flex items-center uppercase">
               {t('dashboard.fullCalendar')}
               <CalendarDays className={`${i18n.language === 'ar' ? 'mr-2' : 'ml-2'} h-4 w-4`} />
             </button>

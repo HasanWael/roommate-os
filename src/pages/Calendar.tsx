@@ -98,55 +98,55 @@ export default function Calendar() {
   if (loading) return <LoadingScreen message={t('dashboard.loading')} />;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <header className="flex justify-between items-center">
+    <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-text-primary tracking-tight flex items-center gap-3">
-            <CalendarDays className="h-8 w-8 text-primary" />
+          <h1 className="text-2xl md:text-3xl font-bold text-text-primary tracking-tight flex items-center gap-3">
+            <CalendarDays className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             {t('calendar.title')}
           </h1>
-          <p className="text-text-secondary mt-1">
+          <p className="text-text-secondary mt-1 text-sm md:text-base">
             {t('calendar.description')}
           </p>
         </div>
         <button 
           onClick={() => setIsAdding(!isAdding)}
-          className="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium flex items-center transition-colors"
+          className="w-full sm:w-auto bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center transition-colors text-sm md:text-base"
         >
-          <Plus className={`h-5 w-5 ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+          <Plus className={`h-4 w-4 md:h-5 md:w-5 ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`} />
           {isAdding ? t('calendar.cancel') : t('calendar.addEvent')}
         </button>
       </header>
 
       {isAdding && (
-        <form onSubmit={handleAddEvent} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-wrap gap-4 items-end">
+        <form onSubmit={handleAddEvent} className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row flex-wrap gap-4 items-stretch sm:items-end">
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-text-secondary mb-1">{t('calendar.eventTitle')}</label>
+            <label className="block text-xs md:text-sm font-medium text-text-secondary mb-1">{t('calendar.eventTitle')}</label>
             <input 
               type="text" 
               value={newEventTitle}
               onChange={(e) => setNewEventTitle(e.target.value)}
-              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm md:text-base"
               placeholder={t('calendar.eventTitlePlaceholder')}
               required
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1">{t('calendar.dateTime')}</label>
+          <div className="flex-1 min-w-[200px]">
+            <label className="block text-xs md:text-sm font-medium text-text-secondary mb-1">{t('calendar.dateTime')}</label>
             <input 
               type="datetime-local" 
               value={newEventDate}
               onChange={(e) => setNewEventDate(e.target.value)}
-              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm md:text-base"
               required
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1">{t('calendar.type')}</label>
+          <div className="flex-1 min-w-[150px]">
+            <label className="block text-xs md:text-sm font-medium text-text-secondary mb-1">{t('calendar.type')}</label>
             <select 
               value={newEventType}
               onChange={(e) => setNewEventType(e.target.value)}
-              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm md:text-base"
             >
               <option value="general">{t('calendar.general')}</option>
               <option value="maintenance">{t('calendar.maintenance')}</option>
@@ -154,12 +154,12 @@ export default function Calendar() {
               <option value="bill">{t('calendar.bill')}</option>
             </select>
           </div>
-          <div className="w-48">
-            <label className="block text-sm font-medium text-text-secondary mb-1">{t('calendar.assignTo')}</label>
+          <div className="flex-1 min-w-[150px]">
+            <label className="block text-xs md:text-sm font-medium text-text-secondary mb-1">{t('calendar.assignTo')}</label>
             <select
               value={assignedToUserId}
               onChange={(e) => setAssignedToUserId(e.target.value)}
-              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm md:text-base"
             >
               <option value="">{t('calendar.everyone')}</option>
               {members.map(member => (
@@ -169,42 +169,42 @@ export default function Calendar() {
               ))}
             </select>
           </div>
-          <button type="submit" className="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors">
+          <button type="submit" className="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors text-sm md:text-base">
             {t('calendar.save')}
           </button>
         </form>
       )}
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-          <h2 className="font-bold text-text-primary">{t('calendar.upcomingEvents')}</h2>
-          <div className="text-sm font-medium text-text-secondary">
+        <div className="p-4 md:p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+          <h2 className="font-bold text-text-primary text-sm md:text-base">{t('calendar.upcomingEvents')}</h2>
+          <div className="text-xs md:text-sm font-medium text-text-secondary">
             {t('calendar.total')} <span className="text-text-primary font-bold">{events.length}</span>
           </div>
         </div>
         
         <div className="divide-y divide-gray-100">
           {events.map((event) => (
-            <div key={event.id} className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
-              <div className="flex items-center space-x-6 rtl:space-x-reverse">
-                <div className="text-center">
-                  <p className="text-xs font-bold text-text-secondary uppercase tracking-wider mb-1">
+            <div key={event.id} className="p-4 md:p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
+              <div className="flex items-center space-x-3 md:space-x-6 rtl:space-x-reverse min-w-0">
+                <div className="text-center flex-shrink-0">
+                  <p className="text-[10px] md:text-xs font-bold text-text-secondary uppercase tracking-wider mb-0.5 md:mb-1">
                     {event.startDatetime ? format(new Date(event.startDatetime), 'MMM', { locale: dateLocale }) : ''}
                   </p>
-                  <p className="text-3xl font-bold text-text-primary">
+                  <p className="text-xl md:text-3xl font-bold text-text-primary">
                     {event.startDatetime ? format(new Date(event.startDatetime), 'd', { locale: dateLocale }) : ''}
                   </p>
                 </div>
-                <div>
-                  <h3 className="font-bold text-text-primary text-lg">{event.title}</h3>
-                  <div className="flex items-center mt-1 space-x-2 rtl:space-x-reverse">
-                    <p className="text-sm text-text-secondary flex items-center">
-                      <Clock className={`h-4 w-4 ${i18n.language === 'ar' ? 'ml-1' : 'mr-1'}`} />
+                <div className="min-w-0">
+                  <h3 className="font-bold text-text-primary text-base md:text-lg truncate">{event.title}</h3>
+                  <div className="flex flex-col sm:flex-row sm:items-center mt-1 sm:space-x-2 rtl:sm:space-x-reverse gap-1 sm:gap-0">
+                    <p className="text-xs md:text-sm text-text-secondary flex items-center">
+                      <Clock className={`h-3 w-3 md:h-4 md:w-4 ${i18n.language === 'ar' ? 'ml-1' : 'mr-1'}`} />
                       {event.startDatetime ? format(new Date(event.startDatetime), 'h:mm a', { locale: dateLocale }) : ''}
                     </p>
                     {event.assignedToUserId && (
-                      <div className={`flex items-center space-x-1 rtl:space-x-reverse ${i18n.language === 'ar' ? 'border-r pr-2' : 'border-l pl-2'} border-gray-200`}>
-                        <div className="h-4 w-4 rounded-full bg-primary text-white flex items-center justify-center text-[8px] font-bold overflow-hidden">
+                      <div className={`flex items-center space-x-1 rtl:space-x-reverse sm:border-l sm:pl-2 rtl:sm:pl-0 rtl:sm:pr-2 sm:border-gray-200`}>
+                        <div className="h-3 w-3 md:h-4 md:w-4 rounded-full bg-primary text-white flex items-center justify-center text-[6px] md:text-[8px] font-bold overflow-hidden flex-shrink-0">
                           {(() => {
                             const assigned = members.find(m => m.userId === event.assignedToUserId);
                             if (assigned?.user?.avatarUrl) {
@@ -213,23 +213,23 @@ export default function Calendar() {
                             return getAssignedUserName(event.assignedToUserId).charAt(0);
                           })()}
                         </div>
-                        <span className="text-sm text-text-secondary">{t('calendar.for')} {getAssignedUserName(event.assignedToUserId)}</span>
+                        <span className="text-[10px] md:text-sm text-text-secondary truncate">{t('calendar.for')} {getAssignedUserName(event.assignedToUserId)}</span>
                       </div>
                     )}
                   </div>
                 </div>
               </div>
               
-              <div className="flex items-center gap-4">
-                <span className="text-xs font-bold px-3 py-1 bg-gray-200 text-text-primary rounded-full uppercase tracking-wider">
+              <div className="flex items-center gap-2 md:gap-4 ml-2 rtl:ml-0 rtl:mr-2">
+                <span className="text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 bg-gray-200 text-text-primary rounded-full uppercase tracking-wider flex-shrink-0">
                   {t(`calendar.${event.eventType}`)}
                 </span>
                 <button 
                   onClick={() => confirmDelete(event.id)}
-                  className="text-gray-400 hover:text-red-500 transition-colors p-2"
+                  className="text-gray-400 hover:text-red-500 transition-colors p-1 md:p-2 flex-shrink-0"
                   title={t('calendar.deleteEvent')}
                 >
-                  <Trash2 className="h-5 w-5" />
+                  <Trash2 className="h-4 w-4 md:h-5 md:w-5" />
                 </button>
               </div>
             </div>

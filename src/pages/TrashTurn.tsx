@@ -125,14 +125,14 @@ export default function TrashTurn() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 p-4 md:p-8 pb-32">
+    <div className="max-w-4xl mx-auto space-y-6 md:space-y-8 p-4 md:p-8 pb-32">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-text-primary tracking-tight flex items-center gap-3">
-            <Trash2 className="h-8 w-8 text-primary" />
+          <h1 className="text-2xl md:text-3xl font-bold text-text-primary tracking-tight flex items-center gap-3">
+            <Trash2 className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             {t('trashTurn.trashTurnTitle')}
           </h1>
-          <p className="text-text-secondary mt-1">
+          <p className="text-text-secondary mt-1 text-sm md:text-base">
             {t('trashTurn.nextPersonNotified')}
           </p>
         </div>
@@ -140,13 +140,13 @@ export default function TrashTurn() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Controls */}
-        <div className="lg:col-span-2 space-y-8">
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
-              <Trash2 className="h-24 w-24" />
+        <div className="lg:col-span-2 space-y-6 md:space-y-8">
+          <div className="bg-white rounded-3xl p-4 md:p-6 shadow-sm border border-gray-100 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 md:p-6 opacity-5 pointer-events-none">
+              <Trash2 className="h-16 w-16 md:h-24 md:w-24" />
             </div>
             
-            <h3 className="font-bold text-text-primary mb-4 relative z-10">
+            <h3 className="font-bold text-text-primary mb-3 md:mb-4 relative z-10 text-sm md:text-base">
               {t('trashTurn.currentTurn')}
             </h3>
 
@@ -157,9 +157,9 @@ export default function TrashTurn() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
-                  className="flex flex-col md:flex-row items-center gap-4 relative z-10"
+                  className="flex flex-col md:flex-row items-center gap-3 md:gap-4 relative z-10"
                 >
-                  <div className="h-12 w-12 rounded-full bg-success text-white flex items-center justify-center font-bold text-lg shadow-xl shadow-success/20 ring-4 ring-success/10 overflow-hidden">
+                  <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-success text-white flex items-center justify-center font-bold text-base md:text-lg shadow-xl shadow-success/20 ring-4 ring-success/10 overflow-hidden">
                     {currentTurner.user?.avatarUrl ? (
                       <img src={currentTurner.user.avatarUrl} alt="" className="h-full w-full object-cover" />
                     ) : (
@@ -167,10 +167,10 @@ export default function TrashTurn() {
                     )}
                   </div>
                   <div className="text-center md:text-left flex-1">
-                    <h2 className="text-xl font-bold text-text-primary">
+                    <h2 className="text-lg md:text-xl font-bold text-text-primary">
                       {currentTurner.user?.fullName}
                     </h2>
-                    <p className="text-success-dark font-bold text-sm">
+                    <p className="text-success-dark font-bold text-xs md:text-sm">
                       {t('trashTurn.trashTurnTitle')}
                     </p>
                   </div>
@@ -178,25 +178,25 @@ export default function TrashTurn() {
                     <button
                       disabled={currentTurner?.userId !== user?.uid}
                       onClick={markAsDone}
-                      className={`flex-1 md:flex-none px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 ${
+                      className={`flex-1 md:flex-none px-4 md:px-5 py-2 md:py-2.5 rounded-xl font-bold text-xs md:text-sm transition-all shadow-md flex items-center justify-center gap-2 ${
                         currentTurner?.userId === user?.uid
                           ? 'bg-primary text-white hover:bg-primary-dark active:scale-95'
                           : 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none'
                       }`}
                     >
-                      <CheckCircle2 className="h-4 w-4" />
+                      <CheckCircle2 className="h-3.5 w-3.5 md:h-4 md:w-4" />
                       {t('trashTurn.markAsDone')}
                     </button>
                     <button
                       onClick={iThrewIt}
-                      className="flex-1 md:flex-none px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-gray-200 text-text-primary hover:bg-gray-50 active:scale-95 flex items-center justify-center gap-2"
+                      className="flex-1 md:flex-none px-4 md:px-5 py-2 md:py-2.5 rounded-xl font-bold text-xs md:text-sm transition-all border border-gray-200 text-text-primary hover:bg-gray-50 active:scale-95 flex items-center justify-center gap-2"
                     >
                       {t('trashTurn.iThrewIt')}
                     </button>
                   </div>
                 </motion.div>
               ) : (
-                <div className="py-8 text-center text-text-secondary italic text-base">
+                <div className="py-6 md:py-8 text-center text-text-secondary italic text-sm md:text-base">
                   {t('trashTurn.noRotation')}
                 </div>
               )}
@@ -204,8 +204,8 @@ export default function TrashTurn() {
           </div>
 
           {/* Rotation List */}
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-            <h3 className="font-bold text-text-primary mb-6">
+          <div className="bg-white rounded-3xl p-4 md:p-6 shadow-sm border border-gray-100">
+            <h3 className="font-bold text-text-primary mb-4 md:mb-6 text-sm md:text-base">
               {t('trashTurn.rotationOrder')}
             </h3>
             <div className="flex flex-col gap-2">
@@ -219,17 +219,17 @@ export default function TrashTurn() {
                 return (
                   <div 
                     key={uid} 
-                    className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
+                    className={`flex items-center justify-between p-2 md:p-3 rounded-xl border transition-all ${
                       isCurrent 
                         ? 'border-success bg-success/5 ring-1 ring-success/20' 
                         : 'border-gray-50 bg-gray-50/30'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-6 text-xs font-bold text-text-secondary opacity-50">
+                    <div className="flex items-center gap-2 md:gap-3">
+                      <div className="w-5 md:w-6 text-[10px] md:text-xs font-bold text-text-secondary opacity-50">
                         {(index + 1).toString().padStart(2, '0')}
                       </div>
-                      <div className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-xs overflow-hidden shadow-sm ${
+                      <div className={`h-7 w-7 md:h-8 md:w-8 rounded-full flex items-center justify-center font-bold text-[10px] md:text-xs overflow-hidden shadow-sm ${
                         isUserAway ? 'bg-gray-200 text-gray-400' : 'bg-white text-text-primary'
                       }`}>
                         {member.user?.avatarUrl ? (
@@ -239,18 +239,18 @@ export default function TrashTurn() {
                         )}
                       </div>
                       <div>
-                        <div className="flex items-center gap-2">
-                          <p className={`font-bold text-sm ${isUserAway ? 'text-gray-400 line-through' : 'text-text-primary'}`}>
+                        <div className="flex items-center gap-1.5 md:gap-2">
+                          <p className={`font-bold text-xs md:text-sm ${isUserAway ? 'text-gray-400 line-through' : 'text-text-primary'}`}>
                             {member.user?.fullName}
                           </p>
                           {isCurrent && (
-                            <span className="text-[10px] bg-success text-white px-1.5 py-0.5 rounded-md uppercase font-black tracking-tighter">
+                            <span className="text-[8px] md:text-[10px] bg-success text-white px-1 md:px-1.5 py-0.5 rounded-md uppercase font-black tracking-tighter">
                               {t('dashboard.active')}
                             </span>
                           )}
                         </div>
                         {isUserAway && (
-                          <span className="text-[9px] text-gray-500 uppercase font-bold">
+                          <span className="text-[8px] md:text-[9px] text-gray-500 uppercase font-bold">
                             {t('trashTurn.away')} — {t('trashTurn.outOfTurn')}
                           </span>
                         )}
@@ -258,14 +258,14 @@ export default function TrashTurn() {
                     </div>
                     <button
                       onClick={() => toggleAway(memberId, isUserAway)}
-                      className={`p-1.5 rounded-lg transition-all ${
+                      className={`p-1 md:p-1.5 rounded-lg transition-all ${
                         isUserAway 
                           ? 'bg-text-primary text-white hover:bg-black' 
                           : 'bg-white text-text-secondary border border-gray-100 hover:border-text-primary hover:text-text-primary'
                       }`}
                       title={isUserAway ? t('trashTurn.markAvailable') : t('trashTurn.markAway')}
                     >
-                      {isUserAway ? <UserCheck className="h-4 w-4" /> : <UserMinus className="h-4 w-4" />}
+                      {isUserAway ? <UserCheck className="h-3.5 w-3.5 md:h-4 md:w-4" /> : <UserMinus className="h-3.5 w-3.5 md:h-4 md:w-4" />}
                     </button>
                   </div>
                 );
@@ -275,25 +275,25 @@ export default function TrashTurn() {
         </div>
 
         {/* Sidebar Info */}
-        <div className="space-y-8">
+        <div className="space-y-6 md:space-y-8">
           {/* History */}
-          <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-3 mb-8">
-              <History className="h-6 w-6 text-text-secondary" />
-              <h3 className="font-bold text-text-primary">
+          <div className="bg-white rounded-3xl p-4 md:p-8 shadow-sm border border-gray-100">
+            <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-8">
+              <History className="h-5 w-5 md:h-6 md:w-6 text-text-secondary" />
+              <h3 className="font-bold text-text-primary text-sm md:text-base">
                 {t('trashTurn.history')}
               </h3>
             </div>
-            <div className="space-y-6">
+            <div className="space-y-4 md:space-y-6">
               {history.map((item) => (
                 <div key={item.id} className="flex items-start justify-between group">
-                  <div>
-                    <p className="font-bold text-text-primary text-sm">{item.userName}</p>
-                    <p className="text-xs text-text-secondary mt-1">
+                  <div className="min-w-0">
+                    <p className="font-bold text-text-primary text-xs md:text-sm truncate">{item.userName}</p>
+                    <p className="text-[10px] md:text-xs text-text-secondary mt-0.5 md:mt-1">
                       {item.createdAt ? format(item.createdAt.toDate(), 'MMM d, h:mm a') : '...'}
                     </p>
                   </div>
-                  <span className={`px-3 py-1 rounded-full font-black text-[10px] uppercase tracking-tighter ${
+                  <span className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full font-black text-[8px] md:text-[10px] uppercase tracking-tighter flex-shrink-0 ${
                     item.isOutOfTurn 
                       ? 'bg-gray-100 text-gray-500' 
                       : 'bg-success/10 text-success-dark'
@@ -303,8 +303,8 @@ export default function TrashTurn() {
                 </div>
               ))}
               {history.length === 0 && !loading && (
-                <div className="text-center py-8">
-                  <p className="text-sm text-text-secondary italic">{t('trashTurn.noHistory')}</p>
+                <div className="text-center py-6 md:py-8">
+                  <p className="text-xs md:text-sm text-text-secondary italic">{t('trashTurn.noHistory')}</p>
                 </div>
               )}
             </div>

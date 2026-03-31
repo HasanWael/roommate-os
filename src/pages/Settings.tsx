@@ -121,24 +121,24 @@ export default function Settings() {
   }
 
   return (
-    <div className="p-8 max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold text-text-primary mb-2">{t('settings.title')}</h1>
-      <p className="text-text-secondary mb-8">{t('settings.description')}</p>
+    <div className="p-4 md:p-8 max-w-2xl mx-auto pb-32">
+      <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-2">{t('settings.title')}</h1>
+      <p className="text-sm md:text-base text-text-secondary mb-6 md:mb-8">{t('settings.description')}</p>
 
-      <div className="space-y-8">
+      <div className="space-y-6 md:space-y-8">
         {/* Language Settings */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-6 border-b border-gray-100 flex items-center">
+          <div className="p-4 md:p-6 border-b border-gray-100 flex items-center">
             <Globe className={`w-5 h-5 ${i18n.language === 'ar' ? 'ml-3' : 'mr-3'} text-primary`} />
-            <h2 className="font-bold text-text-primary">{t('settings.languageSettings')}</h2>
+            <h2 className="font-bold text-text-primary text-sm md:text-base">{t('settings.languageSettings')}</h2>
           </div>
-          <div className="p-6 space-y-4">
+          <div className="p-4 md:p-6 space-y-4">
             <div>
-              <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-2">
+              <label className="block text-[10px] md:text-xs font-bold text-text-primary uppercase tracking-wider mb-2">
                 {t('settings.appLanguage')}
               </label>
               <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                <LanguageSwitcher className="bg-gray-50 border border-gray-200 px-4 py-2" />
+                <LanguageSwitcher className="bg-gray-50 border border-gray-200 px-3 md:px-4 py-2 text-sm" />
               </div>
             </div>
           </div>
@@ -146,23 +146,23 @@ export default function Settings() {
 
         {/* Invitation */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-6 border-b border-gray-100">
-            <h2 className="font-bold text-text-primary">{t('settings.invitation')}</h2>
+          <div className="p-4 md:p-6 border-b border-gray-100">
+            <h2 className="font-bold text-text-primary text-sm md:text-base">{t('settings.invitation')}</h2>
           </div>
-          <div className="p-6 space-y-4">
+          <div className="p-4 md:p-6 space-y-4">
             <div>
-              <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-2">
+              <label className="block text-[10px] md:text-xs font-bold text-text-primary uppercase tracking-wider mb-2">
                 {t('settings.inviteCode')}
               </label>
-              <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                <code className="bg-gray-100 px-4 py-2 rounded-lg font-mono text-lg">{apartment.inviteCode}</code>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:space-x-2 rtl:sm:space-x-reverse">
+                <code className="w-full sm:w-auto bg-gray-100 px-4 py-2 rounded-lg font-mono text-base md:text-lg text-center sm:text-left">{apartment.inviteCode}</code>
                 <button
                   onClick={() => {
                     const link = `${window.location.origin}/auth?inviteCode=${apartment.inviteCode}`;
                     navigator.clipboard.writeText(link);
                     toast.success(t('settings.inviteCopied'));
                   }}
-                  className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors"
+                  className="w-full sm:w-auto bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors"
                 >
                   {t('settings.copyInviteLink')}
                 </button>
@@ -172,15 +172,15 @@ export default function Settings() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-6 border-b border-gray-100">
-            <h2 className="font-bold text-text-primary">{t('settings.showerQueueSettings')}</h2>
+          <div className="p-4 md:p-6 border-b border-gray-100">
+            <h2 className="font-bold text-text-primary text-sm md:text-base">{t('settings.showerQueueSettings')}</h2>
           </div>
-          <div className="p-6 space-y-4">
+          <div className="p-4 md:p-6 space-y-4">
             <div>
-              <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-2">
+              <label className="block text-[10px] md:text-xs font-bold text-text-primary uppercase tracking-wider mb-2">
                 {t('settings.hotWaterBuffer')}
               </label>
-              <p className="text-sm text-text-secondary mb-4">
+              <p className="text-xs md:text-sm text-text-secondary mb-4">
                 {t('settings.hotWaterBufferDesc')}
               </p>
               <div className="flex items-center space-x-2 rtl:space-x-reverse">
@@ -190,12 +190,12 @@ export default function Settings() {
                   max="120"
                   value={hotWaterBuffer}
                   onChange={(e) => setHotWaterBuffer(Number(e.target.value))}
-                  className="w-32 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                  className="w-24 md:w-32 bg-gray-50 border border-gray-200 rounded-lg px-3 md:px-4 py-2.5 md:py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
                 />
                 <button
                   onClick={handleSaveBuffer}
                   disabled={isSavingBuffer || hotWaterBuffer === apartment.hotWaterBuffer || (hotWaterBuffer === 20 && apartment.hotWaterBuffer === undefined)}
-                  className="bg-primary text-white px-4 py-3 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                  className="flex-1 sm:flex-none bg-primary text-white px-4 py-2.5 md:py-3 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                 >
                   <Save className={`w-4 h-4 ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`} />
                   {isSavingBuffer ? t('settings.saving') : t('settings.save')}
@@ -206,22 +206,22 @@ export default function Settings() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-red-100 overflow-hidden">
-          <div className="p-6 bg-red-50 border-b border-red-100 flex items-center">
+          <div className="p-4 md:p-6 bg-red-50 border-b border-red-100 flex items-center">
             <AlertTriangle className={`text-red-600 ${i18n.language === 'ar' ? 'ml-3' : 'mr-3'} h-5 w-5`} />
-            <h2 className="font-bold text-red-900">{t('settings.dangerZone')}</h2>
+            <h2 className="font-bold text-red-900 text-sm md:text-base">{t('settings.dangerZone')}</h2>
           </div>
-          <div className="p-6 space-y-6">
+          <div className="p-4 md:p-6 space-y-6">
             <div>
-              <h3 className="text-lg font-bold text-text-primary mb-2">{t('settings.deleteApartment')}</h3>
-              <p className="text-sm text-text-secondary mb-4">
+              <h3 className="text-base md:text-lg font-bold text-text-primary mb-2">{t('settings.deleteApartment')}</h3>
+              <p className="text-xs md:text-sm text-text-secondary mb-4">
                 {t('settings.deleteWarning1')} <strong>{apartment.name}</strong> {t('settings.deleteWarning2')}
               </p>
               
-              {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+              {error && <p className="text-red-500 text-xs md:text-sm mb-4">{error}</p>}
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-2">
+                  <label className="block text-[10px] md:text-xs font-bold text-text-primary uppercase tracking-wider mb-2">
                     {t('settings.typeToConfirm')} "{apartment.name}"
                   </label>
                   <input
@@ -229,14 +229,14 @@ export default function Settings() {
                     value={confirmName}
                     onChange={(e) => setConfirmName(e.target.value)}
                     placeholder={apartment.name}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 md:py-3 text-sm focus:ring-2 focus:ring-red-500 outline-none transition-all"
                   />
                 </div>
                 
                 <button
                   onClick={handleDeleteApartment}
                   disabled={isDeleting || confirmName !== apartment.name}
-                  className={`w-full flex items-center justify-center px-4 py-3 rounded-lg font-bold text-sm transition-all ${
+                  className={`w-full flex items-center justify-center px-4 py-2.5 md:py-3 rounded-lg font-bold text-sm transition-all ${
                     confirmName === apartment.name 
                       ? 'bg-red-600 hover:bg-red-700 text-white shadow-sm' 
                       : 'bg-gray-100 text-gray-400 cursor-not-allowed'

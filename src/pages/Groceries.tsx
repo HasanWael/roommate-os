@@ -109,60 +109,60 @@ export default function Groceries() {
   if (loading) return <LoadingScreen message={t('dashboard.loading')} />;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <header className="flex justify-between items-center">
+    <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-text-primary tracking-tight flex items-center gap-3">
-            <ShoppingCart className="h-8 w-8 text-primary" />
+          <h1 className="text-2xl md:text-3xl font-bold text-text-primary tracking-tight flex items-center gap-3">
+            <ShoppingCart className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             {t('groceries.title')}
           </h1>
-          <p className="text-text-secondary mt-1">
+          <p className="text-text-secondary mt-1 text-sm md:text-base">
             {t('groceries.description')}
           </p>
         </div>
         <button 
           onClick={() => setIsAdding(!isAdding)}
-          className="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium flex items-center transition-colors"
+          className="w-full sm:w-auto bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center transition-colors text-sm md:text-base"
         >
-          <Plus className={`h-5 w-5 ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+          <Plus className={`h-4 w-4 md:h-5 md:w-5 ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`} />
           {isAdding ? t('groceries.cancel') : t('groceries.addItem')}
         </button>
       </header>
 
       {isAdding && (
-        <form onSubmit={handleAddItem} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex gap-4 items-end">
+        <form onSubmit={handleAddItem} className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
           <div className="flex-1">
-            <label className="block text-sm font-medium text-text-secondary mb-1">{t('groceries.itemName')}</label>
+            <label className="block text-xs md:text-sm font-medium text-text-secondary mb-1">{t('groceries.itemName')}</label>
             <input 
               type="text" 
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
-              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm md:text-base"
               placeholder={t('groceries.itemNamePlaceholder')}
               required
             />
           </div>
-          <div className="w-24">
-            <label className="block text-sm font-medium text-text-secondary mb-1">{t('groceries.quantity')}</label>
+          <div className="w-full sm:w-24">
+            <label className="block text-xs md:text-sm font-medium text-text-secondary mb-1">{t('groceries.quantity')}</label>
             <input 
               type="number" 
               min="1"
               value={newItemQuantity}
               onChange={(e) => setNewItemQuantity(e.target.value)}
-              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm md:text-base"
               required
             />
           </div>
-          <button type="submit" className="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors">
+          <button type="submit" className="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors text-sm md:text-base">
             {t('groceries.save')}
           </button>
         </form>
       )}
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-          <h2 className="font-bold text-text-primary">{t('groceries.neededItems')}</h2>
-          <div className="text-sm font-medium text-text-secondary">
+        <div className="p-4 md:p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+          <h2 className="font-bold text-text-primary text-sm md:text-base">{t('groceries.neededItems')}</h2>
+          <div className="text-xs md:text-sm font-medium text-text-secondary">
             {t('groceries.total')} <span className="text-text-primary font-bold">{groceries.filter(g => g.status === 'needed').length}</span>
           </div>
         </div>
@@ -171,33 +171,33 @@ export default function Groceries() {
           {groceries.filter(g => g.status !== 'purchased').map((item) => {
             const isCompleting = completingItems.has(item.id);
             return (
-            <div key={item.id} className={`p-6 flex items-center justify-between transition-all duration-500 ${isCompleting ? 'bg-gray-50 opacity-60 scale-[0.99]' : 'hover:bg-gray-50'}`}>
-              <div className="flex items-center space-x-4 rtl:space-x-reverse">
+            <div key={item.id} className={`p-4 md:p-6 flex items-center justify-between transition-all duration-500 ${isCompleting ? 'bg-gray-50 opacity-60 scale-[0.99]' : 'hover:bg-gray-50'}`}>
+              <div className="flex items-center space-x-3 md:space-x-4 rtl:space-x-reverse min-w-0">
                 <button 
                   onClick={() => toggleItemStatus(item.id)}
-                  className="h-8 w-8 rounded-full border-2 border-gray-300 hover:border-primary flex items-center justify-center transition-colors"
+                  className="h-6 w-6 md:h-8 md:w-8 rounded-full border-2 border-gray-300 hover:border-primary flex items-center justify-center transition-colors flex-shrink-0"
                   disabled={isCompleting}
                 >
                   {isCompleting || item.status === 'purchased' ? (
-                    <CheckCircle2 className="h-6 w-6 text-green-500 transition-all duration-500 scale-110" />
+                    <CheckCircle2 className="h-5 w-5 md:h-6 md:w-6 text-green-500 transition-all duration-500 scale-110" />
                   ) : (
-                    <div className="h-4 w-4 rounded-full bg-transparent"></div>
+                    <div className="h-3 w-3 md:h-4 md:w-4 rounded-full bg-transparent"></div>
                   )}
                 </button>
-                <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+                <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
                   {(() => {
                     const adder = members.find(m => m.userId === item.addedByUserId);
                     if (adder?.user?.avatarUrl) {
                       return <img src={adder.user.avatarUrl} alt={item.addedBy} className="h-full w-full object-cover" />;
                     }
-                    return <ShoppingCart className="h-4 w-4 text-gray-400" />;
+                    return <ShoppingCart className="h-4 w-4 md:h-5 md:w-5 text-gray-400" />;
                   })()}
                 </div>
-                <div>
-                  <h3 className={`font-bold text-lg transition-all duration-500 ${isCompleting || item.status === 'purchased' ? 'text-gray-400 line-through' : 'text-text-primary'}`}>
+                <div className="min-w-0">
+                  <h3 className={`font-bold text-base md:text-lg truncate transition-all duration-500 ${isCompleting || item.status === 'purchased' ? 'text-gray-400 line-through' : 'text-text-primary'}`}>
                     {item.name}
                   </h3>
-                  <p className={`text-sm transition-all duration-500 ${isCompleting ? 'text-gray-400' : 'text-text-secondary'}`}>
+                  <p className={`text-[10px] md:text-sm truncate transition-all duration-500 ${isCompleting ? 'text-gray-400' : 'text-text-secondary'}`}>
                     {t('groceries.qty')} {item.quantity} • {t('groceries.addedBy')} {(() => {
                       const adder = members.find(m => m.userId === item.addedByUserId);
                       return adder?.user?.fullName || item.addedBy;
@@ -206,18 +206,18 @@ export default function Groceries() {
                 </div>
               </div>
               
-              <div className="flex items-center gap-4">
-                <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider transition-all duration-500 ${
+              <div className="flex items-center gap-2 md:gap-4 ml-2 rtl:ml-0 rtl:mr-2">
+                <span className={`text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-full uppercase tracking-wider transition-all duration-500 flex-shrink-0 ${
                   isCompleting || item.status === 'purchased' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                 }`}>
                   {isCompleting ? t('groceries.purchasing') : (item.status === 'purchased' ? t('groceries.purchased') : t('groceries.needed'))}
                 </span>
                 <button 
                   onClick={() => confirmDelete(item.id)}
-                  className={`text-gray-400 hover:text-red-500 transition-colors p-2 ${isCompleting ? 'opacity-0 pointer-events-none' : ''}`}
+                  className={`text-gray-400 hover:text-red-500 transition-colors p-1 md:p-2 flex-shrink-0 ${isCompleting ? 'opacity-0 pointer-events-none' : ''}`}
                   title={t('groceries.deleteItem')}
                 >
-                  <Trash2 className="h-5 w-5" />
+                  <Trash2 className="h-4 w-4 md:h-5 md:w-5" />
                 </button>
               </div>
             </div>
