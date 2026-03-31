@@ -10,6 +10,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import LoadingScreen from '../components/LoadingScreen';
 import EmptyState from '../components/EmptyState';
 import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'motion/react';
 import { ar, enUS } from 'date-fns/locale';
 
 interface ShowerSlot {
@@ -235,35 +236,35 @@ export default function ShowerQueue() {
     const secs = remainingSeconds % 60;
 
     return (
-      <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-4 md:p-5 text-white shadow-lg relative overflow-hidden">
-        <div className={`absolute top-0 ${i18n.language === 'ar' ? 'left-0' : 'right-0'} p-4 md:p-6 opacity-10`}>
-          <Droplets className="w-24 h-24 md:w-32 md:h-32" />
+      <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 md:p-8 text-white shadow-lg relative overflow-hidden">
+        <div className={`absolute top-0 ${i18n.language === 'ar' ? 'left-0' : 'right-0'} p-6 md:p-8 opacity-10`}>
+          <Droplets className="w-32 h-32 md:w-48 md:h-48" />
         </div>
         <div className="relative z-10">
-          <div className="flex items-center space-x-2 rtl:space-x-reverse mb-3 md:mb-4">
-            <span className="flex h-2 w-2 md:h-3 md:w-3 relative">
+          <div className="flex items-center space-x-2 rtl:space-x-reverse mb-4 md:mb-6">
+            <span className="flex h-3 w-3 md:h-4 md:w-4 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 md:h-3 md:w-3 bg-white"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 md:h-4 md:w-4 bg-white"></span>
             </span>
-            <span className="font-medium tracking-wide uppercase text-[10px] md:text-xs">{t('showerQueue.nowShowering')}</span>
+            <span className="font-medium tracking-wide uppercase text-xs md:text-sm">{t('showerQueue.nowShowering')}</span>
           </div>
           
-          <div className="flex justify-between items-end mb-4 md:mb-6">
+          <div className="flex justify-between items-end mb-6 md:mb-8">
             <div>
-              <h2 className="text-xl md:text-3xl font-bold mb-0.5 md:mb-1">{activeSlot.userName}</h2>
-              <p className="text-blue-100 text-xs md:text-base">{activeSlot.duration} {t('showerQueue.minSlot')}</p>
+              <h2 className="text-2xl md:text-4xl font-bold mb-1 md:mb-2">{activeSlot.userName}</h2>
+              <p className="text-blue-100 text-sm md:text-lg">{activeSlot.duration} {t('showerQueue.minSlot')}</p>
             </div>
             <div className={`text-${i18n.language === 'ar' ? 'left' : 'right'}`}>
-              <div className="text-2xl md:text-4xl font-mono font-bold" dir="ltr">
+              <div className="text-4xl md:text-6xl font-mono font-bold" dir="ltr">
                 {String(mins).padStart(2, '0')}:{String(secs).padStart(2, '0')}
               </div>
-              <p className="text-blue-100 text-[10px] md:text-sm">{t('showerQueue.remaining')}</p>
+              <p className="text-blue-100 text-xs md:text-base">{t('showerQueue.remaining')}</p>
             </div>
           </div>
 
-          <div className="w-full bg-blue-900/30 rounded-full h-1.5 md:h-2 mb-1 md:mb-2">
+          <div className="w-full bg-blue-900/30 rounded-full h-2 md:h-3 mb-2 md:mb-3">
             <div 
-              className="bg-white h-1.5 md:h-2 rounded-full transition-all duration-1000 ease-linear"
+              className="bg-white h-2 md:h-3 rounded-full transition-all duration-1000 ease-linear"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -379,118 +380,134 @@ export default function ShowerQueue() {
       </div>
 
       {/* Booking Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl animate-in slide-in-from-bottom-4">
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-text-primary">{t('showerQueue.bookSlot')}</h2>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-full">
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsModalOpen(false)}
+              className="fixed inset-0 w-full h-full bg-black/60 backdrop-blur-sm"
+            />
             
-            <div className="p-6 space-y-6">
-              {/* Mode Selection */}
-              <div className="flex bg-gray-100 p-1 rounded-xl">
-                <button
-                  onClick={() => setMode('now')}
-                  className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${mode === 'now' ? 'bg-white shadow-sm text-text-primary' : 'text-text-secondary'}`}
-                >
-                  {t('showerQueue.joinQueue')}
-                </button>
-                <button
-                  onClick={() => setMode('advance')}
-                  className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${mode === 'advance' ? 'bg-white shadow-sm text-text-primary' : 'text-text-secondary'}`}
-                >
-                  {t('showerQueue.advanceBooking')}
+            <motion.div
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 100 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="bg-white w-full max-w-md rounded-t-[2rem] md:rounded-[2rem] overflow-hidden shadow-2xl relative z-10"
+            >
+              <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h2 className="text-xl font-bold text-text-primary">{t('showerQueue.bookSlot')}</h2>
+                <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                  <X className="w-5 h-5 text-gray-500" />
                 </button>
               </div>
-
-              {/* Duration Selection */}
-              <div>
-                <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-3">{t('showerQueue.duration')}</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {[10, 15, 30, 45].map(d => (
-                    <button
-                      key={d}
-                      onClick={() => setDuration(d)}
-                      className={`py-3 rounded-xl font-bold text-sm transition-colors ${duration === d ? 'bg-blue-100 text-blue-700 border-2 border-blue-500' : 'bg-gray-50 text-text-secondary border-2 border-transparent hover:bg-gray-100'}`}
-                    >
-                      {d}m
-                    </button>
-                  ))}
+              
+              <div className="p-6 space-y-6">
+                {/* Mode Selection */}
+                <div className="flex bg-gray-100 p-1 rounded-xl">
+                  <button
+                    onClick={() => setMode('now')}
+                    className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${mode === 'now' ? 'bg-white shadow-sm text-text-primary' : 'text-text-secondary'}`}
+                  >
+                    {t('showerQueue.joinQueue')}
+                  </button>
+                  <button
+                    onClick={() => setMode('advance')}
+                    className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${mode === 'advance' ? 'bg-white shadow-sm text-text-primary' : 'text-text-secondary'}`}
+                  >
+                    {t('showerQueue.advanceBooking')}
+                  </button>
                 </div>
-              </div>
 
-              {/* Advance Booking Time */}
-              {mode === 'advance' && (
-                <div className="space-y-6">
-                  {/* Quick Date Selector */}
-                  <div>
-                    <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-3">{t('showerQueue.date')}</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { label: t('showerQueue.today'), value: format(new Date(), 'yyyy-MM-dd') },
-                        { label: t('showerQueue.tomorrow'), value: format(addDays(new Date(), 1), 'yyyy-MM-dd') },
-                        { label: t('common.other'), value: 'other' }
-                      ].map(d => (
-                        <button
-                          key={d.value}
-                          type="button"
-                          onClick={() => setAdvanceDate(d.value === 'other' ? format(addDays(new Date(), 2), 'yyyy-MM-dd') : d.value)}
-                          className={`py-2.5 rounded-xl font-bold text-xs transition-all ${
-                            (d.value === 'other' ? (advanceDate !== format(new Date(), 'yyyy-MM-dd') && advanceDate !== format(addDays(new Date(), 1), 'yyyy-MM-dd')) : advanceDate === d.value)
-                              ? 'bg-primary text-white shadow-md'
-                              : 'bg-gray-50 text-text-secondary hover:bg-gray-100'
-                          }`}
-                        >
-                          {d.label}
-                        </button>
-                      ))}
+                {/* Duration Selection */}
+                <div>
+                  <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-3">{t('showerQueue.duration')}</label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[10, 15, 30, 45].map(d => (
+                      <button
+                        key={d}
+                        onClick={() => setDuration(d)}
+                        className={`py-3 rounded-xl font-bold text-sm transition-colors ${duration === d ? 'bg-blue-100 text-blue-700 border-2 border-blue-500' : 'bg-gray-50 text-text-secondary border-2 border-transparent hover:bg-gray-100'}`}
+                      >
+                        {d}m
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Advance Booking Time */}
+                {mode === 'advance' && (
+                  <div className="space-y-6">
+                    {/* Quick Date Selector */}
+                    <div>
+                      <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-3">{t('showerQueue.date')}</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { label: t('showerQueue.today'), value: format(new Date(), 'yyyy-MM-dd') },
+                          { label: t('showerQueue.tomorrow'), value: format(addDays(new Date(), 1), 'yyyy-MM-dd') },
+                          { label: t('common.other'), value: 'other' }
+                        ].map(d => (
+                          <button
+                            key={d.value}
+                            type="button"
+                            onClick={() => setAdvanceDate(d.value === 'other' ? format(addDays(new Date(), 2), 'yyyy-MM-dd') : d.value)}
+                            className={`py-2.5 rounded-xl font-bold text-xs transition-all ${
+                              (d.value === 'other' ? (advanceDate !== format(new Date(), 'yyyy-MM-dd') && advanceDate !== format(addDays(new Date(), 1), 'yyyy-MM-dd')) : advanceDate === d.value)
+                                ? 'bg-primary text-white shadow-md'
+                                : 'bg-gray-50 text-text-secondary hover:bg-gray-100'
+                            }`}
+                          >
+                            {d.label}
+                          </button>
+                        ))}
+                      </div>
+                      
+                      {/* Custom Date Input (only if not today/tomorrow) */}
+                      {(advanceDate !== format(new Date(), 'yyyy-MM-dd') && advanceDate !== format(addDays(new Date(), 1), 'yyyy-MM-dd')) && (
+                        <div className="mt-3 relative">
+                          <CalendarDays className={`absolute ${i18n.language === 'ar' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400`} />
+                          <input
+                            type="date"
+                            value={advanceDate}
+                            min={format(new Date(), 'yyyy-MM-dd')}
+                            max={format(addDays(new Date(), 7), 'yyyy-MM-dd')}
+                            onChange={(e) => setAdvanceDate(e.target.value)}
+                            className={`w-full bg-gray-50 border border-gray-200 rounded-xl ${i18n.language === 'ar' ? 'pr-11 pl-4' : 'pl-11 pr-4'} py-3 text-sm focus:ring-2 focus:ring-primary outline-none`}
+                          />
+                        </div>
+                      )}
                     </div>
-                    
-                    {/* Custom Date Input (only if not today/tomorrow) */}
-                    {(advanceDate !== format(new Date(), 'yyyy-MM-dd') && advanceDate !== format(addDays(new Date(), 1), 'yyyy-MM-dd')) && (
-                      <div className="mt-3 relative">
-                        <CalendarDays className={`absolute ${i18n.language === 'ar' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400`} />
+
+                    {/* Time Selector */}
+                    <div>
+                      <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-3">{t('showerQueue.time')}</label>
+                      <div className="relative">
+                        <Clock className={`absolute ${i18n.language === 'ar' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400`} />
                         <input
-                          type="date"
-                          value={advanceDate}
-                          min={format(new Date(), 'yyyy-MM-dd')}
-                          max={format(addDays(new Date(), 7), 'yyyy-MM-dd')}
-                          onChange={(e) => setAdvanceDate(e.target.value)}
-                          className={`w-full bg-gray-50 border border-gray-200 rounded-xl ${i18n.language === 'ar' ? 'pr-11 pl-4' : 'pl-11 pr-4'} py-3 text-sm focus:ring-2 focus:ring-primary outline-none`}
+                          type="time"
+                          value={advanceTime}
+                          onChange={(e) => setAdvanceTime(e.target.value)}
+                          className={`w-full bg-gray-50 border border-gray-200 rounded-xl ${i18n.language === 'ar' ? 'pr-11 pl-4' : 'pl-11 pr-4'} py-4 text-2xl font-mono font-bold focus:ring-2 focus:ring-primary outline-none text-center`}
                         />
                       </div>
-                    )}
-                  </div>
-
-                  {/* Time Selector */}
-                  <div>
-                    <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-3">{t('showerQueue.time')}</label>
-                    <div className="relative">
-                      <Clock className={`absolute ${i18n.language === 'ar' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400`} />
-                      <input
-                        type="time"
-                        value={advanceTime}
-                        onChange={(e) => setAdvanceTime(e.target.value)}
-                        className={`w-full bg-gray-50 border border-gray-200 rounded-xl ${i18n.language === 'ar' ? 'pr-11 pl-4' : 'pl-11 pr-4'} py-4 text-2xl font-mono font-bold focus:ring-2 focus:ring-primary outline-none text-center`}
-                      />
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              <button
-                onClick={handleJoinQueue}
-                className="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg hover:bg-primary/90 transition-colors"
-              >
-                {t('showerQueue.confirmBooking')}
-              </button>
-            </div>
+                <button
+                  onClick={handleJoinQueue}
+                  className="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg hover:bg-primary/90 transition-colors shadow-lg active:scale-[0.98] transition-all"
+                >
+                  {t('showerQueue.confirmBooking')}
+                </button>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
       <ConfirmModal
         isOpen={!!pendingBufferConflict}
@@ -498,6 +515,7 @@ export default function ShowerQueue() {
         message={t('showerQueue.hotWaterWarningMsg', { buffer: hotWaterBuffer })}
         confirmText={t('showerQueue.bookAnyway')}
         cancelText={t('showerQueue.cancel')}
+        type="warning"
         onConfirm={() => {
           if (pendingBufferConflict) {
             executeBooking(pendingBufferConflict.startTime, pendingBufferConflict.endTime);

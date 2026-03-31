@@ -102,72 +102,72 @@ export default function Members() {
   if (loading) return <LoadingScreen message={t('common.loading')} />;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <header className="flex justify-between items-center">
+    <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-text-primary tracking-tight">{t('members.title')}</h1>
-          <p className="text-text-secondary mt-1">{t('members.description')}</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-text-primary tracking-tight">{t('members.title')}</h1>
+          <p className="text-text-secondary mt-1 text-sm md:text-base">{t('members.description')}</p>
         </div>
         {inviteCode && (
-          <div className="bg-gray-100 px-4 py-2 rounded-lg font-medium flex items-center border border-gray-200">
-            <span className={`text-text-secondary text-sm ${isRTL ? 'ml-2' : 'mr-2'}`}>{t('members.inviteCode')}</span>
-            <span className="text-primary font-bold tracking-widest">{inviteCode}</span>
+          <div className="w-full sm:w-auto bg-gray-100 px-4 py-2 rounded-lg font-medium flex items-center justify-between sm:justify-start border border-gray-200">
+            <span className={`text-text-secondary text-xs md:text-sm ${isRTL ? 'ml-2' : 'mr-2'}`}>{t('members.inviteCode')}</span>
+            <span className="text-primary font-bold tracking-widest text-sm md:text-base">{inviteCode}</span>
           </div>
         )}
       </header>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-          <h2 className="font-bold text-text-primary">{t('members.currentRoommates')}</h2>
-          <div className="text-sm font-medium text-text-secondary">
+        <div className="p-4 md:p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+          <h2 className="font-bold text-text-primary text-sm md:text-base">{t('members.currentRoommates')}</h2>
+          <div className="text-xs md:text-sm font-medium text-text-secondary">
             {t('members.total')} <span className="text-text-primary font-bold">{members.length}</span>
           </div>
         </div>
         
         <div className="divide-y divide-gray-100">
           {members.map((member) => (
-            <div key={member.id} className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
-              <div className="flex items-center space-x-4 rtl:space-x-reverse">
+            <div key={member.id} className="p-4 md:p-6 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-gray-50 transition-colors gap-4">
+              <div className="flex items-center space-x-3 md:space-x-4 rtl:space-x-reverse">
                 {member.user?.avatarUrl ? (
-                  <img src={member.user.avatarUrl} alt="Avatar" className="h-12 w-12 rounded-full border border-gray-200" />
+                  <img src={member.user.avatarUrl} alt="Avatar" className="h-10 w-10 md:h-12 md:w-12 rounded-full border border-gray-200" />
                 ) : (
-                  <div className="h-12 w-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xl">
+                  <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg md:text-xl">
                     {member.user?.fullName?.charAt(0) || '?'}
                   </div>
                 )}
                 <div>
-                  <h3 className="font-bold text-text-primary text-lg flex items-center">
+                  <h3 className="font-bold text-text-primary text-base md:text-lg flex items-center">
                     {member.user?.fullName || t('members.unknownUser')}
-                    {member.role === 'admin' && <Shield className={`h-4 w-4 text-accent ${isRTL ? 'mr-2' : 'ml-2'}`} />}
+                    {member.role === 'admin' && <Shield className={`h-3 w-3 md:h-4 md:w-4 text-accent ${isRTL ? 'mr-2' : 'ml-2'}`} />}
                   </h3>
-                  <p className="text-sm text-text-secondary">
+                  <p className="text-xs md:text-sm text-text-secondary">
                     {t('members.status')} <span>{t(`members.status_${member.status}`)}</span>
                   </p>
                 </div>
               </div>
               
-              <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${
+              <div className="flex items-center justify-between sm:justify-end space-x-4 rtl:space-x-reverse">
+                <span className={`text-[10px] md:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${
                   member.role === 'admin' ? 'bg-orange-100 text-orange-700' : 'bg-gray-200 text-text-primary'
                 }`}>
                   {t(`members.role_${member.role}`)}
                 </span>
                 
                 {isAdmin && member.userId !== user?.uid && (
-                  <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                  <div className="flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
                     <button
                       onClick={() => handleToggleRole(member.id, member.role)}
-                      className="p-2 text-gray-400 hover:text-primary transition-colors rounded-lg hover:bg-gray-100"
+                      className="p-1.5 md:p-2 text-gray-400 hover:text-primary transition-colors rounded-lg hover:bg-gray-100"
                       title={member.role === 'admin' ? t('members.removeAdmin') : t('members.makeAdmin')}
                     >
-                      <ShieldAlert className="h-5 w-5" />
+                      <ShieldAlert className="h-4 w-4 md:h-5 md:w-5" />
                     </button>
                     <button
                       onClick={() => setMemberToRemove({ id: member.id, name: member.user?.fullName || t('members.unknownUser') })}
-                      className="p-2 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
+                      className="p-1.5 md:p-2 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
                       title={t('members.removeMember')}
                     >
-                      <Trash2 className="h-5 w-5" />
+                      <Trash2 className="h-4 w-4 md:h-5 md:w-5" />
                     </button>
                   </div>
                 )}

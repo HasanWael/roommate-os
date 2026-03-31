@@ -130,30 +130,32 @@ export default function Groceries() {
       </header>
 
       {isAdding && (
-        <form onSubmit={handleAddItem} className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
-          <div className="flex-1">
-            <label className="block text-xs md:text-sm font-medium text-text-secondary mb-1">{t('groceries.itemName')}</label>
-            <input 
-              type="text" 
-              value={newItemName}
-              onChange={(e) => setNewItemName(e.target.value)}
-              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm md:text-base"
-              placeholder={t('groceries.itemNamePlaceholder')}
-              required
-            />
+        <form onSubmit={handleAddItem} className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <div className="sm:col-span-3">
+              <label className="block text-sm font-medium text-text-secondary mb-1.5">{t('groceries.itemName')}</label>
+              <input 
+                type="text" 
+                value={newItemName}
+                onChange={(e) => setNewItemName(e.target.value)}
+                className="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                placeholder={t('groceries.itemNamePlaceholder')}
+                required
+              />
+            </div>
+            <div className="sm:col-span-1">
+              <label className="block text-sm font-medium text-text-secondary mb-1.5">{t('groceries.quantity')}</label>
+              <input 
+                type="number" 
+                min="1"
+                value={newItemQuantity}
+                onChange={(e) => setNewItemQuantity(e.target.value)}
+                className="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                required
+              />
+            </div>
           </div>
-          <div className="w-full sm:w-24">
-            <label className="block text-xs md:text-sm font-medium text-text-secondary mb-1">{t('groceries.quantity')}</label>
-            <input 
-              type="number" 
-              min="1"
-              value={newItemQuantity}
-              onChange={(e) => setNewItemQuantity(e.target.value)}
-              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm md:text-base"
-              required
-            />
-          </div>
-          <button type="submit" className="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors text-sm md:text-base">
+          <button type="submit" className="w-full bg-primary text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition-all shadow-sm hover:shadow-md active:scale-[0.98]">
             {t('groceries.save')}
           </button>
         </form>
