@@ -7,7 +7,9 @@ import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc, serverTim
 import { useMembers } from '../hooks/useMembers';
 import { toast } from 'sonner';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
+import LoadingScreen from '../components/LoadingScreen';
 import ConfirmModal from '../components/ConfirmModal';
+import EmptyState from '../components/EmptyState';
 
 export default function Calendar() {
   const { user, apartmentId } = useAuth();
@@ -89,7 +91,7 @@ export default function Calendar() {
     return member?.user?.fullName || 'Unknown';
   };
 
-  if (loading) return <div className="p-8">Loading calendar...</div>;
+  if (loading) return <LoadingScreen message="Loading calendar..." />;
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -224,7 +226,13 @@ export default function Calendar() {
             </div>
           ))}
           {events.length === 0 && (
-            <div className="p-8 text-center text-text-secondary">No upcoming events.</div>
+            <div className="p-8">
+              <EmptyState 
+                icon={CalendarDays} 
+                title="No upcoming events" 
+                description="Your calendar is clear for now. Add some plans to keep everyone in the loop." 
+              />
+            </div>
           )}
         </div>
       </div>

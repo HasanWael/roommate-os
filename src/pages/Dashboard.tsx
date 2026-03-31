@@ -7,7 +7,9 @@ import { db } from '../firebase';
 import { collection, query, where, onSnapshot, doc, getDoc, orderBy, limit, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { useMembers } from '../hooks/useMembers';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
+import LoadingScreen from '../components/LoadingScreen';
 import DashboardShowerWidget from '../components/DashboardShowerWidget';
+import EmptyState from '../components/EmptyState';
 
 export default function Dashboard() {
   const { user, apartmentId, apartment } = useAuth();
@@ -141,7 +143,7 @@ export default function Dashboard() {
 
   const neededGroceries = groceries.filter(g => g.status !== 'purchased');
 
-  if (loading) return <div className="p-8">Loading dashboard...</div>;
+  if (loading) return <LoadingScreen message="Loading dashboard..." />;
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
@@ -294,6 +296,7 @@ export default function Dashboard() {
           <ul className="space-y-3 mb-6 flex-1">
             {neededGroceries.slice(0, 3).map(item => {
               const isCompleting = completingGroceries.has(item.id);
+              const addedByMember = members.find(m => m.userId === item.addedByUserId);
               return (
                 <li 
                   key={item.id} 
@@ -304,13 +307,29 @@ export default function Dashboard() {
                       : 'bg-success-light/30 border-success-light/50 hover:bg-success-light/60 hover:shadow-sm'
                   }`}
                 >
-                  <span className={`font-medium transition-all duration-500 ${isCompleting ? 'text-gray-400 line-through' : 'text-text-primary'}`}>
-                    {item.name}
-                  </span>
-                  {isCompleting ? (
-                    <CheckCircle2 className="h-5 w-5 text-success-dark transition-all duration-500 scale-110" />
-                  ) : (
-                    <Circle className="h-5 w-5 text-success-dark opacity-40 hover:opacity-100 transition-opacity" />
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    {isCompleting ? (
+                      <CheckCircle2 className="flex-shrink-0 h-6 w-6 text-success-dark transition-all duration-500 scale-110" />
+                    ) : (
+                      <Circle className="flex-shrink-0 h-6 w-6 text-success-dark opacity-40 hover:opacity-100 transition-opacity" />
+                    )}
+                    <div className="truncate">
+                      <p className={`font-medium truncate transition-all duration-500 ${isCompleting ? 'text-gray-400 line-through' : 'text-text-primary'}`}>
+                        {item.name}
+                      </p>
+                      <p className={`text-xs transition-all duration-500 ${isCompleting ? 'text-gray-400' : 'text-text-secondary'}`}>
+                        Qty: {item.quantity || 1}
+                      </p>
+                    </div>
+                  </div>
+                  {addedByMember && (
+                    <div className={`flex-shrink-0 h-6 w-6 rounded-full bg-success text-white flex items-center justify-center text-[10px] font-bold overflow-hidden ml-2 transition-opacity duration-500 ${isCompleting ? 'opacity-40' : 'opacity-100'}`} title={addedByMember.user?.fullName}>
+                      {addedByMember.user?.avatarUrl ? (
+                        <img src={addedByMember.user.avatarUrl} alt={addedByMember.user.fullName} className="h-full w-full object-cover" />
+                      ) : (
+                        getMemberInitials(addedByMember.userId)
+                      )}
+                    </div>
                   )}
                 </li>
               );
@@ -350,9 +369,12 @@ export default function Dashboard() {
               </div>
             ))}
             {events.length === 0 && (
-              <div className="col-span-3 py-12 text-center bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-                <CalendarDays className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-text-secondary font-medium">No upcoming events scheduled.</p>
+              <div className="col-span-3 py-12">
+                <EmptyState 
+                  icon={CalendarDays} 
+                  title="No upcoming events" 
+                  description="Your calendar is clear for now. Add some plans to keep everyone in the loop." 
+                />
               </div>
             )}
           </div>
@@ -392,7 +414,14 @@ export default function Dashboard() {
                 </div>
               </>
             ) : (
-              <p className="text-xl font-medium opacity-60">No recent announcements from the crew.</p>
+              <div className="py-8">
+                <EmptyState 
+                  icon={Megaphone} 
+                  title="No announcements" 
+                  description="Everything is quiet in the apartment. Share an update with your roommates!" 
+                  variant="dark"
+                />
+              </div>
             )}
           </div>
         </div>

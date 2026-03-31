@@ -4,8 +4,9 @@ import { useAuth } from '../AuthContext';
 import { db } from '../firebase';
 import { doc, deleteDoc, collection, query, where, getDocs, writeBatch, updateDoc } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
-import { AlertTriangle, Trash2, Save } from 'lucide-react';
+import { AlertTriangle, Trash2, Save, Home } from 'lucide-react';
 import { toast } from 'sonner';
+import EmptyState from '../components/EmptyState';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -94,9 +95,13 @@ export default function Settings() {
     return (
       <div className="p-8 max-w-2xl mx-auto">
         <h1 className="text-3xl font-bold text-text-primary mb-6">Settings</h1>
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-          <p className="text-text-secondary">No apartment selected.</p>
-        </div>
+        <EmptyState 
+          icon={Home} 
+          title="No apartment selected" 
+          description="You need to be in an apartment to access settings. Head back to the dashboard or join a space." 
+          actionLabel="Go to Dashboard"
+          onAction={() => navigate('/')}
+        />
       </div>
     );
   }

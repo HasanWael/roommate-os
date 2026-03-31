@@ -8,6 +8,8 @@ import { useMembers } from '../hooks/useMembers';
 import { toast } from 'sonner';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 import ConfirmModal from '../components/ConfirmModal';
+import EmptyState from '../components/EmptyState';
+import LoadingScreen from '../components/LoadingScreen';
 
 export default function Announcements() {
   const { user, apartmentId } = useAuth();
@@ -80,7 +82,7 @@ export default function Announcements() {
     }
   };
 
-  if (loading) return <div className="p-8 text-center text-text-secondary">Loading announcements...</div>;
+  if (loading) return <LoadingScreen message="Loading announcements..." />;
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -192,7 +194,11 @@ export default function Announcements() {
           </div>
         ))}
         {announcements.length === 0 && (
-          <div className="p-8 text-center text-text-secondary bg-white rounded-2xl border border-gray-100">No announcements found.</div>
+          <EmptyState 
+            icon={Megaphone} 
+            title="Quiet in here" 
+            description="There are no announcements right now. Share something important with your roommates!" 
+          />
         )}
       </div>
 

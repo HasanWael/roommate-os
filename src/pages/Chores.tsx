@@ -8,6 +8,8 @@ import { useMembers } from '../hooks/useMembers';
 import { toast } from 'sonner';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 import ConfirmModal from '../components/ConfirmModal';
+import EmptyState from '../components/EmptyState';
+import LoadingScreen from '../components/LoadingScreen';
 
 export default function Chores() {
   const { user, apartmentId } = useAuth();
@@ -116,7 +118,7 @@ export default function Chores() {
     return member?.user?.fullName || 'Unknown';
   };
 
-  if (loading) return <div className="p-8 text-center text-text-secondary">Loading chores...</div>;
+  if (loading) return <LoadingScreen message="Loading chores..." />;
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -240,7 +242,13 @@ export default function Chores() {
             </div>
           )})}
           {chores.filter(c => c.status !== 'completed').length === 0 && (
-            <div className="p-8 text-center text-text-secondary">No chores found.</div>
+            <div className="p-8">
+              <EmptyState 
+                icon={CheckSquare} 
+                title="All caught up!" 
+                description="There are no pending chores at the moment. Enjoy your free time or add a new chore." 
+              />
+            </div>
           )}
         </div>
       </div>

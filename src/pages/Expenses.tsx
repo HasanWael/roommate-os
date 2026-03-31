@@ -8,6 +8,8 @@ import { useMembers } from '../hooks/useMembers';
 import { toast } from 'sonner';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 import ConfirmModal from '../components/ConfirmModal';
+import EmptyState from '../components/EmptyState';
+import LoadingScreen from '../components/LoadingScreen';
 
 export default function Expenses() {
   const { user, apartmentId } = useAuth();
@@ -94,7 +96,7 @@ export default function Expenses() {
     );
   };
 
-  if (loading) return <div className="p-8 text-center text-text-secondary">Loading expenses...</div>;
+  if (loading) return <LoadingScreen message="Loading expenses..." />;
 
   const totalPending = expenses.reduce((sum, exp) => sum + exp.amount, 0);
 
@@ -241,7 +243,13 @@ export default function Expenses() {
             </div>
           ))}
           {expenses.length === 0 && (
-            <div className="p-8 text-center text-text-secondary">No expenses found.</div>
+            <div className="p-8">
+              <EmptyState 
+                icon={Receipt} 
+                title="All settled up!" 
+                description="There are no pending expenses. You're all caught up with your roommates." 
+              />
+            </div>
           )}
         </div>
       </div>

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { Receipt, CheckSquare, ShoppingCart, Megaphone, CalendarDays, LayoutDashboard } from 'lucide-react';
+import { Receipt, CheckSquare, ShoppingCart, Megaphone, CalendarDays, LayoutDashboard, Droplets } from 'lucide-react';
 import { useAuth } from '../AuthContext';
 import { db, loginWithGoogle, logout } from '../firebase';
 import { collection, query, where, onSnapshot, doc, getDoc, orderBy, limit } from 'firebase/firestore';
 import { useMembers } from '../hooks/useMembers';
+import TVShowerQueueWidget from '../components/TVShowerQueueWidget';
 
 export default function TVMode() {
   const { user, apartmentId, apartment, memberships, setApartmentId } = useAuth();
@@ -179,7 +180,10 @@ export default function TVMode() {
           </div>
         </header>
 
-        <div className="grid grid-cols-4 gap-8 flex-1 px-8 pb-8">
+        <div className="grid grid-cols-5 gap-8 flex-1 px-8 pb-8">
+          {/* Shower Queue */}
+          <TVShowerQueueWidget apartmentId={apartmentId || ''} />
+
           {/* Chores */}
           <div className="bg-slate-900 rounded-3xl p-8 border border-slate-800 flex flex-col">
             <div className="flex items-center justify-between mb-8">

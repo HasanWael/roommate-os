@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, AlertCircle, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, AlertCircle, LogOut, Home } from 'lucide-react';
 import { useAuth } from '../AuthContext';
 import { loginWithGoogle, logout, db } from '../firebase';
 import { collection, doc, setDoc, getDoc, writeBatch } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
+import EmptyState from '../components/EmptyState';
 
 function ApartmentCard({ membership, onSelect }: { membership: any, onSelect: () => void }) {
   const { user } = useAuth();

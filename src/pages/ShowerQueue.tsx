@@ -7,6 +7,8 @@ import { format, addMinutes, isBefore, isAfter, parseISO, differenceInSeconds, i
 import { Droplets, Clock, Calendar as CalendarIcon, X, Plus, Play } from 'lucide-react';
 import { toast } from 'sonner';
 import ConfirmModal from '../components/ConfirmModal';
+import LoadingScreen from '../components/LoadingScreen';
+import EmptyState from '../components/EmptyState';
 
 interface ShowerSlot {
   id: string;
@@ -24,6 +26,7 @@ interface ShowerSlot {
 export default function ShowerQueue() {
   const { user, apartment } = useAuth();
   const [slots, setSlots] = useState<ShowerSlot[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [mode, setMode] = useState<'now' | 'advance'>('now');
   const [duration, setDuration] = useState<number>(15);
@@ -64,8 +67,10 @@ export default function ShowerQueue() {
       });
 
       setSlots(fetchedSlots.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()));
+      setLoading(false);
     }, (error) => {
       handleFirestoreError(error, OperationType.GET, 'showerSlots');
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -76,6 +81,8 @@ export default function ShowerQueue() {
   
   const upNextSlots = slots.filter(s => s.status === 'scheduled' && s.mode === 'now' && (!activeSlot || s.id !== activeSlot.id));
   const scheduledSlots = slots.filter(s => s.status === 'scheduled' && s.mode === 'advance');
+
+  if (loading) return <LoadingScreen message="Loading shower queue..." />;
 
   const executeBooking = async (startTime: Date, endTime: Date) => {
     if (!user || !apartment) return;
@@ -184,12 +191,12 @@ export default function ShowerQueue() {
   const renderActiveCard = () => {
     if (!activeSlot) {
       return (
-        <div className="bg-white rounded-2xl p-8 text-center border border-gray-100 shadow-sm">
-          <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Droplets className="w-8 h-8 text-blue-500" />
-          </div>
-          <h2 className="text-xl font-bold text-text-primary mb-2">Bathroom is free</h2>
-          <p className="text-text-secondary">No one is currently showering.</p>
+        <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
+          <EmptyState 
+            icon={Droplets} 
+            title="Bathroom is free" 
+            description="No one is currently showering. Feel free to jump in!" 
+          />
         </div>
       );
     }

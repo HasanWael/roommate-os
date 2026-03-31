@@ -6,6 +6,7 @@ import { db } from '../firebase';
 import { collection, query, where, getDocs, onSnapshot, doc, getDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { toast } from 'sonner';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
+import LoadingScreen from '../components/LoadingScreen';
 
 export default function Members() {
   const { user, apartmentId } = useAuth();
@@ -91,7 +92,7 @@ export default function Members() {
     }
   };
 
-  if (loading) return <div className="p-8 text-center text-text-secondary">Loading members...</div>;
+  if (loading) return <LoadingScreen message="Loading members..." />;
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">

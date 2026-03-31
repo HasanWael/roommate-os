@@ -7,6 +7,8 @@ import { useMembers } from '../hooks/useMembers';
 import { toast } from 'sonner';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 import ConfirmModal from '../components/ConfirmModal';
+import EmptyState from '../components/EmptyState';
+import LoadingScreen from '../components/LoadingScreen';
 
 export default function Groceries() {
   const { user, apartmentId } = useAuth();
@@ -102,7 +104,7 @@ export default function Groceries() {
     }
   };
 
-  if (loading) return <div className="p-8 text-center text-text-secondary">Loading groceries...</div>;
+  if (loading) return <LoadingScreen message="Loading groceries..." />;
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -214,7 +216,13 @@ export default function Groceries() {
             </div>
           )})}
           {groceries.filter(g => g.status !== 'purchased').length === 0 && (
-            <div className="p-8 text-center text-text-secondary">No groceries needed.</div>
+            <div className="p-8">
+              <EmptyState 
+                icon={ShoppingCart} 
+                title="Fridge is full!" 
+                description="You don't need any groceries right now. Add items when you run out." 
+              />
+            </div>
           )}
         </div>
       </div>
