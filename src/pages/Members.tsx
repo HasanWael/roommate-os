@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, UserPlus, Shield, User, Trash2, ShieldAlert } from 'lucide-react';
+import { Users, UserPlus, Shield, User, Trash2, ShieldAlert, Copy, Check, Link as LinkIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { useAuth } from '../AuthContext';
 import { db } from '../firebase';
@@ -15,6 +15,7 @@ export default function Members() {
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [inviteCode, setInviteCode] = useState<string | null>(null);
+  const [copied, setCopied] = useState<'code' | 'link' | null>(null);
   const [memberToRemove, setMemberToRemove] = useState<{ id: string, name: string } | null>(null);
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
@@ -99,6 +100,15 @@ export default function Members() {
     }
   };
 
+  const copyToClipboard = (text: string, type: 'code' | 'link') => {
+    navigator.clipboard.writeText(text);
+    setCopied(type);
+    toast.success(type === 'code' ? t('members.codeCopied') : t('members.linkCopied'));
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  const inviteLink = inviteCode ? `${window.location.origin}/auth?join=${inviteCode}` : '';
+
   if (loading) return <LoadingScreen message={t('common.loading')} />;
 
   return (
@@ -108,13 +118,38 @@ export default function Members() {
           <h1 className="text-2xl md:text-3xl font-bold text-text-primary tracking-tight">{t('members.title')}</h1>
           <p className="text-text-secondary mt-1 text-sm md:text-base">{t('members.description')}</p>
         </div>
-        {inviteCode && (
-          <div className="w-full sm:w-auto bg-gray-100 px-4 py-2 rounded-lg font-medium flex items-center justify-between sm:justify-start border border-gray-200">
-            <span className={`text-text-secondary text-xs md:text-sm ${isRTL ? 'ml-2' : 'mr-2'}`}>{t('members.inviteCode')}</span>
-            <span className="text-primary font-bold tracking-widest text-sm md:text-base">{inviteCode}</span>
-          </div>
-        )}
       </header>
+
+      {inviteCode && (
+        <div className="bg-white rounded-2xl p-4 md:p-6 border border-gray-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <UserPlus className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest leading-none mb-1">{t('members.inviteCode')}</p>
+              <p className="text-lg font-black text-text-primary tracking-widest leading-none">{inviteCode}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <button
+              onClick={() => copyToClipboard(inviteCode, 'code')}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gray-50 text-text-primary text-sm font-bold hover:bg-gray-100 transition-all active:scale-95 border border-gray-200/50"
+            >
+              {copied === 'code' ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4 text-text-secondary" />}
+              {t('members.copyCode')}
+            </button>
+            <button
+              onClick={() => copyToClipboard(inviteLink, 'link')}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all active:scale-95 shadow-sm shadow-primary/20"
+            >
+              {copied === 'link' ? <Check className="h-4 w-4" /> : <LinkIcon className="h-4 w-4" />}
+              {t('members.copyLink')}
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-4 md:p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">

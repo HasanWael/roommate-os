@@ -288,7 +288,11 @@
     "removeSuccess": "تمت إزالة {{name}}.",
     "removeError": "فشل في إزالة العضو.",
     "roleSuccess": "تم تحديث الدور إلى {{role}}.",
-    "roleError": "فشل في تحديث دور العضو."
+    "roleError": "فشل في تحديث دور العضو.",
+    "copyCode": "نسخ الرمز",
+    "copyLink": "نسخ الرابط",
+    "codeCopied": "تم نسخ رمز الدعوة!",
+    "linkCopied": "تم نسخ رابط الدعوة!"
   },
   "auth": {
     "title": "نظام الشركاء",

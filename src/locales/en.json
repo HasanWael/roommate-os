@@ -288,7 +288,11 @@
     "removeSuccess": "{{name}} has been removed.",
     "removeError": "Failed to remove member.",
     "roleSuccess": "Role updated to {{role}}.",
-    "roleError": "Failed to update member role."
+    "roleError": "Failed to update member role.",
+    "copyCode": "Copy Code",
+    "copyLink": "Copy Link",
+    "codeCopied": "Invite code copied!",
+    "linkCopied": "Invite link copied!"
   },
   "auth": {
     "title": "Roommate OS",
