@@ -8,7 +8,6 @@ import Expenses from './pages/Expenses';
 import Chores from './pages/Chores';
 import Groceries from './pages/Groceries';
 import Calendar from './pages/Calendar';
-import Announcements from './pages/Announcements';
 import Members from './pages/Members';
 import Settings from './pages/Settings';
 import ShowerQueue from './pages/ShowerQueue';
@@ -42,7 +41,6 @@ export default function App() {
           <Route path="chores" element={<Chores />} />
           <Route path="groceries" element={<Groceries />} />
           <Route path="calendar" element={<Calendar />} />
-          <Route path="announcements" element={<Announcements />} />
           <Route path="shower-queue" element={<ShowerQueue />} />
           <Route path="members" element={<Members />} />
           <Route path="settings" element={<Settings />} />

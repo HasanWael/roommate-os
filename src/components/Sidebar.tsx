@@ -61,14 +61,6 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       <div className="p-4 border-t border-gray-200 space-y-1">
         <NavLink 
-          to="/announcements" 
-          onClick={onClose}
-          className="flex items-center px-4 py-3 text-sm font-medium text-text-secondary hover:bg-gray-100 rounded-lg"
-        >
-          <Megaphone className="mr-3 h-5 w-5" />
-          Announcements
-        </NavLink>
-        <NavLink 
           to="/members" 
           onClick={onClose}
           className="flex items-center px-4 py-3 text-sm font-medium text-text-secondary hover:bg-gray-100 rounded-lg"

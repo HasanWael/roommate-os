@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Receipt, CheckSquare, ShoppingCart, CalendarDays, Megaphone, AlertCircle, CheckCircle2, Circle } from 'lucide-react';
+import { Receipt, CheckSquare, ShoppingCart, CalendarDays, AlertCircle, CheckCircle2, Circle } from 'lucide-react';
 import { isPast, isToday, isTomorrow, format, parseISO } from 'date-fns';
 import { useAuth } from '../AuthContext';
 import { db } from '../firebase';
@@ -20,7 +20,6 @@ export default function Dashboard() {
   const [groceries, setGroceries] = useState<any[]>([]);
   const [completingGroceries, setCompletingGroceries] = useState<Set<string>>(new Set());
   const [events, setEvents] = useState<any[]>([]);
-  const [announcements, setAnnouncements] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -54,17 +53,9 @@ export default function Dashboard() {
     const qEvents = query(collection(db, 'calendarEvents'), where('apartmentId', '==', apartmentId), orderBy('startDatetime', 'asc'), limit(5));
     const unsubEvents = onSnapshot(qEvents, (snapshot) => {
       setEvents(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
-    }, (error) => {
-      handleFirestoreError(error, OperationType.GET, 'calendarEvents');
-    });
-
-    // Fetch Announcements
-    const qAnnouncements = query(collection(db, 'announcements'), where('apartmentId', '==', apartmentId), orderBy('createdAt', 'desc'), limit(3));
-    const unsubAnnouncements = onSnapshot(qAnnouncements, (snapshot) => {
-      setAnnouncements(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
       setLoading(prev => prev ? false : prev);
     }, (error) => {
-      handleFirestoreError(error, OperationType.GET, 'announcements');
+      handleFirestoreError(error, OperationType.GET, 'calendarEvents');
     });
 
     return () => {
@@ -72,7 +63,6 @@ export default function Dashboard() {
       unsubChores();
       unsubGroceries();
       unsubEvents();
-      unsubAnnouncements();
     };
   }, [apartmentId]);
 
@@ -346,7 +336,7 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Schedule */}
-        <div className="lg:col-span-2 bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+        <div className="lg:col-span-3 bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
           <div className="flex justify-between items-center mb-8">
             <h3 className="text-2xl font-bold text-text-primary">Upcoming Events</h3>
             <button className="text-sm font-bold text-primary hover:text-primary-dark transition-colors flex items-center">
@@ -374,52 +364,6 @@ export default function Dashboard() {
                   icon={CalendarDays} 
                   title="No upcoming events" 
                   description="Your calendar is clear for now. Add some plans to keep everyone in the loop." 
-                />
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Announcements */}
-        <div className="bg-text-primary text-white rounded-3xl p-8 flex flex-col relative overflow-hidden shadow-2xl">
-          <div className="absolute top-0 right-0 p-8 opacity-10">
-            <Megaphone className="h-32 w-32 rotate-12" />
-          </div>
-          <div className="relative z-10">
-            <div className="flex items-center text-xs font-bold uppercase tracking-widest mb-6 text-primary">
-              <Megaphone className="h-5 w-5 mr-3" />
-              Latest Update
-            </div>
-            {announcements.length > 0 ? (
-              <>
-                <p className="text-2xl font-bold leading-tight mb-8">
-                  "{announcements[0].content}"
-                </p>
-                <div className="flex items-center">
-                  <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-xs font-bold mr-3 overflow-hidden">
-                    {(() => {
-                      const author = members.find(m => m.userId === announcements[0].authorId);
-                      if (author?.user?.avatarUrl) {
-                        return <img src={author.user.avatarUrl} alt={author.user.fullName} className="h-full w-full object-cover" />;
-                      }
-                      return getMemberInitials(announcements[0].authorId);
-                    })()}
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold">
-                      Posted by {members.find(m => m.userId === announcements[0].authorId)?.user?.fullName || 'Roommate'}
-                    </p>
-                    <p className="text-xs opacity-50">{announcements[0].createdAt ? announcements[0].createdAt.toDate().toLocaleDateString() : 'Just now'}</p>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="py-8">
-                <EmptyState 
-                  icon={Megaphone} 
-                  title="No announcements" 
-                  description="Everything is quiet in the apartment. Share an update with your roommates!" 
-                  variant="dark"
                 />
               </div>
             )}

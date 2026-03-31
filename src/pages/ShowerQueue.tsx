@@ -42,6 +42,27 @@ export default function ShowerQueue() {
     return () => clearInterval(timer);
   }, []);
 
+  const updatingSlots = React.useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    // Auto-complete past slots and auto-start scheduled slots based on current time
+    slots.forEach(slot => {
+      if (updatingSlots.current.has(slot.id)) return;
+
+      if (slot.status === 'active' && isAfter(nowTime, parseISO(slot.endTime))) {
+        updatingSlots.current.add(slot.id);
+        updateDoc(doc(db, 'showerSlots', slot.id), { status: 'completed' })
+          .catch(console.error)
+          .finally(() => updatingSlots.current.delete(slot.id));
+      } else if (slot.status === 'scheduled' && isAfter(nowTime, parseISO(slot.startTime))) {
+        updatingSlots.current.add(slot.id);
+        updateDoc(doc(db, 'showerSlots', slot.id), { status: 'active' })
+          .catch(console.error)
+          .finally(() => updatingSlots.current.delete(slot.id));
+      }
+    });
+  }, [nowTime, slots]);
+
   useEffect(() => {
     if (!apartment) return;
 
@@ -56,15 +77,6 @@ export default function ShowerQueue() {
         id: doc.id,
         ...doc.data()
       })) as ShowerSlot[];
-      
-      // Auto-complete past slots and auto-start scheduled slots
-      fetchedSlots.forEach(slot => {
-        if (slot.status === 'active' && isAfter(new Date(), parseISO(slot.endTime))) {
-          updateDoc(doc(db, 'showerSlots', slot.id), { status: 'completed' }).catch(console.error);
-        } else if (slot.status === 'scheduled' && isAfter(new Date(), parseISO(slot.startTime))) {
-          updateDoc(doc(db, 'showerSlots', slot.id), { status: 'active' }).catch(console.error);
-        }
-      });
 
       setSlots(fetchedSlots.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()));
       setLoading(false);
@@ -76,8 +88,13 @@ export default function ShowerQueue() {
     return () => unsubscribe();
   }, [apartment]);
 
-  const activeSlot = slots.find(s => s.status === 'active' || (s.status === 'scheduled' && isBefore(parseISO(s.startTime), nowTime) && isAfter(parseISO(s.endTime), nowTime)));
-  const myActiveSlot = slots.find(s => s.userId === user?.uid && (s.status === 'active' || s.status === 'scheduled'));
+  const activeSlot = slots.find(s => {
+    const start = parseISO(s.startTime);
+    const end = parseISO(s.endTime);
+    if (s.status === 'active' && isAfter(end, nowTime)) return true;
+    return s.status === 'scheduled' && isBefore(start, nowTime) && isAfter(end, nowTime);
+  });
+  const myActiveSlot = slots.find(s => s.userId === user?.uid && (s.status === 'active' || s.status === 'scheduled') && isAfter(parseISO(s.endTime), nowTime));
   
   const upNextSlots = slots.filter(s => s.status === 'scheduled' && s.mode === 'now' && (!activeSlot || s.id !== activeSlot.id));
   const scheduledSlots = slots.filter(s => s.status === 'scheduled' && s.mode === 'advance');

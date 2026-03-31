@@ -20,7 +20,7 @@ interface ShowerSlot {
 
 export default function DashboardShowerWidget() {
   const { apartment } = useAuth();
-  const [activeSlot, setActiveSlot] = useState<ShowerSlot | null>(null);
+  const [slots, setSlots] = useState<ShowerSlot[]>([]);
   const [nowTime, setNowTime] = useState<Date>(new Date());
 
   useEffect(() => {
@@ -38,15 +38,21 @@ export default function DashboardShowerWidget() {
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const slots = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as ShowerSlot[];
-      const current = slots.find(s => s.status === 'active' || (s.status === 'scheduled' && isBefore(parseISO(s.startTime), new Date()) && isAfter(parseISO(s.endTime), new Date())));
-      setActiveSlot(current || null);
+      const fetchedSlots = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as ShowerSlot[];
+      setSlots(fetchedSlots);
     }, (error) => {
       handleFirestoreError(error, OperationType.GET, 'showerSlots');
     });
 
     return () => unsubscribe();
   }, [apartment]);
+
+  const activeSlot = slots.find(s => {
+    const start = parseISO(s.startTime);
+    const end = parseISO(s.endTime);
+    if (s.status === 'active' && isAfter(end, nowTime)) return true;
+    return s.status === 'scheduled' && isBefore(start, nowTime) && isAfter(end, nowTime);
+  });
 
   if (!activeSlot) return null;
 

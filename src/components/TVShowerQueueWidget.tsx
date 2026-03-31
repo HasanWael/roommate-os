@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, updateDoc, doc } from 'firebase/firestore';
 import { format, parseISO, differenceInSeconds, isToday, isTomorrow } from 'date-fns';
 import { Droplets } from 'lucide-react';
 
@@ -22,6 +22,27 @@ export default function TVShowerQueueWidget({ apartmentId }: { apartmentId: stri
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  const updatingSlots = React.useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    // Auto-complete past slots and auto-start scheduled slots based on current time
+    slots.forEach(slot => {
+      if (updatingSlots.current.has(slot.id)) return;
+
+      if (slot.status === 'active' && parseISO(slot.endTime) < now) {
+        updatingSlots.current.add(slot.id);
+        updateDoc(doc(db, 'showerSlots', slot.id), { status: 'completed' })
+          .catch(console.error)
+          .finally(() => updatingSlots.current.delete(slot.id));
+      } else if (slot.status === 'scheduled' && parseISO(slot.startTime) < now) {
+        updatingSlots.current.add(slot.id);
+        updateDoc(doc(db, 'showerSlots', slot.id), { status: 'active' })
+          .catch(console.error)
+          .finally(() => updatingSlots.current.delete(slot.id));
+      }
+    });
+  }, [now, slots]);
 
   useEffect(() => {
     if (!apartmentId) return;
@@ -51,11 +72,11 @@ export default function TVShowerQueueWidget({ apartmentId }: { apartmentId: stri
     return () => unsubscribe();
   }, [apartmentId]);
 
-  // Find active slot: either explicitly active, or scheduled and currently happening
+  // Find active slot: either explicitly active and not stale, or scheduled and currently happening
   const activeSlot = slots.find(s => {
-    if (s.status === 'active') return true;
     const start = parseISO(s.startTime);
     const end = parseISO(s.endTime);
+    if (s.status === 'active' && now < end) return true;
     return s.status === 'scheduled' && now >= start && now < end;
   });
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { Receipt, CheckSquare, ShoppingCart, Megaphone, CalendarDays, LayoutDashboard, Droplets } from 'lucide-react';
+import { Receipt, CheckSquare, ShoppingCart, CalendarDays, LayoutDashboard, Droplets } from 'lucide-react';
 import { useAuth } from '../AuthContext';
 import { db, loginWithGoogle, logout } from '../firebase';
 import { collection, query, where, onSnapshot, doc, getDoc, orderBy, limit } from 'firebase/firestore';
@@ -15,7 +15,6 @@ export default function TVMode() {
   const [chores, setChores] = useState<any[]>([]);
   const [groceries, setGroceries] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
-  const [announcements, setAnnouncements] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -58,17 +57,9 @@ export default function TVMode() {
     const qEvents = query(collection(db, 'calendarEvents'), where('apartmentId', '==', apartmentId), orderBy('startDatetime', 'asc'), limit(5));
     const unsubEvents = onSnapshot(qEvents, (snapshot) => {
       setEvents(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
-    }, (error) => {
-      console.error('Error fetching events:', error);
-    });
-
-    // Fetch Announcements
-    const qAnnouncements = query(collection(db, 'announcements'), where('apartmentId', '==', apartmentId), orderBy('createdAt', 'desc'), limit(1));
-    const unsubAnnouncements = onSnapshot(qAnnouncements, (snapshot) => {
-      setAnnouncements(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
       setLoading(false);
     }, (error) => {
-      console.error('Error fetching announcements:', error);
+      console.error('Error fetching events:', error);
       setLoading(false);
     });
 
@@ -80,7 +71,6 @@ export default function TVMode() {
       unsubChores();
       unsubGroceries();
       unsubEvents();
-      unsubAnnouncements();
       clearTimeout(timeout);
     };
   }, [apartmentId]);
@@ -243,27 +233,8 @@ export default function TVMode() {
             </ul>
           </div>
 
-          {/* Announcements + Schedule */}
+          {/* Schedule */}
           <div className="space-y-8 flex flex-col">
-            {/* Announcements */}
-            <div className="bg-primary text-white rounded-3xl p-8 flex-1 flex flex-col justify-center">
-              <div className="flex items-center text-sm font-bold uppercase tracking-wider mb-6 opacity-80">
-                <Megaphone className="h-6 w-6 mr-3" />
-                Latest Announcement
-              </div>
-              {announcements.length > 0 ? (
-                <>
-                  <p className="text-3xl font-semibold leading-tight mb-6">
-                    "{announcements[0].content}"
-                  </p>
-                  <p className="text-lg opacity-80 font-medium">— Posted by Roommate</p>
-                </>
-              ) : (
-                <p className="text-3xl font-semibold leading-tight mb-6">No recent announcements.</p>
-              )}
-            </div>
-
-            {/* Schedule */}
             <div className="bg-slate-900 rounded-3xl p-8 border border-slate-800 flex-1">
               <div className="flex items-center justify-between mb-8">
                 <h3 className="text-xl font-bold text-slate-400 uppercase tracking-wider">Schedule</h3>
