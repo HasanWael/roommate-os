@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Receipt, Plus, CheckCircle2, Circle, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { enUS, ar } from 'date-fns/locale';
 import { formatCurrency } from '../lib/format';
 import { useAuth } from '../AuthContext';
 import { db } from '../firebase';
@@ -11,10 +12,12 @@ import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 import ConfirmModal from '../components/ConfirmModal';
 import EmptyState from '../components/EmptyState';
 import LoadingScreen from '../components/LoadingScreen';
+import { useTranslation } from 'react-i18next';
 
 export default function Expenses() {
   const { user, apartmentId } = useAuth();
   const { members } = useMembers();
+  const { t, i18n } = useTranslation();
   const [expenses, setExpenses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
@@ -65,10 +68,10 @@ export default function Expenses() {
       setNewExpenseAmount('');
       setSplitAmong([user.uid]);
       setIsAdding(false);
-      toast.success('Expense added successfully.');
+      toast.success(t('expenses.addSuccess'));
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'expenses');
-      toast.error('Failed to add expense.');
+      toast.error(t('expenses.addError'));
     }
   };
 
@@ -80,10 +83,10 @@ export default function Expenses() {
     if (!itemToDelete) return;
     try {
       await deleteDoc(doc(db, 'expenses', itemToDelete));
-      toast.success('Expense deleted.');
+      toast.success(t('expenses.deleteSuccess'));
     } catch (error) {
       handleFirestoreError(error, OperationType.DELETE, `expenses/${itemToDelete}`);
-      toast.error('Failed to delete expense.');
+      toast.error(t('expenses.deleteError'));
     } finally {
       setItemToDelete(null);
     }
@@ -97,23 +100,25 @@ export default function Expenses() {
     );
   };
 
-  if (loading) return <LoadingScreen message="Loading expenses..." />;
+  if (loading) return <LoadingScreen message={t('dashboard.loading')} />;
 
   const totalPending = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+
+  const dateLocale = i18n.language === 'ar' ? ar : enUS;
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-text-primary tracking-tight">Bills & Expenses</h1>
-          <p className="text-text-secondary mt-1">Manage shared costs and track who owes what.</p>
+          <h1 className="text-3xl font-bold text-text-primary tracking-tight">{t('expenses.title')}</h1>
+          <p className="text-text-secondary mt-1">{t('expenses.description')}</p>
         </div>
         <button 
           onClick={() => setIsAdding(!isAdding)}
           className="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium flex items-center transition-colors"
         >
-          <Plus className="h-5 w-5 mr-2" />
-          {isAdding ? 'Cancel' : 'Add Expense'}
+          <Plus className={`h-5 w-5 ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+          {isAdding ? t('expenses.cancel') : t('expenses.addExpense')}
         </button>
       </header>
 
@@ -121,18 +126,18 @@ export default function Expenses() {
         <form onSubmit={handleAddExpense} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-4">
           <div className="flex gap-4 items-end">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-text-secondary mb-1">Description</label>
+              <label className="block text-sm font-medium text-text-secondary mb-1">{t('expenses.descriptionLabel')}</label>
               <input 
                 type="text" 
                 value={newExpenseTitle}
                 onChange={(e) => setNewExpenseTitle(e.target.value)}
                 className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                placeholder="e.g., Electric Bill, Groceries"
+                placeholder={t('expenses.descriptionPlaceholder')}
                 required
               />
             </div>
             <div className="w-32">
-              <label className="block text-sm font-medium text-text-secondary mb-1">Amount (EGP)</label>
+              <label className="block text-sm font-medium text-text-secondary mb-1">{t('expenses.amountLabel')}</label>
               <input 
                 type="number" 
                 step="0.01"
@@ -146,10 +151,10 @@ export default function Expenses() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-2">Split Among</label>
+            <label className="block text-sm font-medium text-text-secondary mb-2">{t('expenses.splitAmong')}</label>
             <div className="flex flex-wrap gap-3">
               {members.map(member => (
-                <label key={member.userId} className="flex items-center space-x-2 cursor-pointer bg-gray-50 px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-100">
+                <label key={member.userId} className="flex items-center space-x-2 rtl:space-x-reverse cursor-pointer bg-gray-50 px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-100">
                   <input 
                     type="checkbox" 
                     checked={splitAmong.includes(member.userId)}
@@ -163,7 +168,7 @@ export default function Expenses() {
                       member.user?.fullName?.charAt(0) || '?'
                     )}
                   </div>
-                  <span className="text-sm font-medium text-text-primary">{member.user?.fullName || 'Unknown'}</span>
+                  <span className="text-sm font-medium text-text-primary">{member.user?.fullName || t('common.unknown')}</span>
                 </label>
               ))}
             </div>
@@ -171,7 +176,7 @@ export default function Expenses() {
 
           <div className="flex justify-end mt-2">
             <button type="submit" className="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors">
-              Save Expense
+              {t('expenses.saveExpense')}
             </button>
           </div>
         </form>
@@ -179,21 +184,21 @@ export default function Expenses() {
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-          <h2 className="font-bold text-text-primary">Recent Expenses</h2>
+          <h2 className="font-bold text-text-primary">{t('expenses.recentExpenses')}</h2>
           <div className="text-sm font-medium text-text-secondary">
-            Total Pending: <span className="text-danger font-bold">EGP {formatCurrency(totalPending, 2)}</span>
+            {t('expenses.totalPending')} <span className="text-danger font-bold">{i18n.language === 'ar' ? 'ج.م' : 'EGP'} {formatCurrency(totalPending, 2)}</span>
           </div>
         </div>
         
         <div className="divide-y divide-gray-100">
           {expenses.map((expense) => (
             <div key={expense.id} className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-4 rtl:space-x-reverse">
                 <div className="h-12 w-12 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden">
                   {(() => {
                     const payer = members.find(m => m.userId === expense.paidByUserId);
                     if (payer?.user?.avatarUrl) {
-                      return <img src={payer.user.avatarUrl} alt={expense.paidBy} className="h-full w-full object-cover" />;
+                      return <img src={payer.user.avatarUrl} alt={expense.paidBy === 'Roommate' ? t('common.roommate') : expense.paidBy} className="h-full w-full object-cover" />;
                     }
                     return <Receipt className="h-6 w-6 text-primary" />;
                   })()}
@@ -201,20 +206,21 @@ export default function Expenses() {
                 <div>
                   <h3 className="font-bold text-text-primary text-lg">{expense.title}</h3>
                   <p className="text-sm text-text-secondary">
-                    {expense.createdAt ? format(expense.createdAt.toDate(), 'MMM d, yyyy') : 'Just now'} • Paid by {(() => {
+                    {expense.createdAt ? format(expense.createdAt.toDate(), 'MMM d, yyyy', { locale: dateLocale }) : t('expenses.justNow')} • {t('expenses.paidBy')} {(() => {
                       const payer = members.find(m => m.userId === expense.paidByUserId);
-                      return payer?.user?.fullName || expense.paidBy;
+                      if (payer?.user?.fullName) return payer.user.fullName;
+                      return expense.paidBy === 'Roommate' ? t('common.roommate') : expense.paidBy;
                     })()}
                   </p>
                   <div className="text-xs text-text-secondary mt-1 flex items-center gap-1">
-                    Split among {expense.splitAmong?.length || 1} people:
-                    <div className="flex -space-x-2 ml-1">
+                    {t('expenses.splitAmongPeople', { count: expense.splitAmong?.length || 1 })}
+                    <div className={`flex ${i18n.language === 'ar' ? '-space-x-reverse' : ''} -space-x-2 mx-1`}>
                       {expense.splitAmong?.map((userId: string) => {
                         const member = members.find(m => m.userId === userId);
                         return (
-                          <div key={userId} className="h-5 w-5 rounded-full border border-white bg-primary text-[8px] text-white flex items-center justify-center overflow-hidden" title={member?.user?.fullName}>
+                          <div key={userId} className="h-5 w-5 rounded-full border border-white bg-primary text-[8px] text-white flex items-center justify-center overflow-hidden" title={member?.user?.fullName || t('common.unknown')}>
                             {member?.user?.avatarUrl ? (
-                              <img src={member.user.avatarUrl} alt={member.user.fullName} className="h-full w-full object-cover" />
+                              <img src={member.user.avatarUrl} alt={member.user.fullName || t('common.unknown')} className="h-full w-full object-cover" />
                             ) : (
                               member?.user?.fullName?.charAt(0) || '?'
                             )}
@@ -227,16 +233,16 @@ export default function Expenses() {
               </div>
               
               <div className="flex items-center gap-6">
-                <div className="text-right">
-                  <div className="font-bold text-xl text-text-primary">EGP {formatCurrency(expense.amount, 2)}</div>
-                  <div className="text-sm text-text-secondary mt-1 flex items-center justify-end space-x-1">
-                    <Circle className="h-4 w-4 text-orange-500" /><span className="text-orange-600 font-medium">Pending</span>
+                <div className={`text-${i18n.language === 'ar' ? 'left' : 'right'}`}>
+                  <div className="font-bold text-xl text-text-primary">{i18n.language === 'ar' ? 'ج.م' : 'EGP'} {formatCurrency(expense.amount, 2)}</div>
+                  <div className={`text-sm text-text-secondary mt-1 flex items-center justify-${i18n.language === 'ar' ? 'start' : 'end'} space-x-1 rtl:space-x-reverse`}>
+                    <Circle className="h-4 w-4 text-orange-500" /><span className="text-orange-600 font-medium">{t('expenses.pending')}</span>
                   </div>
                 </div>
                 <button 
                   onClick={() => confirmDelete(expense.id)}
                   className="text-gray-400 hover:text-red-500 transition-colors p-2"
-                  title="Delete expense"
+                  title={t('expenses.deleteExpense')}
                 >
                   <Trash2 className="h-5 w-5" />
                 </button>
@@ -247,8 +253,8 @@ export default function Expenses() {
             <div className="p-8">
               <EmptyState 
                 icon={Receipt} 
-                title="All settled up!" 
-                description="There are no pending expenses. You're all caught up with your roommates." 
+                title={t('expenses.allSettled')} 
+                description={t('expenses.allSettledDesc')} 
               />
             </div>
           )}
@@ -257,8 +263,8 @@ export default function Expenses() {
 
       <ConfirmModal
         isOpen={!!itemToDelete}
-        title="Delete Expense"
-        message="Are you sure you want to delete this expense? This action cannot be undone."
+        title={t('expenses.deleteTitle')}
+        message={t('expenses.deleteMessage')}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setItemToDelete(null)}
       />

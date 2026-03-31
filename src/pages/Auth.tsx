@@ -6,11 +6,13 @@ import { loginWithGoogle, logout, db } from '../firebase';
 import { collection, doc, setDoc, getDoc, writeBatch } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 import EmptyState from '../components/EmptyState';
+import { useTranslation } from 'react-i18next';
 
 function ApartmentCard({ membership, onSelect }: { membership: any, onSelect: () => void }) {
   const { user } = useAuth();
   const [apartmentData, setApartmentData] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(true);
+  const { t } = useTranslation();
 
   React.useEffect(() => {
     const fetchApartment = async () => {
@@ -33,11 +35,11 @@ function ApartmentCard({ membership, onSelect }: { membership: any, onSelect: ()
   return (
     <button
       onClick={onSelect}
-      className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:border-primary transition-all text-left group"
+      className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:border-primary transition-all text-left rtl:text-right group"
     >
       <h3 className="font-bold text-text-primary group-hover:text-primary transition-colors">
         {loading ? (
-          <span className="flex items-center space-x-2">
+          <span className="flex items-center space-x-2 rtl:space-x-reverse">
             <span className="h-4 w-24 bg-gray-100 animate-pulse rounded" />
           </span>
         ) : (
@@ -45,7 +47,7 @@ function ApartmentCard({ membership, onSelect }: { membership: any, onSelect: ()
         )}
       </h3>
       <p className="text-xs text-text-secondary mt-1">
-        {isCreator ? 'Created' : 'Joined'} {new Date(membership.joinedAt).toLocaleDateString()}
+        {isCreator ? t('auth.created') : t('auth.joined')} {new Date(membership.joinedAt).toLocaleDateString()}
       </p>
     </button>
   );
@@ -58,6 +60,8 @@ export default function Auth() {
   const [address, setAddress] = useState('');
   const [inviteCode, setInviteCode] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -73,7 +77,7 @@ export default function Auth() {
     try {
       await loginWithGoogle();
     } catch (err) {
-      setError('Failed to log in with Google.');
+      setError(t('auth.loginError'));
     }
   };
 
@@ -82,7 +86,7 @@ export default function Auth() {
       await logout();
       navigate('/auth');
     } catch (err) {
-      setError('Failed to log out.');
+      setError(t('auth.logoutError'));
     }
   };
 
@@ -143,7 +147,7 @@ export default function Auth() {
       navigate('/dashboard');
     } catch (err) {
       console.error('Error creating apartment:', err);
-      setError('Failed to create apartment.');
+      setError(t('auth.createError'));
     }
   };
 
@@ -152,7 +156,7 @@ export default function Auth() {
     if (!user) return;
     const code = inviteCode.join('').trim().toUpperCase();
     if (code.length < 6) {
-      setError('Please enter the full 6-digit code.');
+      setError(t('auth.enterFullCode'));
       return;
     }
     
@@ -166,13 +170,13 @@ export default function Auth() {
         inviteSnap = await getDoc(inviteRef);
       } catch (err) {
         handleFirestoreError(err, OperationType.GET, `inviteCodes/${code}`);
-        setError('Failed to verify invite code.');
+        setError(t('auth.verifyError'));
         return;
       }
       
       if (!inviteSnap.exists()) {
         console.log('Invalid invite code');
-        setError('Invalid invite code. Please check and try again.');
+        setError(t('auth.invalidCode'));
         return;
       }
 
@@ -186,7 +190,7 @@ export default function Auth() {
         memberSnap = await getDoc(memberRef);
       } catch (err) {
         handleFirestoreError(err, OperationType.GET, `apartmentMembers/${aptId}_${user.uid}`);
-        setError('Failed to check membership status.');
+        setError(t('auth.checkMembershipError'));
         return;
       }
       
@@ -215,7 +219,7 @@ export default function Auth() {
         console.log('Membership record created successfully');
       } catch (err) {
         handleFirestoreError(err, OperationType.WRITE, `apartmentMembers/${aptId}_${user.uid}`);
-        setError('Failed to join apartment. Please try again.');
+        setError(t('auth.joinError'));
         return;
       }
 
@@ -225,7 +229,7 @@ export default function Auth() {
       navigate('/dashboard');
     } catch (err) {
       console.error('Error joining apartment:', err);
-      setError('An unexpected error occurred. Please try again.');
+      setError(t('auth.unexpectedError'));
     }
   };
 
@@ -240,26 +244,26 @@ export default function Auth() {
           <div className="h-20 w-20 bg-gradient-to-br from-primary to-indigo-600 rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-xl shadow-primary/20 rotate-3">
             <LayoutDashboard className="h-10 w-10 text-white" />
           </div>
-          <h1 className="text-4xl font-black text-text-primary tracking-tighter mb-3">Roommate OS</h1>
-          <p className="text-text-secondary mb-10 text-lg">The digital backbone for your shared living space.</p>
+          <h1 className="text-4xl font-black text-text-primary tracking-tighter mb-3">{t('auth.title')}</h1>
+          <p className="text-text-secondary mb-10 text-lg">{t('auth.subtitle')}</p>
           
           {error && (
             <div className="bg-danger/10 text-danger p-4 rounded-2xl mb-6 text-sm font-medium flex items-center justify-center">
-              <AlertCircle className="h-4 w-4 mr-2" />
+              <AlertCircle className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
               {error}
             </div>
           )}
           
           <button 
             onClick={handleLogin}
-            className="w-full bg-text-primary hover:bg-black text-white font-bold py-4 rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center space-x-3 text-lg"
+            className="w-full bg-text-primary hover:bg-black text-white font-bold py-4 rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center space-x-3 rtl:space-x-reverse text-lg"
           >
             <img src="https://www.google.com/favicon.ico" className="h-5 w-5" alt="Google" />
-            <span>Continue with Google</span>
+            <span>{t('auth.continueWithGoogle')}</span>
           </button>
           
           <p className="mt-8 text-xs text-text-secondary uppercase tracking-widest font-bold opacity-50">
-            Secure • Real-time • Collaborative
+            {t('auth.secureRealtime')}
           </p>
         </div>
       </div>
@@ -270,8 +274,8 @@ export default function Auth() {
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 md:p-8">
       <div className="w-full max-w-6xl">
         <header className="flex justify-between items-center mb-16">
-          <h1 className="text-3xl font-black text-primary tracking-tighter">Roommate OS</h1>
-          <div className="flex items-center space-x-4 bg-white p-2 pr-4 rounded-full shadow-sm border border-gray-100">
+          <h1 className="text-3xl font-black text-primary tracking-tighter">{t('auth.title')}</h1>
+          <div className="flex items-center space-x-4 rtl:space-x-reverse bg-white p-2 pr-4 rtl:pr-2 rtl:pl-4 rounded-full shadow-sm border border-gray-100">
             <img src={user.photoURL || ''} alt="Avatar" className="h-10 w-10 rounded-full ring-2 ring-primary/10" />
             <span className="text-sm font-bold text-text-primary">{user.displayName}</span>
             <button 
@@ -286,7 +290,7 @@ export default function Auth() {
 
         {error && (
           <div className="bg-danger/10 text-danger p-6 rounded-3xl mb-12 text-center font-bold shadow-sm flex items-center justify-center">
-            <AlertCircle className="h-5 w-5 mr-3" />
+            <AlertCircle className={`h-5 w-5 ${isRTL ? 'ml-3' : 'mr-3'}`} />
             {error}
           </div>
         )}
@@ -294,8 +298,8 @@ export default function Auth() {
         {memberships.length > 0 && (
           <div className="mb-20">
             <div className="flex items-center mb-6">
-              <div className="h-1 w-8 bg-primary rounded-full mr-3"></div>
-              <p className="text-xs font-black text-text-secondary uppercase tracking-widest">Your Active Spaces</p>
+              <div className={`h-1 w-8 bg-primary rounded-full ${isRTL ? 'ml-3' : 'mr-3'}`}></div>
+              <p className="text-xs font-black text-text-secondary uppercase tracking-widest">{t('auth.activeSpaces')}</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {memberships.map((m) => (
@@ -312,19 +316,19 @@ export default function Auth() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
           {/* Create Apartment */}
           <div className="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-100 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-              <LayoutDashboard className="h-32 w-32 -rotate-12" />
+            <div className={`absolute top-0 ${isRTL ? 'left-0' : 'right-0'} p-6 opacity-5 group-hover:opacity-10 transition-opacity`}>
+              <LayoutDashboard className={`h-32 w-32 ${isRTL ? 'rotate-12' : '-rotate-12'}`} />
             </div>
-            <p className="text-xs font-black text-primary uppercase tracking-widest mb-4">Option 01</p>
-            <h2 className="text-4xl font-black text-text-primary tracking-tighter mb-4">Create Space</h2>
-            <p className="text-text-secondary mb-10 text-lg leading-relaxed">Establish a new digital blueprint for your apartment and invite your crew.</p>
+            <p className="text-xs font-black text-primary uppercase tracking-widest mb-4">{t('auth.option1')}</p>
+            <h2 className="text-4xl font-black text-text-primary tracking-tighter mb-4">{t('auth.createSpace')}</h2>
+            <p className="text-text-secondary mb-10 text-lg leading-relaxed">{t('auth.createDesc')}</p>
 
             <form onSubmit={handleCreate} className="space-y-8">
               <div>
-                <label className="block text-xs font-black text-text-primary uppercase tracking-widest mb-3">Apartment Name</label>
+                <label className="block text-xs font-black text-text-primary uppercase tracking-widest mb-3">{t('auth.apartmentName')}</label>
                 <input
                   type="text"
-                  placeholder="e.g. The Penthouse 4B"
+                  placeholder={t('auth.apartmentNamePlaceholder')}
                   value={apartmentName}
                   onChange={(e) => setApartmentName(e.target.value)}
                   className="w-full bg-gray-100 border-2 border-transparent rounded-2xl px-6 py-4 text-sm font-medium focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all"
@@ -332,24 +336,24 @@ export default function Auth() {
                 />
               </div>
               <button type="submit" className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-4 rounded-2xl text-lg transition-all shadow-xl shadow-primary/20 active:scale-95">
-                Initialize Space
+                {t('auth.initializeSpace')}
               </button>
             </form>
           </div>
 
           {/* Join Existing */}
           <div className="bg-gray-900 p-10 rounded-[2.5rem] shadow-2xl text-white relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-              <Users className="h-32 w-32 rotate-12" />
+            <div className={`absolute top-0 ${isRTL ? 'left-0' : 'right-0'} p-6 opacity-5 group-hover:opacity-10 transition-opacity`}>
+              <Users className={`h-32 w-32 ${isRTL ? '-rotate-12' : 'rotate-12'}`} />
             </div>
-            <p className="text-xs font-black text-secondary uppercase tracking-widest mb-4">Option 02</p>
-            <h2 className="text-4xl font-black tracking-tighter mb-4">Join Crew</h2>
-            <p className="text-white/60 mb-10 text-lg leading-relaxed">Enter a unique invite code provided by your future roommates to connect.</p>
+            <p className="text-xs font-black text-secondary uppercase tracking-widest mb-4">{t('auth.option2')}</p>
+            <h2 className="text-4xl font-black tracking-tighter mb-4">{t('auth.joinCrew')}</h2>
+            <p className="text-white/60 mb-10 text-lg leading-relaxed">{t('auth.joinDesc')}</p>
 
             <div className="space-y-8">
               <div>
-                <label className="block text-xs font-black text-white/60 uppercase tracking-widest mb-4 text-center">6-Digit Invitation Code</label>
-                <div className="flex justify-center space-x-3 mb-10">
+                <label className="block text-xs font-black text-white/60 uppercase tracking-widest mb-4 text-center">{t('auth.inviteCodeLabel')}</label>
+                <div className="flex justify-center space-x-3 rtl:space-x-reverse mb-10" dir="ltr">
                   {inviteCode.map((digit, idx) => (
                     <input
                       key={idx}
@@ -377,7 +381,7 @@ export default function Auth() {
                   ))}
                 </div>
                 <button onClick={handleJoin} className="w-full bg-secondary hover:bg-secondary/90 text-white font-bold py-4 rounded-2xl text-lg transition-all shadow-xl shadow-secondary/20 active:scale-95">
-                  Connect to Hub
+                  {t('auth.connectToHub')}
                 </button>
               </div>
             </div>

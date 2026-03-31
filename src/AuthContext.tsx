@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from './firebase';
-import { doc, getDoc, setDoc, collection, query, where, onSnapshot, getDocFromServer } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection, query, where, onSnapshot, getDocFromServer } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from './lib/firestore-error';
+import { useTranslation } from 'react-i18next';
 
 async function testConnection() {
   try {
@@ -23,6 +24,8 @@ interface AuthContextType {
   apartment: any | null;
   memberships: any[];
   setApartmentId: (id: string | null) => void;
+  language: string;
+  changeLanguage: (lang: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -32,18 +35,39 @@ const AuthContext = createContext<AuthContextType>({
   apartment: null,
   memberships: [],
   setApartmentId: () => {},
+  language: 'ar',
+  changeLanguage: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { i18n } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [apartmentId, setApartmentId] = useState<string | null>(null);
   const [apartment, setApartment] = useState<any | null>(null);
   const [memberships, setMemberships] = useState<any[]>([]);
+  const [language, setLanguage] = useState<string>(i18n.language || 'ar');
   const membershipUnsubscribeRef = React.useRef<(() => void) | null>(null);
   const apartmentUnsubscribeRef = React.useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    document.documentElement.dir = i18n.dir();
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
+
+  const changeLanguage = async (lang: string) => {
+    await i18n.changeLanguage(lang);
+    setLanguage(lang);
+    if (user) {
+      try {
+        await updateDoc(doc(db, 'users', user.uid), { language: lang });
+      } catch (error) {
+        console.error('Failed to save language preference:', error);
+      }
+    }
+  };
 
   useEffect(() => {
     if (apartmentId) {
@@ -99,11 +123,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               fullName: currentUser.displayName || 'New User',
               email: currentUser.email,
               avatarUrl: currentUser.photoURL,
+              language: 'ar',
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
             });
+            i18n.changeLanguage('ar');
+            setLanguage('ar');
           } catch (error) {
             handleFirestoreError(error, OperationType.WRITE, `users/${currentUser.uid}`);
+          }
+        } else {
+          const userData = userSnap.data();
+          if (userData.language && userData.language !== i18n.language) {
+            i18n.changeLanguage(userData.language);
+            setLanguage(userData.language);
           }
         }
         
@@ -173,8 +206,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     apartmentId,
     apartment,
     memberships,
-    setApartmentId
-  }), [user, loading, apartmentId, apartment, memberships]);
+    setApartmentId,
+    language,
+    changeLanguage
+  }), [user, loading, apartmentId, apartment, memberships, language]);
 
   return (
     <AuthContext.Provider value={contextValue}>

@@ -4,13 +4,16 @@ import { useAuth } from '../AuthContext';
 import { db } from '../firebase';
 import { doc, deleteDoc, collection, query, where, getDocs, writeBatch, updateDoc } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
-import { AlertTriangle, Trash2, Save, Home } from 'lucide-react';
+import { AlertTriangle, Trash2, Save, Home, Globe } from 'lucide-react';
 import { toast } from 'sonner';
 import EmptyState from '../components/EmptyState';
+import LanguageSwitcher from '../components/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 export default function Settings() {
   const navigate = useNavigate();
   const { user, apartment, setApartmentId, memberships } = useAuth();
+  const { t, i18n } = useTranslation();
   const [isDeleting, setIsDeleting] = useState(false);
   const [confirmName, setConfirmName] = useState('');
   const [error, setError] = useState('');
@@ -33,10 +36,10 @@ export default function Settings() {
       await updateDoc(doc(db, 'apartments', apartment.id), {
         hotWaterBuffer: Number(hotWaterBuffer)
       });
-      toast.success('Hot water buffer updated successfully');
+      toast.success(t('settings.bufferSuccess'));
     } catch (err) {
       handleFirestoreError(err, OperationType.UPDATE, `apartments/${apartment.id}`);
-      toast.error('Failed to update hot water buffer');
+      toast.error(t('settings.bufferError'));
     } finally {
       setIsSavingBuffer(false);
     }
@@ -45,7 +48,7 @@ export default function Settings() {
   const handleDeleteApartment = async () => {
     if (!isAdmin || !apartment || !user) return;
     if (confirmName !== apartment.name) {
-      setError('Apartment name does not match.');
+      setError(t('settings.deleteMatchError'));
       return;
     }
 
@@ -86,7 +89,7 @@ export default function Settings() {
       navigate('/auth');
     } catch (err) {
       handleFirestoreError(err, OperationType.DELETE, `apartments/${apartment.id}`);
-      setError('Failed to delete apartment. Please try again.');
+      setError(t('settings.deleteError'));
       setIsDeleting(false);
     }
   };
@@ -94,12 +97,12 @@ export default function Settings() {
   if (!apartment || !user) {
     return (
       <div className="p-8 max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-text-primary mb-6">Settings</h1>
+        <h1 className="text-3xl font-bold text-text-primary mb-6">{t('settings.title')}</h1>
         <EmptyState 
           icon={Home} 
-          title="No apartment selected" 
-          description="You need to be in an apartment to access settings. Head back to the dashboard or join a space." 
-          actionLabel="Go to Dashboard"
+          title={t('settings.noApartment')} 
+          description={t('settings.noApartmentDesc')} 
+          actionLabel={t('settings.goToDashboard')}
           onAction={() => navigate('/')}
         />
       </div>
@@ -109,9 +112,9 @@ export default function Settings() {
   if (!isAdmin) {
     return (
       <div className="p-8 max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-text-primary mb-6">Settings</h1>
+        <h1 className="text-3xl font-bold text-text-primary mb-6">{t('settings.title')}</h1>
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-          <p className="text-text-secondary">Only the creator or administrators of this apartment can access these settings.</p>
+          <p className="text-text-secondary">{t('settings.adminOnly')}</p>
         </div>
       </div>
     );
@@ -119,31 +122,49 @@ export default function Settings() {
 
   return (
     <div className="p-8 max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold text-text-primary mb-2">Settings</h1>
-      <p className="text-text-secondary mb-8">Manage your apartment configuration and data.</p>
+      <h1 className="text-3xl font-bold text-text-primary mb-2">{t('settings.title')}</h1>
+      <p className="text-text-secondary mb-8">{t('settings.description')}</p>
 
       <div className="space-y-8">
-        {/* Danger Zone */}
+        {/* Language Settings */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-6 border-b border-gray-100">
-            <h2 className="font-bold text-text-primary">Invitation</h2>
+          <div className="p-6 border-b border-gray-100 flex items-center">
+            <Globe className={`w-5 h-5 ${i18n.language === 'ar' ? 'ml-3' : 'mr-3'} text-primary`} />
+            <h2 className="font-bold text-text-primary">{t('settings.languageSettings')}</h2>
           </div>
           <div className="p-6 space-y-4">
             <div>
               <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-2">
-                Invite Code
+                {t('settings.appLanguage')}
               </label>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                <LanguageSwitcher className="bg-gray-50 border border-gray-200 px-4 py-2" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Invitation */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="p-6 border-b border-gray-100">
+            <h2 className="font-bold text-text-primary">{t('settings.invitation')}</h2>
+          </div>
+          <div className="p-6 space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-2">
+                {t('settings.inviteCode')}
+              </label>
+              <div className="flex items-center space-x-2 rtl:space-x-reverse">
                 <code className="bg-gray-100 px-4 py-2 rounded-lg font-mono text-lg">{apartment.inviteCode}</code>
                 <button
                   onClick={() => {
                     const link = `${window.location.origin}/auth?inviteCode=${apartment.inviteCode}`;
                     navigator.clipboard.writeText(link);
-                    alert('Invite link copied to clipboard!');
+                    toast.success(t('settings.inviteCopied'));
                   }}
                   className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors"
                 >
-                  Copy Invite Link
+                  {t('settings.copyInviteLink')}
                 </button>
               </div>
             </div>
@@ -152,17 +173,17 @@ export default function Settings() {
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-100">
-            <h2 className="font-bold text-text-primary">Shower Queue Settings</h2>
+            <h2 className="font-bold text-text-primary">{t('settings.showerQueueSettings')}</h2>
           </div>
           <div className="p-6 space-y-4">
             <div>
               <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-2">
-                Hot Water Buffer (Minutes)
+                {t('settings.hotWaterBuffer')}
               </label>
               <p className="text-sm text-text-secondary mb-4">
-                The mandatory gap between consecutive shower slots to allow hot water to replenish.
+                {t('settings.hotWaterBufferDesc')}
               </p>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 rtl:space-x-reverse">
                 <input
                   type="number"
                   min="0"
@@ -176,8 +197,8 @@ export default function Settings() {
                   disabled={isSavingBuffer || hotWaterBuffer === apartment.hotWaterBuffer || (hotWaterBuffer === 20 && apartment.hotWaterBuffer === undefined)}
                   className="bg-primary text-white px-4 py-3 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                 >
-                  <Save className="w-4 h-4 mr-2" />
-                  {isSavingBuffer ? 'Saving...' : 'Save'}
+                  <Save className={`w-4 h-4 ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+                  {isSavingBuffer ? t('settings.saving') : t('settings.save')}
                 </button>
               </div>
             </div>
@@ -186,14 +207,14 @@ export default function Settings() {
 
         <div className="bg-white rounded-2xl shadow-sm border border-red-100 overflow-hidden">
           <div className="p-6 bg-red-50 border-b border-red-100 flex items-center">
-            <AlertTriangle className="text-red-600 mr-3 h-5 w-5" />
-            <h2 className="font-bold text-red-900">Danger Zone</h2>
+            <AlertTriangle className={`text-red-600 ${i18n.language === 'ar' ? 'ml-3' : 'mr-3'} h-5 w-5`} />
+            <h2 className="font-bold text-red-900">{t('settings.dangerZone')}</h2>
           </div>
           <div className="p-6 space-y-6">
             <div>
-              <h3 className="text-lg font-bold text-text-primary mb-2">Delete Apartment</h3>
+              <h3 className="text-lg font-bold text-text-primary mb-2">{t('settings.deleteApartment')}</h3>
               <p className="text-sm text-text-secondary mb-4">
-                This action is permanent and cannot be undone. All data associated with <strong>{apartment.name}</strong> will be permanently deleted, including bills, chores, and member history.
+                {t('settings.deleteWarning1')} <strong>{apartment.name}</strong> {t('settings.deleteWarning2')}
               </p>
               
               {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
@@ -201,7 +222,7 @@ export default function Settings() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-2">
-                    Type "{apartment.name}" to confirm
+                    {t('settings.typeToConfirm')} "{apartment.name}"
                   </label>
                   <input
                     type="text"
@@ -221,8 +242,8 @@ export default function Settings() {
                       : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   }`}
                 >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  {isDeleting ? 'Deleting...' : 'Permanently Delete Apartment'}
+                  <Trash2 className={`h-4 w-4 ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+                  {isDeleting ? t('settings.deleting') : t('settings.permanentlyDelete')}
                 </button>
               </div>
             </div>

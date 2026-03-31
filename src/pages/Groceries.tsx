@@ -9,10 +9,12 @@ import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 import ConfirmModal from '../components/ConfirmModal';
 import EmptyState from '../components/EmptyState';
 import LoadingScreen from '../components/LoadingScreen';
+import { useTranslation } from 'react-i18next';
 
 export default function Groceries() {
   const { user, apartmentId } = useAuth();
   const { members } = useMembers();
+  const { t, i18n } = useTranslation();
   const [groceries, setGroceries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
@@ -56,10 +58,10 @@ export default function Groceries() {
       setNewItemName('');
       setNewItemQuantity('1');
       setIsAdding(false);
-      toast.success('Item added to grocery list.');
+      toast.success(t('groceries.addSuccess'));
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'groceries');
-      toast.error('Failed to add item.');
+      toast.error(t('groceries.addError'));
     }
   };
 
@@ -73,10 +75,10 @@ export default function Groceries() {
     setTimeout(async () => {
       try {
         await deleteDoc(doc(db, 'groceries', itemId));
-        toast.success('Item purchased and removed.');
+        toast.success(t('groceries.completeSuccess'));
       } catch (error) {
         handleFirestoreError(error, OperationType.DELETE, `groceries/${itemId}`);
-        toast.error('Failed to complete item.');
+        toast.error(t('groceries.completeError'));
       } finally {
         setCompletingItems(prev => {
           const next = new Set(prev);
@@ -95,48 +97,48 @@ export default function Groceries() {
     if (!itemToDelete) return;
     try {
       await deleteDoc(doc(db, 'groceries', itemToDelete));
-      toast.success('Item deleted.');
+      toast.success(t('groceries.deleteSuccess'));
     } catch (error) {
       handleFirestoreError(error, OperationType.DELETE, `groceries/${itemToDelete}`);
-      toast.error('Failed to delete item.');
+      toast.error(t('groceries.deleteError'));
     } finally {
       setItemToDelete(null);
     }
   };
 
-  if (loading) return <LoadingScreen message="Loading groceries..." />;
+  if (loading) return <LoadingScreen message={t('dashboard.loading')} />;
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-text-primary tracking-tight">Grocery List</h1>
-          <p className="text-text-secondary mt-1">Add items needed for the apartment.</p>
+          <h1 className="text-3xl font-bold text-text-primary tracking-tight">{t('groceries.title')}</h1>
+          <p className="text-text-secondary mt-1">{t('groceries.description')}</p>
         </div>
         <button 
           onClick={() => setIsAdding(!isAdding)}
           className="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium flex items-center transition-colors"
         >
-          <Plus className="h-5 w-5 mr-2" />
-          {isAdding ? 'Cancel' : 'Add Item'}
+          <Plus className={`h-5 w-5 ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+          {isAdding ? t('groceries.cancel') : t('groceries.addItem')}
         </button>
       </header>
 
       {isAdding && (
         <form onSubmit={handleAddItem} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex gap-4 items-end">
           <div className="flex-1">
-            <label className="block text-sm font-medium text-text-secondary mb-1">Item Name</label>
+            <label className="block text-sm font-medium text-text-secondary mb-1">{t('groceries.itemName')}</label>
             <input 
               type="text" 
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
               className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              placeholder="e.g., Milk, Eggs, Bread"
+              placeholder={t('groceries.itemNamePlaceholder')}
               required
             />
           </div>
           <div className="w-24">
-            <label className="block text-sm font-medium text-text-secondary mb-1">Quantity</label>
+            <label className="block text-sm font-medium text-text-secondary mb-1">{t('groceries.quantity')}</label>
             <input 
               type="number" 
               min="1"
@@ -147,16 +149,16 @@ export default function Groceries() {
             />
           </div>
           <button type="submit" className="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors">
-            Save
+            {t('groceries.save')}
           </button>
         </form>
       )}
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-          <h2 className="font-bold text-text-primary">Needed Items</h2>
+          <h2 className="font-bold text-text-primary">{t('groceries.neededItems')}</h2>
           <div className="text-sm font-medium text-text-secondary">
-            Total: <span className="text-text-primary font-bold">{groceries.filter(g => g.status === 'needed').length}</span>
+            {t('groceries.total')} <span className="text-text-primary font-bold">{groceries.filter(g => g.status === 'needed').length}</span>
           </div>
         </div>
         
@@ -165,7 +167,7 @@ export default function Groceries() {
             const isCompleting = completingItems.has(item.id);
             return (
             <div key={item.id} className={`p-6 flex items-center justify-between transition-all duration-500 ${isCompleting ? 'bg-gray-50 opacity-60 scale-[0.99]' : 'hover:bg-gray-50'}`}>
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-4 rtl:space-x-reverse">
                 <button 
                   onClick={() => toggleItemStatus(item.id)}
                   className="h-8 w-8 rounded-full border-2 border-gray-300 hover:border-primary flex items-center justify-center transition-colors"
@@ -191,7 +193,7 @@ export default function Groceries() {
                     {item.name}
                   </h3>
                   <p className={`text-sm transition-all duration-500 ${isCompleting ? 'text-gray-400' : 'text-text-secondary'}`}>
-                    Qty: {item.quantity} • Added by {(() => {
+                    {t('groceries.qty')} {item.quantity} • {t('groceries.addedBy')} {(() => {
                       const adder = members.find(m => m.userId === item.addedByUserId);
                       return adder?.user?.fullName || item.addedBy;
                     })()}
@@ -203,12 +205,12 @@ export default function Groceries() {
                 <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider transition-all duration-500 ${
                   isCompleting || item.status === 'purchased' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                 }`}>
-                  {isCompleting ? 'Purchasing...' : (item.status === 'purchased' ? 'Purchased' : 'Needed')}
+                  {isCompleting ? t('groceries.purchasing') : (item.status === 'purchased' ? t('groceries.purchased') : t('groceries.needed'))}
                 </span>
                 <button 
                   onClick={() => confirmDelete(item.id)}
                   className={`text-gray-400 hover:text-red-500 transition-colors p-2 ${isCompleting ? 'opacity-0 pointer-events-none' : ''}`}
-                  title="Delete item"
+                  title={t('groceries.deleteItem')}
                 >
                   <Trash2 className="h-5 w-5" />
                 </button>
@@ -219,8 +221,8 @@ export default function Groceries() {
             <div className="p-8">
               <EmptyState 
                 icon={ShoppingCart} 
-                title="Fridge is full!" 
-                description="You don't need any groceries right now. Add items when you run out." 
+                title={t('groceries.fridgeFull')} 
+                description={t('groceries.fridgeFullDesc')} 
               />
             </div>
           )}
@@ -229,8 +231,8 @@ export default function Groceries() {
 
       <ConfirmModal
         isOpen={!!itemToDelete}
-        title="Delete Grocery Item"
-        message="Are you sure you want to delete this item? This action cannot be undone."
+        title={t('groceries.deleteTitle')}
+        message={t('groceries.deleteMessage')}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setItemToDelete(null)}
       />

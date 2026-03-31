@@ -73,6 +73,7 @@ service cloud.firestore {
       allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
       allow read: if isAuthenticated();
       allow update: if isAuthenticated() && (
+        isApartmentMember(resource.data.apartmentId) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isAway']) ||
         (memberId.matches(".*_" + request.auth.uid) && request.resource.data.role == resource.data.role) ||
         isApartmentAdmin(resource.data.apartmentId) ||
         isApartmentCreator(resource.data.apartmentId) ||
@@ -84,6 +85,11 @@ service cloud.firestore {
         isApartmentCreator(resource.data.apartmentId) ||
         isGlobalAdmin()
       );
+    }
+
+    match /trashHistory/{historyId} {
+      allow read: if isAuthenticated() && isApartmentMember(resource.data.apartmentId);
+      allow create: if isAuthenticated() && isApartmentMember(request.resource.data.apartmentId);
     }
 
     match /expenses/{expenseId} {

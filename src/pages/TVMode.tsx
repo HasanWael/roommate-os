@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
+import { ar, enUS } from 'date-fns/locale';
 import { Receipt, CheckSquare, ShoppingCart, CalendarDays, LayoutDashboard, Droplets } from 'lucide-react';
 import { formatCurrency } from '../lib/format';
 import { useAuth } from '../AuthContext';
@@ -7,6 +8,7 @@ import { db, loginWithGoogle, logout } from '../firebase';
 import { collection, query, where, onSnapshot, doc, getDoc, orderBy, limit } from 'firebase/firestore';
 import { useMembers } from '../hooks/useMembers';
 import TVShowerQueueWidget from '../components/TVShowerQueueWidget';
+import { useTranslation } from 'react-i18next';
 
 export default function TVMode() {
   const { user, apartmentId, apartment, memberships, setApartmentId } = useAuth();
@@ -18,6 +20,9 @@ export default function TVMode() {
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+  const dateLocale = isRTL ? ar : enUS;
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -84,29 +89,29 @@ export default function TVMode() {
     return '?';
   };
 
-  if (loading) return <div className="tv-mode min-h-screen flex items-center justify-center text-2xl font-bold">Loading Command Screen...</div>;
+  if (loading) return <div className="tv-mode min-h-screen flex items-center justify-center text-2xl font-bold">{t('tvMode.loading')}</div>;
 
   if (!apartmentId) {
     return (
       <div className="tv-mode min-h-screen w-screen flex flex-col items-center justify-center text-center bg-tv-dark">
         <div className="max-w-2xl w-full p-8">
-          <h1 className="text-7xl font-bold tracking-tighter mb-4 opacity-20">COMMAND CENTER</h1>
+          <h1 className="text-7xl font-bold tracking-tighter mb-4 opacity-20">{t('tvMode.commandCenter')}</h1>
           <div className="h-1.5 w-32 bg-primary rounded-full mx-auto mb-12"></div>
           
           {!user ? (
             <div className="space-y-8">
-              <p className="text-3xl font-bold text-white/40 uppercase tracking-widest mb-12">Authentication Required</p>
+              <p className="text-3xl font-bold text-white/40 uppercase tracking-widest mb-12">{t('tvMode.authRequired')}</p>
               <button 
                 onClick={() => loginWithGoogle()}
-                className="bg-white text-black font-bold py-6 px-12 rounded-3xl text-2xl transition-all hover:scale-105 active:scale-95 shadow-2xl flex items-center justify-center space-x-4 mx-auto"
+                className="bg-white text-black font-bold py-6 px-12 rounded-3xl text-2xl transition-all hover:scale-105 active:scale-95 shadow-2xl flex items-center justify-center space-x-4 rtl:space-x-reverse mx-auto"
               >
                 <img src="https://www.google.com/favicon.ico" className="h-8 w-8" alt="Google" />
-                <span>Login to Roommate OS</span>
+                <span>{t('tvMode.login')}</span>
               </button>
             </div>
           ) : (
             <div className="space-y-12">
-              <p className="text-3xl font-bold text-white/40 uppercase tracking-widest">Select an Active Space</p>
+              <p className="text-3xl font-bold text-white/40 uppercase tracking-widest">{t('tvMode.selectSpace')}</p>
               
               {memberships.length > 0 ? (
                 <div className="grid grid-cols-1 gap-6">
@@ -114,14 +119,14 @@ export default function TVMode() {
                     <button
                       key={m.id}
                       onClick={() => setApartmentId(m.apartmentId)}
-                      className="bg-[#2A2A2A] border border-gray-800 p-8 rounded-[2.5rem] hover:bg-[#333333] transition-all text-left group flex justify-between items-center"
+                      className="bg-[#2A2A2A] border border-gray-800 p-8 rounded-[2.5rem] hover:bg-[#333333] transition-all text-left rtl:text-right group flex justify-between items-center"
                     >
                       <div>
                         <h3 className="text-4xl font-bold tracking-tighter group-hover:text-primary transition-colors">
-                          {m.apartmentName || 'Unnamed Apartment'}
+                          {m.apartmentName || t('tvMode.unnamedApartment')}
                         </h3>
                         <p className="text-xl text-gray-400 font-bold uppercase tracking-widest mt-2">
-                          {m.role} • Joined {format(new Date(m.joinedAt), 'MMM yyyy')}
+                          {m.role} • {t('tvMode.joined')} {format(new Date(m.joinedAt), 'MMM yyyy', { locale: dateLocale })}
                         </p>
                       </div>
                       <div className="h-16 w-16 rounded-full bg-primary/20 flex items-center justify-center text-primary">
@@ -132,21 +137,21 @@ export default function TVMode() {
                 </div>
               ) : (
                 <div className="space-y-8">
-                  <p className="text-2xl text-gray-500 font-bold uppercase tracking-widest italic">No apartments found for this account.</p>
+                  <p className="text-2xl text-gray-500 font-bold uppercase tracking-widest italic">{t('tvMode.noApartments')}</p>
                   <button 
                     onClick={() => window.location.href = '/auth'}
                     className="bg-primary text-white font-bold py-6 px-12 rounded-3xl text-2xl transition-all hover:scale-105 active:scale-95 shadow-2xl"
                   >
-                    Setup New Space
+                    {t('tvMode.setupSpace')}
                   </button>
                 </div>
               )}
               
               <div className="pt-12 border-t border-gray-800">
-                <div className="flex items-center justify-center space-x-4">
+                <div className="flex items-center justify-center space-x-4 rtl:space-x-reverse">
                   <img src={user.photoURL || ''} className="h-12 w-12 rounded-full border-2 border-primary/30" alt="User" />
                   <span className="text-xl font-bold text-gray-400">{user.displayName}</span>
-                  <button onClick={() => logout()} className="text-danger text-lg font-bold uppercase tracking-widest ml-4 hover:underline">Logout</button>
+                  <button onClick={() => logout()} className={`text-danger text-lg font-bold uppercase tracking-widest ${isRTL ? 'mr-4' : 'ml-4'} hover:underline`}>{t('tvMode.logout')}</button>
                 </div>
               </div>
             </div>
@@ -162,12 +167,12 @@ export default function TVMode() {
         {/* Header */}
         <header className="flex justify-between items-center mb-12 px-8 pt-8">
           <div>
-            <h1 className="text-5xl font-extrabold tracking-tight mb-2 text-white">{apartment?.name || 'Your Apartment'}</h1>
-            <p className="text-xl text-slate-400 font-medium">Roommate OS</p>
+            <h1 className="text-5xl font-extrabold tracking-tight mb-2 text-white">{apartment?.name || t('tvMode.yourApartment')}</h1>
+            <p className="text-xl text-slate-400 font-medium">{t('tvMode.roommateOS')}</p>
           </div>
-          <div className="text-right">
+          <div className={`text-${isRTL ? 'left' : 'right'}`}>
             <h2 className="text-6xl font-extrabold tracking-tighter text-white">{format(time, 'HH:mm')}</h2>
-            <p className="text-2xl text-slate-400 font-medium">{format(time, 'EEEE, MMMM do')}</p>
+            <p className="text-2xl text-slate-400 font-medium">{format(time, 'EEEE, MMMM do', { locale: dateLocale })}</p>
           </div>
         </header>
 
@@ -178,59 +183,59 @@ export default function TVMode() {
           {/* Chores */}
           <div className="bg-slate-900 rounded-3xl p-8 border border-slate-800 flex flex-col">
             <div className="flex items-center justify-between mb-8">
-              <h3 className="text-xl font-bold text-slate-400 uppercase tracking-wider">Pending Chores</h3>
+              <h3 className="text-xl font-bold text-slate-400 uppercase tracking-wider">{t('tvMode.pendingChores')}</h3>
               <CheckSquare className="h-8 w-8 text-white" />
             </div>
             <ul className="space-y-6">
               {chores.slice(0, 10).map((chore: any) => (
                 <li key={chore.id} className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="h-8 w-8 rounded-full bg-secondary flex items-center justify-center text-white text-xs font-bold mr-3">
+                    <div className={`h-8 w-8 rounded-full bg-secondary flex items-center justify-center text-white text-xs font-bold ${isRTL ? 'ml-3' : 'mr-3'}`}>
                       {getMemberInitials(chore.assignedToUserId)}
                     </div>
                     <span className="text-2xl font-semibold text-white">{chore.title}</span>
                   </div>
-                  <span className="text-lg text-slate-400 font-medium">{chore.dueDate ? format(new Date(chore.dueDate), 'MMM d') : 'No date'}</span>
+                  <span className="text-lg text-slate-400 font-medium">{chore.dueDate ? format(new Date(chore.dueDate), 'MMM d', { locale: dateLocale }) : t('tvMode.noDate')}</span>
                 </li>
               ))}
-              {chores.length === 0 && <li className="text-xl text-slate-500 font-medium">No pending chores!</li>}
+              {chores.length === 0 && <li className="text-xl text-slate-500 font-medium">{t('tvMode.noChores')}</li>}
             </ul>
           </div>
 
           {/* Groceries */}
           <div className="bg-slate-900 rounded-3xl p-8 border border-slate-800 flex flex-col">
             <div className="flex items-center justify-between mb-8">
-              <h3 className="text-xl font-bold text-slate-400 uppercase tracking-wider">Grocery List</h3>
+              <h3 className="text-xl font-bold text-slate-400 uppercase tracking-wider">{t('tvMode.groceryList')}</h3>
               <ShoppingCart className="h-8 w-8 text-white" />
             </div>
             <ul className="space-y-6">
               {groceries.slice(0, 10).map((item: any) => (
                 <li key={item.id} className="flex items-center">
-                  <span className="h-3 w-3 rounded-full bg-secondary mr-4"></span>
+                  <span className={`h-3 w-3 rounded-full bg-secondary ${isRTL ? 'ml-4' : 'mr-4'}`}></span>
                   <span className="text-2xl font-semibold text-white">{item.name}</span>
                 </li>
               ))}
-              {groceries.length === 0 && <li className="text-xl text-slate-500 font-medium">List is empty</li>}
+              {groceries.length === 0 && <li className="text-xl text-slate-500 font-medium">{t('tvMode.listEmpty')}</li>}
             </ul>
           </div>
 
           {/* Bills */}
           <div className="bg-slate-900 rounded-3xl p-8 border border-slate-800 flex flex-col">
             <div className="flex items-center justify-between mb-8">
-              <h3 className="text-xl font-bold text-slate-400 uppercase tracking-wider">Upcoming Bills</h3>
+              <h3 className="text-xl font-bold text-slate-400 uppercase tracking-wider">{t('tvMode.upcomingBills')}</h3>
               <Receipt className="h-8 w-8 text-white" />
             </div>
             <ul className="space-y-6">
               {expenses.slice(0, 8).map((exp: any) => (
                 <li key={exp.id} className="bg-slate-950 p-6 rounded-2xl">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-xl font-semibold text-white">{exp.title || 'No Title'}</span>
-                    <span className="text-2xl font-extrabold text-white">{formatCurrency(exp.amount || 0, 2)}</span>
+                    <span className="text-xl font-semibold text-white">{exp.title || t('tvMode.noTitle')}</span>
+                    <span className="text-2xl font-extrabold text-white" dir="ltr">{formatCurrency(exp.amount || 0, 2)}</span>
                   </div>
-                  <div className="text-slate-400 text-lg font-medium">Added: {exp.createdAt ? format(exp.createdAt.toDate(), 'MMM d') : 'Just now'}</div>
+                  <div className="text-slate-400 text-lg font-medium">{t('tvMode.added')} {exp.createdAt ? format(exp.createdAt.toDate(), 'MMM d', { locale: dateLocale }) : t('tvMode.justNow')}</div>
                 </li>
               ))}
-              {expenses.length === 0 && <li className="text-xl text-slate-500 font-medium">No upcoming bills!</li>}
+              {expenses.length === 0 && <li className="text-xl text-slate-500 font-medium">{t('tvMode.noBills')}</li>}
             </ul>
           </div>
 
@@ -238,17 +243,17 @@ export default function TVMode() {
           <div className="space-y-8 flex flex-col">
             <div className="bg-slate-900 rounded-3xl p-8 border border-slate-800 flex-1">
               <div className="flex items-center justify-between mb-8">
-                <h3 className="text-xl font-bold text-slate-400 uppercase tracking-wider">Schedule</h3>
+                <h3 className="text-xl font-bold text-slate-400 uppercase tracking-wider">{t('tvMode.schedule')}</h3>
                 <CalendarDays className="h-8 w-8 text-white" />
               </div>
               <ul className="space-y-6">
                 {events.slice(0, 5).map((event: any) => (
                   <li key={event.id} className="flex flex-col">
-                    <span className="text-slate-400 text-lg font-medium mb-1">{event.startDatetime ? format(new Date(event.startDatetime), 'MMM d, h:mm a') : 'No date'}</span>
+                    <span className="text-slate-400 text-lg font-medium mb-1">{event.startDatetime ? format(new Date(event.startDatetime), 'MMM d, h:mm a', { locale: dateLocale }) : t('tvMode.noDate')}</span>
                     <span className="text-2xl font-semibold text-white">{event.title}</span>
                   </li>
                 ))}
-                {events.length === 0 && <li className="text-xl text-slate-500 font-medium">No upcoming events!</li>}
+                {events.length === 0 && <li className="text-xl text-slate-500 font-medium">{t('tvMode.noEvents')}</li>}
               </ul>
             </div>
           </div>

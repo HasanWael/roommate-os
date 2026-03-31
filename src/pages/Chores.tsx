@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { CheckSquare, Plus, CheckCircle2, Circle, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { enUS, ar } from 'date-fns/locale';
 import { useAuth } from '../AuthContext';
 import { db } from '../firebase';
 import { collection, query, where, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, orderBy } from 'firebase/firestore';
@@ -10,10 +11,12 @@ import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 import ConfirmModal from '../components/ConfirmModal';
 import EmptyState from '../components/EmptyState';
 import LoadingScreen from '../components/LoadingScreen';
+import { useTranslation } from 'react-i18next';
 
 export default function Chores() {
   const { user, apartmentId } = useAuth();
   const { members } = useMembers();
+  const { t, i18n } = useTranslation();
   const [chores, setChores] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
@@ -65,10 +68,10 @@ export default function Chores() {
       setNewChoreTitle('');
       setNewChoreDueDate('');
       setIsAdding(false);
-      toast.success('Chore added successfully.');
+      toast.success(t('chores.addSuccess'));
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'chores');
-      toast.error('Failed to add chore.');
+      toast.error(t('chores.addError'));
     }
   };
 
@@ -82,10 +85,10 @@ export default function Chores() {
     setTimeout(async () => {
       try {
         await deleteDoc(doc(db, 'chores', choreId));
-        toast.success('Chore completed and removed.');
+        toast.success(t('chores.completeSuccess'));
       } catch (error) {
         handleFirestoreError(error, OperationType.DELETE, `chores/${choreId}`);
-        toast.error('Failed to complete chore.');
+        toast.error(t('chores.completeError'));
       } finally {
         setCompletingChores(prev => {
           const next = new Set(prev);
@@ -104,10 +107,10 @@ export default function Chores() {
     if (!itemToDelete) return;
     try {
       await deleteDoc(doc(db, 'chores', itemToDelete));
-      toast.success('Chore deleted.');
+      toast.success(t('chores.deleteSuccess'));
     } catch (error) {
       handleFirestoreError(error, OperationType.DELETE, `chores/${itemToDelete}`);
-      toast.error('Failed to delete chore.');
+      toast.error(t('chores.deleteError'));
     } finally {
       setItemToDelete(null);
     }
@@ -118,46 +121,48 @@ export default function Chores() {
     return member?.user?.fullName || 'Unknown';
   };
 
-  if (loading) return <LoadingScreen message="Loading chores..." />;
+  if (loading) return <LoadingScreen message={t('dashboard.loading')} />;
+
+  const dateLocale = i18n.language === 'ar' ? ar : enUS;
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-text-primary tracking-tight">Chores Board</h1>
-          <p className="text-text-secondary mt-1">Keep the apartment clean and organized.</p>
+          <h1 className="text-3xl font-bold text-text-primary tracking-tight">{t('chores.title')}</h1>
+          <p className="text-text-secondary mt-1">{t('chores.description')}</p>
         </div>
         <button 
           onClick={() => setIsAdding(!isAdding)}
           className="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium flex items-center transition-colors"
         >
-          <Plus className="h-5 w-5 mr-2" />
-          {isAdding ? 'Cancel' : 'Add Chore'}
+          <Plus className={`h-5 w-5 ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+          {isAdding ? t('chores.cancel') : t('chores.addChore')}
         </button>
       </header>
 
       {isAdding && (
         <form onSubmit={handleAddChore} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-wrap gap-4 items-end">
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-text-secondary mb-1">Chore Title</label>
+            <label className="block text-sm font-medium text-text-secondary mb-1">{t('chores.choreTitle')}</label>
             <input 
               type="text" 
               value={newChoreTitle}
               onChange={(e) => setNewChoreTitle(e.target.value)}
               className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              placeholder="e.g., Clean the kitchen"
+              placeholder={t('chores.choreTitlePlaceholder')}
               required
             />
           </div>
           <div className="w-48">
-            <label className="block text-sm font-medium text-text-secondary mb-1">Assign To</label>
+            <label className="block text-sm font-medium text-text-secondary mb-1">{t('chores.assignTo')}</label>
             <select
               value={assignedToUserId}
               onChange={(e) => setAssignedToUserId(e.target.value)}
               className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
               required
             >
-              <option value="" disabled>Select Roommate</option>
+              <option value="" disabled>{t('chores.selectRoommate')}</option>
               {members.map(member => (
                 <option key={member.userId} value={member.userId}>
                   {member.user?.fullName || 'Unknown'}
@@ -166,7 +171,7 @@ export default function Chores() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1">Due Date</label>
+            <label className="block text-sm font-medium text-text-secondary mb-1">{t('chores.dueDate')}</label>
             <input 
               type="date" 
               value={newChoreDueDate}
@@ -176,16 +181,16 @@ export default function Chores() {
             />
           </div>
           <button type="submit" className="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors">
-            Save
+            {t('chores.save')}
           </button>
         </form>
       )}
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-          <h2 className="font-bold text-text-primary">Assigned Chores</h2>
+          <h2 className="font-bold text-text-primary">{t('chores.assignedChores')}</h2>
           <div className="text-sm font-medium text-text-secondary">
-            Pending: <span className="text-text-primary font-bold">{chores.filter(c => c.status === 'pending').length}</span>
+            {t('chores.pending')}: <span className="text-text-primary font-bold">{chores.filter(c => c.status === 'pending').length}</span>
           </div>
         </div>
         
@@ -194,7 +199,7 @@ export default function Chores() {
             const isCompleting = completingChores.has(chore.id);
             return (
             <div key={chore.id} className={`p-6 flex items-center justify-between transition-all duration-500 ${isCompleting ? 'bg-gray-50 opacity-60 scale-[0.99]' : 'hover:bg-gray-50'}`}>
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-4 rtl:space-x-reverse">
                 <button 
                   onClick={() => toggleChoreStatus(chore.id)}
                   className="h-10 w-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
@@ -220,7 +225,7 @@ export default function Chores() {
                     {chore.title}
                   </h3>
                   <p className={`text-sm transition-all duration-500 ${isCompleting ? 'text-gray-400' : 'text-text-secondary'}`}>
-                    Due: {chore.dueDate ? format(new Date(chore.dueDate), 'MMM d, yyyy') : 'No date'} • Assigned to: {getAssignedUserName(chore.assignedToUserId)}
+                    {t('chores.due')} {chore.dueDate ? format(new Date(chore.dueDate), 'MMM d, yyyy', { locale: dateLocale }) : t('chores.noDate')} • {t('chores.assignedTo')} {getAssignedUserName(chore.assignedToUserId)}
                   </p>
                 </div>
               </div>
@@ -229,12 +234,12 @@ export default function Chores() {
                 <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider transition-all duration-500 ${
                   isCompleting || chore.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-text-primary'
                 }`}>
-                  {isCompleting ? 'Completing...' : chore.status}
+                  {isCompleting ? (t('chores.completing') as string) : (t(`chores.${chore.status}`, chore.status) as string)}
                 </span>
                 <button 
                   onClick={() => confirmDelete(chore.id)}
                   className={`text-gray-400 hover:text-red-500 transition-colors p-2 ${isCompleting ? 'opacity-0 pointer-events-none' : ''}`}
-                  title="Delete chore"
+                  title={t('chores.deleteChore')}
                 >
                   <Trash2 className="h-5 w-5" />
                 </button>
@@ -245,8 +250,8 @@ export default function Chores() {
             <div className="p-8">
               <EmptyState 
                 icon={CheckSquare} 
-                title="All caught up!" 
-                description="There are no pending chores at the moment. Enjoy your free time or add a new chore." 
+                title={t('chores.allCaughtUp')} 
+                description={t('chores.allCaughtUpDesc')} 
               />
             </div>
           )}
@@ -255,8 +260,8 @@ export default function Chores() {
 
       <ConfirmModal
         isOpen={!!itemToDelete}
-        title="Delete Chore"
-        message="Are you sure you want to delete this chore? This action cannot be undone."
+        title={t('chores.deleteTitle')}
+        message={t('chores.deleteMessage')}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setItemToDelete(null)}
       />

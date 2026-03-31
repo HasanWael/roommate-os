@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { collection, query, where, onSnapshot, updateDoc, doc } from 'firebase/firestore';
 import { format, parseISO, differenceInSeconds, isToday, isTomorrow } from 'date-fns';
+import { ar, enUS } from 'date-fns/locale';
 import { Droplets } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ShowerSlot {
   id: string;
@@ -17,6 +19,9 @@ interface ShowerSlot {
 export default function TVShowerQueueWidget({ apartmentId }: { apartmentId: string }) {
   const [slots, setSlots] = useState<ShowerSlot[]>([]);
   const [now, setNow] = useState(new Date());
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+  const dateLocale = isRTL ? ar : enUS;
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
@@ -93,11 +98,11 @@ export default function TVShowerQueueWidget({ apartmentId }: { apartmentId: stri
   const formatSlotTime = (startTimeStr: string) => {
     const date = parseISO(startTimeStr);
     if (isToday(date)) {
-      return format(date, 'HH:mm');
+      return format(date, 'HH:mm', { locale: dateLocale });
     } else if (isTomorrow(date)) {
-      return `Tom ${format(date, 'HH:mm')}`;
+      return `${t('tvMode.tomorrowShort')} ${format(date, 'HH:mm', { locale: dateLocale })}`;
     }
-    return format(date, 'MMM d, HH:mm');
+    return format(date, 'MMM d, HH:mm', { locale: dateLocale });
   };
 
   const renderNow = () => {
@@ -107,7 +112,7 @@ export default function TVShowerQueueWidget({ apartmentId }: { apartmentId: stri
           <div className="w-32 h-32 bg-slate-800/50 rounded-full flex items-center justify-center mb-6">
             <Droplets className="h-16 w-16 text-slate-600" />
           </div>
-          <h2 className="text-4xl font-bold text-slate-500">Bathroom is free</h2>
+          <h2 className="text-4xl font-bold text-slate-500">{t('tvMode.bathroomFree')}</h2>
         </div>
       );
     }
@@ -126,12 +131,12 @@ export default function TVShowerQueueWidget({ apartmentId }: { apartmentId: stri
 
     return (
       <div className="flex-1 flex flex-col items-center justify-center py-4">
-        <div className="flex items-center space-x-3 mb-6">
+        <div className={`flex items-center space-x-3 mb-6 ${isRTL ? 'rtl:space-x-reverse' : ''}`}>
           <span className="flex h-4 w-4 relative">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500"></span>
           </span>
-          <span className="text-emerald-400 text-xl font-bold uppercase tracking-widest">Now showering</span>
+          <span className="text-emerald-400 text-xl font-bold uppercase tracking-widest">{t('tvMode.nowShowering')}</span>
         </div>
 
         <h2 className="text-5xl font-black text-white mb-8 text-center tracking-tight">{activeSlot.userName}</h2>
@@ -183,7 +188,7 @@ export default function TVShowerQueueWidget({ apartmentId }: { apartmentId: stri
   return (
     <div className="bg-slate-900 rounded-3xl p-8 border border-slate-800 flex flex-col h-full shadow-2xl">
       <div className="flex items-center justify-between mb-8">
-        <h3 className="text-xl font-bold text-slate-400 uppercase tracking-widest">Shower Queue</h3>
+        <h3 className="text-xl font-bold text-slate-400 uppercase tracking-widest">{t('tvMode.showerQueue')}</h3>
         <Droplets className="h-8 w-8 text-white" />
       </div>
 
@@ -192,10 +197,10 @@ export default function TVShowerQueueWidget({ apartmentId }: { apartmentId: stri
       {/* Up Next */}
       {nextPerson && (
         <div className="mt-auto pt-6 border-t border-slate-800/50">
-          <p className="text-sm font-bold text-slate-500 uppercase tracking-[0.2em] mb-3">Up Next</p>
+          <p className="text-sm font-bold text-slate-500 uppercase tracking-[0.2em] mb-3">{t('tvMode.upNext')}</p>
           <div className="flex justify-between items-center bg-slate-800/30 p-5 rounded-2xl border border-slate-800">
             <span className="text-2xl font-bold text-white">{nextPerson.userName}</span>
-            <span className="text-xl text-emerald-400 font-mono font-bold">
+            <span className="text-xl text-emerald-400 font-mono font-bold" dir="ltr">
               {formatSlotTime(nextPerson.startTime)}
             </span>
           </div>
@@ -205,12 +210,12 @@ export default function TVShowerQueueWidget({ apartmentId }: { apartmentId: stri
       {/* Remaining Queue */}
       {remainingQueue.length > 0 && (
         <div className="mt-4 pt-4 border-t border-slate-800/30 flex-1 overflow-hidden flex flex-col">
-          <p className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-3">Queue</p>
-          <ul className="space-y-2 overflow-y-auto pr-2 flex-1">
+          <p className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-3">{t('tvMode.queue')}</p>
+          <ul className={`space-y-2 overflow-y-auto flex-1 ${isRTL ? 'pl-2' : 'pr-2'}`}>
             {remainingQueue.map(slot => (
               <li key={slot.id} className="flex justify-between items-center opacity-40">
                 <span className="text-lg font-semibold text-white">{slot.userName}</span>
-                <span className="text-base text-slate-400 font-mono">{formatSlotTime(slot.startTime)}</span>
+                <span className="text-base text-slate-400 font-mono" dir="ltr">{formatSlotTime(slot.startTime)}</span>
               </li>
             ))}
           </ul>

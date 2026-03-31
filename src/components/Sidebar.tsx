@@ -1,6 +1,8 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Receipt, CheckSquare, ShoppingCart, CalendarDays, Megaphone, Users, Tv, X, LogOut, Repeat, Settings, Droplets } from 'lucide-react';
 import { useAuth } from '../AuthContext';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -10,13 +12,15 @@ interface SidebarProps {
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navigate = useNavigate();
   const { apartment, setApartmentId } = useAuth();
+  const { t, i18n } = useTranslation();
+  
   const navItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'Shower Queue', path: '/shower-queue', icon: Droplets },
-    { name: 'Bills', path: '/expenses', icon: Receipt },
-    { name: 'Chores', path: '/chores', icon: CheckSquare },
-    { name: 'Groceries', path: '/groceries', icon: ShoppingCart },
-    { name: 'Calendar', path: '/calendar', icon: CalendarDays },
+    { name: t('nav.dashboard'), path: '/dashboard', icon: LayoutDashboard },
+    { name: t('nav.showerQueue'), path: '/shower-queue', icon: Droplets },
+    { name: t('nav.bills'), path: '/expenses', icon: Receipt },
+    { name: t('nav.chores'), path: '/chores', icon: CheckSquare },
+    { name: t('nav.groceries'), path: '/groceries', icon: ShoppingCart },
+    { name: t('nav.calendar'), path: '/calendar', icon: CalendarDays },
   ];
 
   const handleSwitchApartment = () => {
@@ -32,7 +36,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     `}>
       <div className="p-6 flex justify-between items-center">
         <div>
-          <p className="text-xl font-black text-text-primary tracking-tighter">Roommate OS</p>
+          <p className="text-xl font-black text-text-primary tracking-tighter">{t('app.name')}</p>
         </div>
         <button onClick={onClose} className="md:hidden text-gray-400 hover:text-primary transition-colors">
           <X className="h-6 w-6" />
@@ -53,7 +57,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               }`
             }
           >
-            <item.icon className="mr-3 h-5 w-5" />
+            <item.icon className={`${i18n.language === 'ar' ? 'ml-3' : 'mr-3'} h-5 w-5`} />
             {item.name}
           </NavLink>
         ))}
@@ -65,16 +69,16 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           onClick={onClose}
           className="flex items-center px-4 py-3 text-sm font-medium text-text-secondary hover:bg-gray-100 rounded-lg"
         >
-          <Users className="mr-3 h-5 w-5" />
-          Members
+          <Users className={`${i18n.language === 'ar' ? 'ml-3' : 'mr-3'} h-5 w-5`} />
+          {t('nav.members')}
         </NavLink>
         <NavLink 
           to="/settings" 
           onClick={onClose}
           className="flex items-center px-4 py-3 text-sm font-medium text-text-secondary hover:bg-gray-100 rounded-lg"
         >
-          <Settings className="mr-3 h-5 w-5" />
-          Settings
+          <Settings className={`${i18n.language === 'ar' ? 'ml-3' : 'mr-3'} h-5 w-5`} />
+          {t('nav.settings')}
         </NavLink>
         <NavLink 
           to="/tv" 
@@ -82,16 +86,19 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           onClick={onClose}
           className="flex items-center px-4 py-3 text-sm font-medium text-text-secondary hover:bg-gray-100 rounded-lg"
         >
-          <Tv className="mr-3 h-5 w-5" />
-          TV Mode
+          <Tv className={`${i18n.language === 'ar' ? 'ml-3' : 'mr-3'} h-5 w-5`} />
+          {t('nav.tvMode')}
         </NavLink>
         <button 
           onClick={handleSwitchApartment}
           className="w-full flex items-center px-4 py-3 text-sm font-medium text-text-secondary hover:bg-gray-100 rounded-lg transition-colors"
         >
-          <Repeat className="mr-3 h-5 w-5" />
-          Switch Apartment
+          <Repeat className={`${i18n.language === 'ar' ? 'ml-3' : 'mr-3'} h-5 w-5`} />
+          {t('nav.switchApartment')}
         </button>
+        <div className="md:hidden pt-2">
+          <LanguageSwitcher className="w-full justify-start px-4 py-3 text-sm font-medium text-text-secondary hover:bg-gray-100 rounded-lg" />
+        </div>
       </div>
     </aside>
   );

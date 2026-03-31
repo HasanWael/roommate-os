@@ -5,6 +5,7 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 import { format, isBefore, isAfter, parseISO, differenceInSeconds } from 'date-fns';
 import { Droplets } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ShowerSlot {
   id: string;
@@ -22,6 +23,7 @@ export default function DashboardShowerWidget() {
   const { apartment } = useAuth();
   const [slots, setSlots] = useState<ShowerSlot[]>([]);
   const [nowTime, setNowTime] = useState<Date>(new Date());
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const timer = setInterval(() => setNowTime(new Date()), 1000);
@@ -75,13 +77,13 @@ export default function DashboardShowerWidget() {
       </div>
       <div className="relative z-10">
         <div className="flex items-center text-xs font-bold uppercase tracking-widest mb-6 text-primary">
-          <Droplets className="h-5 w-5 mr-3" />
-          Shower Queue
+          <Droplets className={`h-5 w-5 ${i18n.language === 'ar' ? 'ml-3' : 'mr-3'}`} />
+          {t('dashboard.showerQueue')}
         </div>
         
         <div className="flex items-center">
           {/* Circular Timer */}
-          <div className="relative w-24 h-24 mr-8 flex-shrink-0">
+          <div className={`relative w-24 h-24 ${i18n.language === 'ar' ? 'ml-8' : 'mr-8'} flex-shrink-0`}>
             <svg className="w-full h-full transform -rotate-90" viewBox="0 0 64 64">
               {/* Background circle */}
               <circle
@@ -115,15 +117,15 @@ export default function DashboardShowerWidget() {
           {/* Info */}
           <div className="flex-1">
             <div className="inline-flex items-center bg-white rounded-full px-3 py-1 mb-3">
-              <span className="flex h-2 w-2 relative mr-2">
+              <span className={`flex h-2 w-2 relative ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`}>
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              <span className="text-emerald-700 text-xs font-bold uppercase tracking-wider">Now showering</span>
+              <span className="text-emerald-700 text-xs font-bold uppercase tracking-wider">{t('dashboard.nowShowering')}</span>
             </div>
             
             <h3 className="text-white text-3xl font-bold mb-1">{activeSlot.userName}</h3>
-            <p className="text-gray-400 text-sm mb-4">{activeSlot.duration} min slot</p>
+            <p className="text-gray-400 text-sm mb-4">{activeSlot.duration} {t('dashboard.minSlot')}</p>
             
             {/* Linear Progress Bar */}
             <div className="w-full bg-white/10 rounded-full h-2">

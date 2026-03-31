@@ -11,10 +11,12 @@ import LoadingScreen from '../components/LoadingScreen';
 import DashboardShowerWidget from '../components/DashboardShowerWidget';
 import EmptyState from '../components/EmptyState';
 import { formatCurrency } from '../lib/format';
+import { useTranslation } from 'react-i18next';
 
 export default function Dashboard() {
   const { user, apartmentId, apartment } = useAuth();
   const { members } = useMembers();
+  const { t, i18n } = useTranslation();
   const [expenses, setExpenses] = useState<any[]>([]);
   const [chores, setChores] = useState<any[]>([]);
   const [completingChores, setCompletingChores] = useState<Set<string>>(new Set());
@@ -126,7 +128,7 @@ export default function Dashboard() {
       return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
     });
   const myNextChore = pendingChores.find(c => c.assignedToUserId === user?.uid);
-  const nextUpText = myNextChore ? myNextChore.title : (pendingChores[0]?.title || 'All caught up');
+  const nextUpText = myNextChore ? myNextChore.title : (pendingChores[0]?.title || t('dashboard.allCaughtUp'));
 
   const totalChores = chores.length;
   const completedChores = chores.filter(c => c.status === 'completed').length;
@@ -134,24 +136,23 @@ export default function Dashboard() {
 
   const neededGroceries = groceries.filter(g => g.status !== 'purchased');
 
-  if (loading) return <LoadingScreen message="Loading dashboard..." />;
+  if (loading) return <LoadingScreen message={t('dashboard.loading')} />;
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-5xl font-extrabold text-text-primary tracking-tight">
-            Good morning, <span className="text-primary">{(() => {
+            {t('dashboard.greeting')}, <span className="text-primary">{(() => {
               const currentUserMember = members.find(m => m.userId === user?.uid);
-              return currentUserMember?.user?.fullName || user?.displayName || 'Roommate';
+              return currentUserMember?.user?.fullName || user?.displayName || t('dashboard.roommate');
             })()}</span>.
           </h1>
           <p className="text-text-secondary mt-3 text-xl max-w-2xl">
-            Everything in <span className="font-semibold text-text-primary">{apartment?.name || 'your apartment'}</span> is running smoothly. 
-            Here's what requires your attention today.
+            {t('dashboard.statusText1')} <span className="font-semibold text-text-primary">{apartment?.name || t('dashboard.yourApartment')}</span> {t('dashboard.statusText2')}
           </p>
         </div>
-        <div className="flex -space-x-3">
+        <div className="flex -space-x-3 rtl:space-x-reverse">
           {members.slice(0, 5).map((member) => (
             <div 
               key={member.userId} 
@@ -183,11 +184,11 @@ export default function Dashboard() {
               <Receipt className="h-8 w-8 text-warning-dark" />
             </div>
             <span className="bg-warning-light text-warning-dark text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-widest">
-              {expenses.length} Pending
+              {expenses.length} {t('dashboard.pending')}
             </span>
           </div>
-          <h3 className="text-2xl font-bold mb-1 text-text-primary">Bills & Expenses</h3>
-          <p className="text-text-secondary text-sm mb-8">Total outstanding: <span className="font-bold text-text-primary">EGP {formatCurrency(expenses.reduce((sum, e) => sum + e.amount, 0), 2)}</span></p>
+          <h3 className="text-2xl font-bold mb-1 text-text-primary">{t('dashboard.billsTitle')}</h3>
+          <p className="text-text-secondary text-sm mb-8">{t('dashboard.totalOutstanding')}: <span className="font-bold text-text-primary">EGP {formatCurrency(expenses.reduce((sum, e) => sum + e.amount, 0), 2)}</span></p>
           
           <div className="mt-auto space-y-4">
             {expenses.slice(0, 2).map(expense => (
@@ -196,11 +197,11 @@ export default function Dashboard() {
                 <span className="font-bold text-warning-dark">EGP {formatCurrency(expense.amount, 2)}</span>
               </div>
             ))}
-            {expenses.length === 0 && <p className="text-sm text-success font-bold">All bills paid! 🎉</p>}
+            {expenses.length === 0 && <p className="text-sm text-success font-bold">{t('dashboard.allBillsPaid')}</p>}
           </div>
 
-          <Link to="/expenses" className="w-full block text-center bg-gray-50 text-text-primary hover:bg-gray-100 font-bold py-3 rounded-2xl text-sm transition-all shadow-sm active:scale-95 mt-6">
-            VIEW EXPENSES
+          <Link to="/expenses" className="w-full block text-center bg-gray-50 text-text-primary hover:bg-gray-100 font-bold py-3 rounded-2xl text-sm transition-all shadow-sm active:scale-95 mt-6 uppercase">
+            {t('dashboard.viewExpenses')}
           </Link>
         </div>
 
@@ -211,11 +212,11 @@ export default function Dashboard() {
               <CheckSquare className="h-8 w-8 text-info-dark" />
             </div>
             <span className="bg-info-light text-info-dark text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-widest">
-              {pendingChores.length} Active
+              {pendingChores.length} {t('dashboard.active')}
             </span>
           </div>
-          <h3 className="text-2xl font-bold mb-1 text-text-primary">Weekly Chores</h3>
-          <p className="text-text-secondary text-sm mb-6">Next up: <span className="font-bold text-text-primary">{nextUpText}</span></p>
+          <h3 className="text-2xl font-bold mb-1 text-text-primary">{t('dashboard.choresTitle')}</h3>
+          <p className="text-text-secondary text-sm mb-6">{t('dashboard.nextUp')}: <span className="font-bold text-text-primary">{nextUpText}</span></p>
           
           <div className="space-y-3 mb-6 flex-1">
             {pendingChores.slice(0, 3).map(chore => {
@@ -245,12 +246,12 @@ export default function Dashboard() {
                     <div className="truncate">
                       <p className={`font-medium truncate transition-all duration-500 ${isCompleting ? 'text-gray-400 line-through' : 'text-text-primary'}`}>{chore.title}</p>
                       <p className={`text-xs transition-all duration-500 ${isCompleting ? 'text-gray-400' : isOverdue ? 'text-red-600 font-bold' : 'text-text-secondary'}`}>
-                        {dueDate ? (isToday(dueDate) ? 'Today' : isTomorrow(dueDate) ? 'Tomorrow' : format(dueDate, 'MMM d')) : 'No date'}
+                        {dueDate ? (isToday(dueDate) ? t('dashboard.today') : isTomorrow(dueDate) ? t('dashboard.tomorrow') : format(dueDate, 'MMM d')) : t('dashboard.noDate')}
                       </p>
                     </div>
                   </div>
                   {assignedMember && (
-                    <div className={`flex-shrink-0 h-6 w-6 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-bold overflow-hidden ml-2 transition-opacity duration-500 ${isCompleting ? 'opacity-40' : 'opacity-100'}`} title={assignedMember.user?.fullName}>
+                    <div className={`flex-shrink-0 h-6 w-6 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-bold overflow-hidden ${i18n.language === 'ar' ? 'mr-2' : 'ml-2'} transition-opacity duration-500 ${isCompleting ? 'opacity-40' : 'opacity-100'}`} title={assignedMember.user?.fullName}>
                       {assignedMember.user?.avatarUrl ? (
                         <img src={assignedMember.user.avatarUrl} alt={assignedMember.user.fullName} className="h-full w-full object-cover" />
                       ) : (
@@ -262,12 +263,12 @@ export default function Dashboard() {
               );
             })}
             {pendingChores.length === 0 && (
-              <div className="text-sm text-success font-bold text-center py-4">All caught up! 🎉</div>
+              <div className="text-sm text-success font-bold text-center py-4">{t('dashboard.allCaughtUp')}</div>
             )}
           </div>
 
-          <Link to="/chores" className="w-full block text-center bg-gray-50 text-text-primary hover:bg-gray-100 font-bold py-3 rounded-2xl text-sm transition-all shadow-sm active:scale-95 mt-auto">
-            VIEW ALL CHORES
+          <Link to="/chores" className="w-full block text-center bg-gray-50 text-text-primary hover:bg-gray-100 font-bold py-3 rounded-2xl text-sm transition-all shadow-sm active:scale-95 mt-auto uppercase">
+            {t('dashboard.viewChores')}
           </Link>
         </div>
 
@@ -278,11 +279,11 @@ export default function Dashboard() {
               <ShoppingCart className="h-8 w-8 text-success-dark" />
             </div>
             <span className="bg-success-light text-success-dark text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-widest">
-              {neededGroceries.length} Items
+              {neededGroceries.length} {t('dashboard.items')}
             </span>
           </div>
-          <h3 className="text-2xl font-bold mb-1 text-text-primary">Grocery List</h3>
-          <p className="text-text-secondary text-sm mb-6">{neededGroceries.length} items needed this week</p>
+          <h3 className="text-2xl font-bold mb-1 text-text-primary">{t('dashboard.groceriesTitle')}</h3>
+          <p className="text-text-secondary text-sm mb-6">{neededGroceries.length} {t('dashboard.itemsNeeded')}</p>
           
           <ul className="space-y-3 mb-6 flex-1">
             {neededGroceries.slice(0, 3).map(item => {
@@ -309,12 +310,12 @@ export default function Dashboard() {
                         {item.name}
                       </p>
                       <p className={`text-xs transition-all duration-500 ${isCompleting ? 'text-gray-400' : 'text-text-secondary'}`}>
-                        Qty: {item.quantity || 1}
+                        {t('dashboard.qty')}: {item.quantity || 1}
                       </p>
                     </div>
                   </div>
                   {addedByMember && (
-                    <div className={`flex-shrink-0 h-6 w-6 rounded-full bg-success text-white flex items-center justify-center text-[10px] font-bold overflow-hidden ml-2 transition-opacity duration-500 ${isCompleting ? 'opacity-40' : 'opacity-100'}`} title={addedByMember.user?.fullName}>
+                    <div className={`flex-shrink-0 h-6 w-6 rounded-full bg-success text-white flex items-center justify-center text-[10px] font-bold overflow-hidden ${i18n.language === 'ar' ? 'mr-2' : 'ml-2'} transition-opacity duration-500 ${isCompleting ? 'opacity-40' : 'opacity-100'}`} title={addedByMember.user?.fullName}>
                       {addedByMember.user?.avatarUrl ? (
                         <img src={addedByMember.user.avatarUrl} alt={addedByMember.user.fullName} className="h-full w-full object-cover" />
                       ) : (
@@ -326,11 +327,11 @@ export default function Dashboard() {
               );
             })}
             {neededGroceries.length === 0 && (
-              <li className="text-sm text-success-dark font-medium italic">Fridge is full!</li>
+              <li className="text-sm text-success-dark font-medium italic">{t('dashboard.fridgeFull')}</li>
             )}
           </ul>
-          <Link to="/groceries" className="w-full block text-center bg-primary text-white hover:bg-primary-dark font-bold py-3 rounded-2xl text-sm transition-all shadow-lg active:scale-95">
-            ADD ITEMS
+          <Link to="/groceries" className="w-full block text-center bg-primary text-white hover:bg-primary-dark font-bold py-3 rounded-2xl text-sm transition-all shadow-lg active:scale-95 uppercase">
+            {t('dashboard.addItems')}
           </Link>
         </div>
       </div>
@@ -339,10 +340,10 @@ export default function Dashboard() {
         {/* Schedule */}
         <div className="lg:col-span-3 bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
           <div className="flex justify-between items-center mb-8">
-            <h3 className="text-2xl font-bold text-text-primary">Upcoming Events</h3>
-            <button className="text-sm font-bold text-primary hover:text-primary-dark transition-colors flex items-center">
-              FULL CALENDAR
-              <CalendarDays className="ml-2 h-4 w-4" />
+            <h3 className="text-2xl font-bold text-text-primary">{t('dashboard.upcomingEvents')}</h3>
+            <button className="text-sm font-bold text-primary hover:text-primary-dark transition-colors flex items-center uppercase">
+              {t('dashboard.fullCalendar')}
+              <CalendarDays className={`${i18n.language === 'ar' ? 'mr-2' : 'ml-2'} h-4 w-4`} />
             </button>
           </div>
           
@@ -350,12 +351,12 @@ export default function Dashboard() {
             {events.slice(0, 3).map(event => (
               <div key={event.id} className="group cursor-pointer">
                 <div className="text-xs font-bold text-primary uppercase tracking-widest mb-2 bg-primary/10 inline-block px-2 py-1 rounded">
-                  {new Date(event.startDatetime).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' })}
+                  {new Date(event.startDatetime).toLocaleDateString(i18n.language === 'ar' ? 'ar-EG' : 'en-US', { weekday: 'short', day: 'numeric', month: 'short' })}
                 </div>
                 <h4 className="font-bold text-text-primary text-lg group-hover:text-primary transition-colors">{event.title}</h4>
                 <p className="text-sm text-text-secondary flex items-center mt-1">
-                  <span className="w-2 h-2 rounded-full bg-primary mr-2"></span>
-                  {new Date(event.startDatetime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                  <span className={`w-2 h-2 rounded-full bg-primary ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`}></span>
+                  {new Date(event.startDatetime).toLocaleTimeString(i18n.language === 'ar' ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
             ))}
@@ -363,8 +364,8 @@ export default function Dashboard() {
               <div className="col-span-3 py-12">
                 <EmptyState 
                   icon={CalendarDays} 
-                  title="No upcoming events" 
-                  description="Your calendar is clear for now. Add some plans to keep everyone in the loop." 
+                  title={t('dashboard.noEvents')} 
+                  description={t('dashboard.noEventsDesc')} 
                 />
               </div>
             )}

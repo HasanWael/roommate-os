@@ -25,6 +25,8 @@
         "inviteCode": { "type": "string" },
         "createdBy": { "type": "string", "description": "UID of the creator" },
         "hotWaterBuffer": { "type": "number", "description": "Buffer in minutes between showers" },
+        "trashRotationOrder": { "type": "array", "items": { "type": "string" }, "description": "UIDs of members in rotation order" },
+        "currentTrashTurnerIndex": { "type": "number", "description": "Index of the current person in the rotation order" },
         "createdAt": { "type": "string", "format": "date-time" },
         "updatedAt": { "type": "string", "format": "date-time" }
       },
@@ -39,6 +41,7 @@
         "userId": { "type": "string" },
         "role": { "type": "string", "enum": ["admin", "member"] },
         "status": { "type": "string", "enum": ["active", "inactive"] },
+        "isAway": { "type": "boolean", "description": "Whether the member is currently away and should be skipped in rotation" },
         "joinedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["apartmentId", "userId", "role", "status", "joinedAt"]
@@ -158,6 +161,19 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["apartmentId", "userId", "userName", "duration", "startTime", "endTime", "status", "mode", "createdAt"]
+    },
+    "TrashHistory": {
+      "title": "Trash History",
+      "description": "A log of trash disposal actions.",
+      "type": "object",
+      "properties": {
+        "apartmentId": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "isOutOfTurn": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["apartmentId", "userId", "userName", "isOutOfTurn", "createdAt"]
     }
   },
   "firestore": {
@@ -200,6 +216,10 @@
     "/showerSlots/{slotId}": {
       "schema": { "$ref": "#/entities/ShowerSlot" },
       "description": "Shower slots for apartments."
+    },
+    "/trashHistory/{historyId}": {
+      "schema": { "$ref": "#/entities/TrashHistory" },
+      "description": "History of trash disposal."
     }
   }
 }

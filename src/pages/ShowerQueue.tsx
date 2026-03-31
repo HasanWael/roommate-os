@@ -9,6 +9,8 @@ import { toast } from 'sonner';
 import ConfirmModal from '../components/ConfirmModal';
 import LoadingScreen from '../components/LoadingScreen';
 import EmptyState from '../components/EmptyState';
+import { useTranslation } from 'react-i18next';
+import { ar, enUS } from 'date-fns/locale';
 
 interface ShowerSlot {
   id: string;
@@ -25,6 +27,8 @@ interface ShowerSlot {
 
 export default function ShowerQueue() {
   const { user, apartment } = useAuth();
+  const { t, i18n } = useTranslation();
+  const dateLocale = i18n.language === 'ar' ? ar : enUS;
   const [slots, setSlots] = useState<ShowerSlot[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -99,7 +103,7 @@ export default function ShowerQueue() {
   const upNextSlots = slots.filter(s => s.status === 'scheduled' && s.mode === 'now' && (!activeSlot || s.id !== activeSlot.id));
   const scheduledSlots = slots.filter(s => s.status === 'scheduled' && s.mode === 'advance');
 
-  if (loading) return <LoadingScreen message="Loading shower queue..." />;
+  if (loading) return <LoadingScreen message={t('dashboard.loading')} />;
 
   const executeBooking = async (startTime: Date, endTime: Date) => {
     if (!user || !apartment) return;
@@ -117,10 +121,10 @@ export default function ShowerQueue() {
       });
       setIsModalOpen(false);
       setPendingBufferConflict(null);
-      toast.success('Shower slot booked!');
+      toast.success(t('showerQueue.bookSuccess'));
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'showerSlots');
-      toast.error('Failed to book slot');
+      toast.error(t('showerQueue.bookError'));
     }
   };
 
@@ -132,12 +136,12 @@ export default function ShowerQueue() {
     
     if (mode === 'advance') {
       if (!advanceTime || !advanceDate) {
-        toast.error('Please select date and time');
+        toast.error(t('showerQueue.selectDateTime'));
         return;
       }
       startTime = new Date(`${advanceDate}T${advanceTime}`);
       if (isBefore(startTime, new Date())) {
-        toast.error('Cannot book in the past');
+        toast.error(t('showerQueue.pastBookingError'));
         return;
       }
       endTime = addMinutes(startTime, duration);
@@ -159,7 +163,7 @@ export default function ShowerQueue() {
       });
 
       if (directConflict) {
-        toast.error('This time slot directly conflicts with an existing booking.');
+        toast.error(t('showerQueue.directConflictError'));
         return;
       }
 
@@ -198,10 +202,10 @@ export default function ShowerQueue() {
   const handleCancel = async (slotId: string) => {
     try {
       await updateDoc(doc(db, 'showerSlots', slotId), { status: 'cancelled' });
-      toast.success('Slot cancelled');
+      toast.success(t('showerQueue.cancelSuccess'));
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `showerSlots/${slotId}`);
-      toast.error('Failed to cancel slot');
+      toast.error(t('showerQueue.cancelError'));
     }
   };
 
@@ -211,8 +215,8 @@ export default function ShowerQueue() {
         <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
           <EmptyState 
             icon={Droplets} 
-            title="Bathroom is free" 
-            description="No one is currently showering. Feel free to jump in!" 
+            title={t('showerQueue.bathroomFree')} 
+            description={t('showerQueue.bathroomFreeDesc')} 
           />
         </div>
       );
@@ -227,28 +231,28 @@ export default function ShowerQueue() {
 
     return (
       <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-6 opacity-10">
+        <div className={`absolute top-0 ${i18n.language === 'ar' ? 'left-0' : 'right-0'} p-6 opacity-10`}>
           <Droplets className="w-32 h-32" />
         </div>
         <div className="relative z-10">
-          <div className="flex items-center space-x-2 mb-6">
+          <div className="flex items-center space-x-2 rtl:space-x-reverse mb-6">
             <span className="flex h-3 w-3 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
             </span>
-            <span className="font-medium tracking-wide uppercase text-xs">Now showering</span>
+            <span className="font-medium tracking-wide uppercase text-xs">{t('showerQueue.nowShowering')}</span>
           </div>
           
           <div className="flex justify-between items-end mb-8">
             <div>
               <h2 className="text-3xl font-bold mb-1">{activeSlot.userName}</h2>
-              <p className="text-blue-100">{activeSlot.duration} min slot</p>
+              <p className="text-blue-100">{activeSlot.duration} {t('showerQueue.minSlot')}</p>
             </div>
-            <div className="text-right">
-              <div className="text-4xl font-mono font-bold">
+            <div className={`text-${i18n.language === 'ar' ? 'left' : 'right'}`}>
+              <div className="text-4xl font-mono font-bold" dir="ltr">
                 {String(mins).padStart(2, '0')}:{String(secs).padStart(2, '0')}
               </div>
-              <p className="text-blue-100 text-sm">remaining</p>
+              <p className="text-blue-100 text-sm">{t('showerQueue.remaining')}</p>
             </div>
           </div>
 
@@ -267,24 +271,24 @@ export default function ShowerQueue() {
     <div className="max-w-4xl mx-auto space-y-8 p-4 md:p-8 pb-32">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-text-primary tracking-tight">Shower Queue</h1>
-          <p className="text-text-secondary mt-1">Manage bathroom time and hot water</p>
+          <h1 className="text-3xl font-bold text-text-primary tracking-tight">{t('showerQueue.title')}</h1>
+          <p className="text-text-secondary mt-1">{t('showerQueue.description')}</p>
         </div>
         {myActiveSlot ? (
           <button
             onClick={() => handleCancel(myActiveSlot.id)}
             className="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-medium flex items-center transition-colors shadow-sm"
           >
-            <X className="h-5 w-5 mr-2" />
-            Cancel Slot
+            <X className={`h-5 w-5 ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+            {t('showerQueue.cancelSlot')}
           </button>
         ) : (
           <button
             onClick={() => setIsModalOpen(true)}
             className="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium flex items-center transition-colors shadow-sm"
           >
-            <Plus className="h-5 w-5 mr-2" />
-            Join Queue
+            <Plus className={`h-5 w-5 ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+            {t('showerQueue.joinQueue')}
           </button>
         )}
       </header>
@@ -292,28 +296,28 @@ export default function ShowerQueue() {
       <div className="space-y-8">
         {/* Now Section */}
         <section>
-          <h3 className="text-lg font-bold text-text-primary mb-4">Now</h3>
+          <h3 className="text-lg font-bold text-text-primary mb-4">{t('showerQueue.now')}</h3>
           {renderActiveCard()}
         </section>
 
         {/* Up Next Section */}
         {upNextSlots.length > 0 && (
           <section>
-            <h3 className="text-lg font-bold text-text-primary mb-4">Up Next</h3>
+            <h3 className="text-lg font-bold text-text-primary mb-4">{t('showerQueue.upNext')}</h3>
             <div className="space-y-4">
               {upNextSlots.map((slot, index) => (
                 <div key={slot.id}>
                   {index > 0 && (
                     <div className="flex items-center justify-center py-2 text-sm text-orange-500 font-medium">
-                      <Clock className="w-4 h-4 mr-2" />
-                      {hotWaterBuffer} min hot water buffer
+                      <Clock className={`w-4 h-4 ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+                      {hotWaterBuffer} {t('showerQueue.hotWaterBuffer')}
                     </div>
                   )}
                   <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center">
                     <div>
                       <p className="font-bold text-text-primary">{slot.userName}</p>
                       <p className="text-sm text-text-secondary">
-                        {format(parseISO(slot.startTime), 'h:mm a')} • {slot.duration} mins
+                        {format(parseISO(slot.startTime), 'h:mm a', { locale: dateLocale })} • {slot.duration} {t('showerQueue.mins')}
                       </p>
                     </div>
                     {slot.userId === user?.uid && (
@@ -334,18 +338,18 @@ export default function ShowerQueue() {
         {/* Scheduled Section */}
         {scheduledSlots.length > 0 && (
           <section>
-            <h3 className="text-lg font-bold text-text-primary mb-4">Scheduled</h3>
+            <h3 className="text-lg font-bold text-text-primary mb-4">{t('showerQueue.scheduled')}</h3>
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
               {scheduledSlots.map((slot, index) => (
                 <div key={slot.id} className={`p-4 flex justify-between items-center ${index !== scheduledSlots.length - 1 ? 'border-b border-gray-50' : ''}`}>
                   <div className="flex items-center">
-                    <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center mr-4">
+                    <div className={`w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center ${i18n.language === 'ar' ? 'ml-4' : 'mr-4'}`}>
                       <CalendarIcon className="w-5 h-5 text-gray-500" />
                     </div>
                     <div>
                       <p className="font-bold text-text-primary">{slot.userName}</p>
                       <p className="text-sm text-text-secondary">
-                        {isToday(parseISO(slot.startTime)) ? 'Today' : isTomorrow(parseISO(slot.startTime)) ? 'Tomorrow' : format(parseISO(slot.startTime), 'MMM d')} at {format(parseISO(slot.startTime), 'h:mm a')} • {slot.duration} mins
+                        {isToday(parseISO(slot.startTime)) ? t('showerQueue.today') : isTomorrow(parseISO(slot.startTime)) ? t('showerQueue.tomorrow') : format(parseISO(slot.startTime), 'MMM d', { locale: dateLocale })} {t('showerQueue.at')} {format(parseISO(slot.startTime), 'h:mm a', { locale: dateLocale })} • {slot.duration} {t('showerQueue.mins')}
                       </p>
                     </div>
                   </div>
@@ -369,7 +373,7 @@ export default function ShowerQueue() {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center p-4">
           <div className="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl animate-in slide-in-from-bottom-4">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-text-primary">Book a Slot</h2>
+              <h2 className="text-xl font-bold text-text-primary">{t('showerQueue.bookSlot')}</h2>
               <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-full">
                 <X className="w-5 h-5 text-gray-500" />
               </button>
@@ -382,19 +386,19 @@ export default function ShowerQueue() {
                   onClick={() => setMode('now')}
                   className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${mode === 'now' ? 'bg-white shadow-sm text-text-primary' : 'text-text-secondary'}`}
                 >
-                  Join Queue
+                  {t('showerQueue.joinQueue')}
                 </button>
                 <button
                   onClick={() => setMode('advance')}
                   className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${mode === 'advance' ? 'bg-white shadow-sm text-text-primary' : 'text-text-secondary'}`}
                 >
-                  Advance Booking
+                  {t('showerQueue.advanceBooking')}
                 </button>
               </div>
 
               {/* Duration Selection */}
               <div>
-                <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-3">Duration</label>
+                <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-3">{t('showerQueue.duration')}</label>
                 <div className="grid grid-cols-4 gap-2">
                   {[10, 15, 30, 45].map(d => (
                     <button
@@ -412,7 +416,7 @@ export default function ShowerQueue() {
               {mode === 'advance' && (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-2">Date</label>
+                    <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-2">{t('showerQueue.date')}</label>
                     <input
                       type="date"
                       value={advanceDate}
@@ -423,7 +427,7 @@ export default function ShowerQueue() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-2">Time</label>
+                    <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-2">{t('showerQueue.time')}</label>
                     <input
                       type="time"
                       value={advanceTime}
@@ -438,7 +442,7 @@ export default function ShowerQueue() {
                 onClick={handleJoinQueue}
                 className="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg hover:bg-primary/90 transition-colors"
               >
-                Confirm Booking
+                {t('showerQueue.confirmBooking')}
               </button>
             </div>
           </div>
@@ -447,10 +451,10 @@ export default function ShowerQueue() {
 
       <ConfirmModal
         isOpen={!!pendingBufferConflict}
-        title="Hot Water Warning"
-        message={`This slot overlaps with the ${hotWaterBuffer}-minute hot water recovery period of a previous shower. You might have a cold shower. Do you want to proceed anyway?`}
-        confirmText="Book Anyway"
-        cancelText="Cancel"
+        title={t('showerQueue.hotWaterWarning')}
+        message={t('showerQueue.hotWaterWarningMsg', { buffer: hotWaterBuffer })}
+        confirmText={t('showerQueue.bookAnyway')}
+        cancelText={t('showerQueue.cancel')}
         onConfirm={() => {
           if (pendingBufferConflict) {
             executeBooking(pendingBufferConflict.startTime, pendingBufferConflict.endTime);
