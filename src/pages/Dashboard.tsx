@@ -10,6 +10,7 @@ import { handleFirestoreError, OperationType } from '../lib/firestore-error';
 import LoadingScreen from '../components/LoadingScreen';
 import DashboardShowerWidget from '../components/DashboardShowerWidget';
 import EmptyState from '../components/EmptyState';
+import { formatCurrency } from '../lib/format';
 
 export default function Dashboard() {
   const { user, apartmentId, apartment } = useAuth();
@@ -186,13 +187,13 @@ export default function Dashboard() {
             </span>
           </div>
           <h3 className="text-2xl font-bold mb-1 text-text-primary">Bills & Expenses</h3>
-          <p className="text-text-secondary text-sm mb-8">Total outstanding: <span className="font-bold text-text-primary">EGP {expenses.reduce((sum, e) => sum + e.amount, 0).toFixed(2)}</span></p>
+          <p className="text-text-secondary text-sm mb-8">Total outstanding: <span className="font-bold text-text-primary">EGP {formatCurrency(expenses.reduce((sum, e) => sum + e.amount, 0), 2)}</span></p>
           
           <div className="mt-auto space-y-4">
             {expenses.slice(0, 2).map(expense => (
               <div key={expense.id} className="flex justify-between items-center text-sm bg-warning-light/30 p-3 rounded-xl border border-warning-light/50">
                 <span className="font-medium text-text-primary">{expense.title}</span>
-                <span className="font-bold text-warning-dark">EGP {expense.amount.toFixed(2)}</span>
+                <span className="font-bold text-warning-dark">EGP {formatCurrency(expense.amount, 2)}</span>
               </div>
             ))}
             {expenses.length === 0 && <p className="text-sm text-success font-bold">All bills paid! 🎉</p>}

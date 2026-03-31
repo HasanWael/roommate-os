@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { Receipt, CheckSquare, ShoppingCart, CalendarDays, LayoutDashboard, Droplets } from 'lucide-react';
+import { formatCurrency } from '../lib/format';
 import { useAuth } from '../AuthContext';
 import { db, loginWithGoogle, logout } from '../firebase';
 import { collection, query, where, onSnapshot, doc, getDoc, orderBy, limit } from 'firebase/firestore';
@@ -224,7 +225,7 @@ export default function TVMode() {
                 <li key={exp.id} className="bg-slate-950 p-6 rounded-2xl">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-xl font-semibold text-white">{exp.title || 'No Title'}</span>
-                    <span className="text-2xl font-extrabold text-white">${exp.amount?.toFixed(2) || '0.00'}</span>
+                    <span className="text-2xl font-extrabold text-white">{formatCurrency(exp.amount || 0, 2)}</span>
                   </div>
                   <div className="text-slate-400 text-lg font-medium">Added: {exp.createdAt ? format(exp.createdAt.toDate(), 'MMM d') : 'Just now'}</div>
                 </li>
