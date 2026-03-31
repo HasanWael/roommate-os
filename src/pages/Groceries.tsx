@@ -112,11 +112,11 @@ export default function Groceries() {
     <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-text-primary tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-3">
             <ShoppingCart className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             {t('groceries.title')}
           </h1>
-          <p className="text-text-secondary mt-1 text-sm md:text-base">
+          <p className="subheading mt-1 text-sm md:text-base">
             {t('groceries.description')}
           </p>
         </div>
@@ -130,32 +130,30 @@ export default function Groceries() {
       </header>
 
       {isAdding && (
-        <form onSubmit={handleAddItem} className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            <div className="sm:col-span-3">
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">{t('groceries.itemName')}</label>
-              <input 
-                type="text" 
-                value={newItemName}
-                onChange={(e) => setNewItemName(e.target.value)}
-                className="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                placeholder={t('groceries.itemNamePlaceholder')}
-                required
-              />
-            </div>
-            <div className="sm:col-span-1">
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">{t('groceries.quantity')}</label>
-              <input 
-                type="number" 
-                min="1"
-                value={newItemQuantity}
-                onChange={(e) => setNewItemQuantity(e.target.value)}
-                className="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                required
-              />
-            </div>
+        <form onSubmit={handleAddItem} className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
+          <div className="flex-1">
+            <label className="block text-xs md:text-sm font-medium text-text-secondary mb-1">{t('groceries.itemName')}</label>
+            <input 
+              type="text" 
+              value={newItemName}
+              onChange={(e) => setNewItemName(e.target.value)}
+              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm md:text-base"
+              placeholder={t('groceries.itemNamePlaceholder')}
+              required
+            />
           </div>
-          <button type="submit" className="w-full bg-primary text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition-all shadow-sm hover:shadow-md active:scale-[0.98]">
+          <div className="w-full sm:w-24">
+            <label className="block text-xs md:text-sm font-medium text-text-secondary mb-1">{t('groceries.quantity')}</label>
+            <input 
+              type="number" 
+              min="1"
+              value={newItemQuantity}
+              onChange={(e) => setNewItemQuantity(e.target.value)}
+              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm md:text-base"
+              required
+            />
+          </div>
+          <button type="submit" className="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors text-sm md:text-base">
             {t('groceries.save')}
           </button>
         </form>

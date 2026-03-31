@@ -129,11 +129,11 @@ export default function Chores() {
     <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-text-primary tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-3">
             <CheckSquare className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             {t('chores.title')}
           </h1>
-          <p className="text-text-secondary mt-1 text-sm md:text-base">
+          <p className="subheading mt-1 text-sm md:text-base">
             {t('chores.description')}
           </p>
         </div>
@@ -147,49 +147,45 @@ export default function Chores() {
       </header>
 
       {isAdding && (
-        <form onSubmit={handleAddChore} className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">{t('chores.choreTitle')}</label>
-              <input 
-                type="text" 
-                value={newChoreTitle}
-                onChange={(e) => setNewChoreTitle(e.target.value)}
-                className="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                placeholder={t('chores.choreTitlePlaceholder')}
-                required
-              />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-text-secondary mb-1.5">{t('chores.assignTo')}</label>
-                <select
-                  value={assignedToUserId}
-                  onChange={(e) => setAssignedToUserId(e.target.value)}
-                  className="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                  required
-                >
-                  <option value="" disabled>{t('chores.selectRoommate')}</option>
-                  {members.map(member => (
-                    <option key={member.userId} value={member.userId}>
-                      {member.user?.fullName || 'Unknown'}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-text-secondary mb-1.5">{t('chores.dueDate')}</label>
-                <input 
-                  type="date" 
-                  value={newChoreDueDate}
-                  onChange={(e) => setNewChoreDueDate(e.target.value)}
-                  className="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                  required
-                />
-              </div>
-            </div>
+        <form onSubmit={handleAddChore} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-wrap gap-4 items-end">
+          <div className="flex-1 min-w-[200px]">
+            <label className="block text-sm font-medium text-text-secondary mb-1">{t('chores.choreTitle')}</label>
+            <input 
+              type="text" 
+              value={newChoreTitle}
+              onChange={(e) => setNewChoreTitle(e.target.value)}
+              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              placeholder={t('chores.choreTitlePlaceholder')}
+              required
+            />
           </div>
-          <button type="submit" className="w-full bg-primary text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition-all shadow-sm hover:shadow-md active:scale-[0.98]">
+          <div className="w-48">
+            <label className="block text-sm font-medium text-text-secondary mb-1">{t('chores.assignTo')}</label>
+            <select
+              value={assignedToUserId}
+              onChange={(e) => setAssignedToUserId(e.target.value)}
+              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              required
+            >
+              <option value="" disabled>{t('chores.selectRoommate')}</option>
+              {members.map(member => (
+                <option key={member.userId} value={member.userId}>
+                  {member.user?.fullName || 'Unknown'}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-1">{t('chores.dueDate')}</label>
+            <input 
+              type="date" 
+              value={newChoreDueDate}
+              onChange={(e) => setNewChoreDueDate(e.target.value)}
+              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              required
+            />
+          </div>
+          <button type="submit" className="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors">
             {t('chores.save')}
           </button>
         </form>

@@ -97,7 +97,7 @@ export default function Settings() {
   if (!apartment || !user) {
     return (
       <div className="p-8 max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-text-primary mb-6">{t('settings.title')}</h1>
+        <h1 className="text-3xl font-black text-text-primary mb-6 tracking-tight">{t('settings.title')}</h1>
         <EmptyState 
           icon={Home} 
           title={t('settings.noApartment')} 
@@ -112,7 +112,7 @@ export default function Settings() {
   if (!isAdmin) {
     return (
       <div className="p-8 max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-text-primary mb-6">{t('settings.title')}</h1>
+        <h1 className="text-3xl font-black text-text-primary mb-6 tracking-tight">{t('settings.title')}</h1>
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
           <p className="text-text-secondary">{t('settings.adminOnly')}</p>
         </div>
@@ -122,8 +122,8 @@ export default function Settings() {
 
   return (
     <div className="p-4 md:p-8 max-w-2xl mx-auto pb-32">
-      <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-2">{t('settings.title')}</h1>
-      <p className="text-sm md:text-base text-text-secondary mb-6 md:mb-8">{t('settings.description')}</p>
+      <h1 className="text-2xl md:text-3xl font-black text-text-primary mb-2 tracking-tight">{t('settings.title')}</h1>
+      <p className="subheading mb-6 md:mb-8 text-sm md:text-base">{t('settings.description')}</p>
 
       <div className="space-y-6 md:space-y-8">
         {/* Language Settings */}

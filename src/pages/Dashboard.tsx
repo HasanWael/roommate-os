@@ -142,13 +142,13 @@ export default function Dashboard() {
     <div className="max-w-6xl mx-auto space-y-8">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-text-primary tracking-tight">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-text-primary tracking-tight">
             {t('dashboard.greeting')}, <span className="text-primary">{(() => {
               const currentUserMember = members.find(m => m.userId === user?.uid);
               return currentUserMember?.user?.fullName || user?.displayName || t('dashboard.roommate');
             })()}</span>.
           </h1>
-          <p className="text-text-secondary mt-2 md:mt-3 text-lg md:text-xl max-w-2xl leading-relaxed">
+          <p className="subheading mt-2 md:mt-3 max-w-2xl">
             {t('dashboard.statusText1')} <span className="font-semibold text-text-primary">{apartment?.name || t('dashboard.yourApartment')}</span> {t('dashboard.statusText2')}
           </p>
         </div>

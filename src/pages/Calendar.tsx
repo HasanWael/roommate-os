@@ -101,11 +101,11 @@ export default function Calendar() {
     <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-text-primary tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-3">
             <CalendarDays className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             {t('calendar.title')}
           </h1>
-          <p className="text-text-secondary mt-1 text-sm md:text-base">
+          <p className="subheading mt-1 text-sm md:text-base">
             {t('calendar.description')}
           </p>
         </div>

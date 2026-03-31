@@ -110,11 +110,11 @@ export default function Expenses() {
     <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-text-primary tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-3">
             <Receipt className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             {t('expenses.title')}
           </h1>
-          <p className="text-text-secondary mt-1 text-sm md:text-base">
+          <p className="subheading mt-1 text-sm md:text-base">
             {t('expenses.description')}
           </p>
         </div>
@@ -128,38 +128,38 @@ export default function Expenses() {
       </header>
 
       {isAdding && (
-        <form onSubmit={handleAddExpense} className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            <div className="sm:col-span-3">
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">{t('expenses.descriptionLabel')}</label>
+        <form onSubmit={handleAddExpense} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-4">
+          <div className="flex gap-4 items-end">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-text-secondary mb-1">{t('expenses.descriptionLabel')}</label>
               <input 
                 type="text" 
                 value={newExpenseTitle}
                 onChange={(e) => setNewExpenseTitle(e.target.value)}
-                className="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder={t('expenses.descriptionPlaceholder')}
                 required
               />
             </div>
-            <div className="sm:col-span-1">
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">{t('expenses.amountLabel')}</label>
+            <div className="w-32">
+              <label className="block text-sm font-medium text-text-secondary mb-1">{t('expenses.amountLabel')}</label>
               <input 
                 type="number" 
                 step="0.01"
                 min="0"
                 value={newExpenseAmount}
                 onChange={(e) => setNewExpenseAmount(e.target.value)}
-                className="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 required
               />
             </div>
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-2.5">{t('expenses.splitAmong')}</label>
-            <div className="flex flex-wrap gap-2 md:gap-3">
+            <label className="block text-sm font-medium text-text-secondary mb-2">{t('expenses.splitAmong')}</label>
+            <div className="flex flex-wrap gap-3">
               {members.map(member => (
-                <label key={member.userId} className="flex items-center space-x-2 rtl:space-x-reverse cursor-pointer bg-gray-50 px-3 py-2 rounded-xl border border-gray-100 hover:bg-gray-100 transition-colors">
+                <label key={member.userId} className="flex items-center space-x-2 rtl:space-x-reverse cursor-pointer bg-gray-50 px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-100">
                   <input 
                     type="checkbox" 
                     checked={splitAmong.includes(member.userId)}
@@ -179,29 +179,27 @@ export default function Expenses() {
             </div>
           </div>
 
-          <button type="submit" className="w-full bg-primary text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition-all shadow-sm hover:shadow-md active:scale-[0.98]">
-            {t('expenses.saveExpense')}
-          </button>
+          <div className="flex justify-end mt-2">
+            <button type="submit" className="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors">
+              {t('expenses.saveExpense')}
+            </button>
+          </div>
         </form>
       )}
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-4 md:p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
           <h2 className="font-bold text-text-primary text-sm md:text-base">{t('expenses.recentExpenses')}</h2>
-          <div className="text-right">
-            <span className="text-[10px] font-bold text-text-secondary uppercase tracking-widest block leading-none mb-1">{t('expenses.totalPending')}</span>
-            <div className="flex items-baseline justify-end gap-1">
-              <span className="text-xs font-bold text-primary">{i18n.language === 'ar' ? 'ج.م' : 'EGP'}</span>
-              <span className="text-lg md:text-xl font-black text-danger tracking-tight">{formatCurrency(totalPending, 2)}</span>
-            </div>
+          <div className="text-xs md:text-sm font-medium text-text-secondary">
+            {t('expenses.totalPending')} <span className="text-danger font-bold">{i18n.language === 'ar' ? 'ج.م' : 'EGP'} {formatCurrency(totalPending, 2)}</span>
           </div>
         </div>
         
         <div className="divide-y divide-gray-100">
           {expenses.map((expense) => (
-            <div key={expense.id} className="p-4 md:p-6 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-gray-50 transition-all duration-200 group gap-4">
-              <div className="flex items-center space-x-3 md:space-x-4 rtl:space-x-reverse min-w-0 flex-1">
-                <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden flex-shrink-0 border border-blue-100 group-hover:scale-110 transition-transform">
+            <div key={expense.id} className="p-4 md:p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
+              <div className="flex items-center space-x-3 md:space-x-4 rtl:space-x-reverse">
+                <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden flex-shrink-0">
                   {(() => {
                     const payer = members.find(m => m.userId === expense.paidByUserId);
                     if (payer?.user?.avatarUrl) {
@@ -210,8 +208,8 @@ export default function Expenses() {
                     return <Receipt className="h-5 w-5 md:h-6 md:w-6 text-primary" />;
                   })()}
                 </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-bold text-text-primary text-base md:text-lg truncate group-hover:text-primary transition-colors">{expense.title}</h3>
+                <div className="min-w-0">
+                  <h3 className="font-bold text-text-primary text-base md:text-lg truncate">{expense.title}</h3>
                   <p className="text-xs md:text-sm text-text-secondary truncate">
                     {expense.createdAt ? format(expense.createdAt.toDate(), 'MMM d, yyyy', { locale: dateLocale }) : t('expenses.justNow')} • {t('expenses.paidBy')} {(() => {
                       const payer = members.find(m => m.userId === expense.paidByUserId);
@@ -239,24 +237,19 @@ export default function Expenses() {
                 </div>
               </div>
               
-              <div className="flex items-center justify-between sm:justify-end gap-4 md:gap-6">
+              <div className="flex items-center gap-2 md:gap-6 ml-2 rtl:ml-0 rtl:mr-2">
                 <div className={`text-${i18n.language === 'ar' ? 'left' : 'right'} flex-shrink-0`}>
-                  <div className="flex items-baseline justify-end gap-1">
-                    <span className="text-xs font-bold text-text-secondary">{i18n.language === 'ar' ? 'ج.م' : 'EGP'}</span>
-                    <span className="text-xl md:text-2xl font-black text-text-primary tracking-tight">{formatCurrency(expense.amount, 2)}</span>
-                  </div>
-                  <div className={`text-[10px] md:text-xs text-text-secondary mt-0.5 flex items-center justify-${i18n.language === 'ar' ? 'start' : 'end'} space-x-1 rtl:space-x-reverse`}>
-                    <Circle className="h-3 w-3 text-orange-500 fill-orange-500" />
-                    <span className="text-orange-600 font-bold uppercase tracking-wider">{t('expenses.pending')}</span>
+                  <div className="font-bold text-lg md:text-xl text-text-primary">{i18n.language === 'ar' ? 'ج.م' : 'EGP'} {formatCurrency(expense.amount, 2)}</div>
+                  <div className={`text-[10px] md:text-sm text-text-secondary mt-0.5 md:mt-1 flex items-center justify-${i18n.language === 'ar' ? 'start' : 'end'} space-x-1 rtl:space-x-reverse`}>
+                    <Circle className="h-3 w-3 md:h-4 md:w-4 text-orange-500" /><span className="text-orange-600 font-medium">{t('expenses.pending')}</span>
                   </div>
                 </div>
-
                 <button 
                   onClick={() => confirmDelete(expense.id)}
-                  className="text-gray-400 hover:text-red-500 transition-all p-2 hover:bg-red-50 rounded-xl"
+                  className="text-gray-400 hover:text-red-500 transition-colors p-1 md:p-2"
                   title={t('expenses.deleteExpense')}
                 >
-                  <Trash2 className="h-5 w-5" />
+                  <Trash2 className="h-4 w-4 md:h-5 md:w-5" />
                 </button>
               </div>
             </div>

@@ -236,35 +236,35 @@ export default function ShowerQueue() {
     const secs = remainingSeconds % 60;
 
     return (
-      <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 md:p-8 text-white shadow-lg relative overflow-hidden">
-        <div className={`absolute top-0 ${i18n.language === 'ar' ? 'left-0' : 'right-0'} p-6 md:p-8 opacity-10`}>
-          <Droplets className="w-32 h-32 md:w-48 md:h-48" />
+      <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-4 md:p-5 text-white shadow-lg relative overflow-hidden">
+        <div className={`absolute top-0 ${i18n.language === 'ar' ? 'left-0' : 'right-0'} p-4 md:p-6 opacity-10`}>
+          <Droplets className="w-24 h-24 md:w-32 md:h-32" />
         </div>
         <div className="relative z-10">
-          <div className="flex items-center space-x-2 rtl:space-x-reverse mb-4 md:mb-6">
-            <span className="flex h-3 w-3 md:h-4 md:w-4 relative">
+          <div className="flex items-center space-x-2 rtl:space-x-reverse mb-3 md:mb-4">
+            <span className="flex h-2 w-2 md:h-3 md:w-3 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 md:h-4 md:w-4 bg-white"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 md:h-3 md:w-3 bg-white"></span>
             </span>
-            <span className="font-medium tracking-wide uppercase text-xs md:text-sm">{t('showerQueue.nowShowering')}</span>
+            <span className="font-medium tracking-wide uppercase text-[10px] md:text-xs">{t('showerQueue.nowShowering')}</span>
           </div>
           
-          <div className="flex justify-between items-end mb-6 md:mb-8">
+          <div className="flex justify-between items-end mb-4 md:mb-6">
             <div>
-              <h2 className="text-2xl md:text-4xl font-bold mb-1 md:mb-2">{activeSlot.userName}</h2>
-              <p className="text-blue-100 text-sm md:text-lg">{activeSlot.duration} {t('showerQueue.minSlot')}</p>
+              <h2 className="text-xl md:text-3xl font-bold mb-0.5 md:mb-1">{activeSlot.userName}</h2>
+              <p className="text-blue-100 text-xs md:text-base">{activeSlot.duration} {t('showerQueue.minSlot')}</p>
             </div>
             <div className={`text-${i18n.language === 'ar' ? 'left' : 'right'}`}>
-              <div className="text-4xl md:text-6xl font-mono font-bold" dir="ltr">
+              <div className="text-2xl md:text-4xl font-mono font-bold" dir="ltr">
                 {String(mins).padStart(2, '0')}:{String(secs).padStart(2, '0')}
               </div>
-              <p className="text-blue-100 text-xs md:text-base">{t('showerQueue.remaining')}</p>
+              <p className="text-blue-100 text-[10px] md:text-sm">{t('showerQueue.remaining')}</p>
             </div>
           </div>
 
-          <div className="w-full bg-blue-900/30 rounded-full h-2 md:h-3 mb-2 md:mb-3">
+          <div className="w-full bg-blue-900/30 rounded-full h-1.5 md:h-2 mb-1 md:mb-2">
             <div 
-              className="bg-white h-2 md:h-3 rounded-full transition-all duration-1000 ease-linear"
+              className="bg-white h-1.5 md:h-2 rounded-full transition-all duration-1000 ease-linear"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -277,11 +277,11 @@ export default function ShowerQueue() {
     <div className="max-w-4xl mx-auto space-y-6 md:space-y-8 p-4 md:p-8 pb-32">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-text-primary tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-3">
             <Droplets className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             {t('showerQueue.title')}
           </h1>
-          <p className="text-text-secondary mt-1 text-sm md:text-base">
+          <p className="subheading mt-1 text-sm md:text-base">
             {t('showerQueue.description')}
           </p>
         </div>
