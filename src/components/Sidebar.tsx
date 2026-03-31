@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Receipt, CheckSquare, ShoppingCart, CalendarDays, Megaphone, Users, Tv, X, LogOut, Repeat, Settings, Droplets } from 'lucide-react';
+import { LayoutDashboard, Receipt, CheckSquare, ShoppingCart, CalendarDays, Megaphone, Users, Tv, X, LogOut, Repeat, Settings, Droplets, Trash2 } from 'lucide-react';
 import { useAuth } from '../AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +17,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navItems = [
     { name: t('nav.dashboard'), path: '/dashboard', icon: LayoutDashboard },
     { name: t('nav.showerQueue'), path: '/shower-queue', icon: Droplets },
+    { name: t('nav.trashTurn'), path: '/trash-turn', icon: Trash2 },
     { name: t('nav.bills'), path: '/expenses', icon: Receipt },
     { name: t('nav.chores'), path: '/chores', icon: CheckSquare },
     { name: t('nav.groceries'), path: '/groceries', icon: ShoppingCart },

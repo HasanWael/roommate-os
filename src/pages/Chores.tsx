@@ -129,8 +129,13 @@ export default function Chores() {
     <div className="max-w-4xl mx-auto space-y-8">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-text-primary tracking-tight">{t('chores.title')}</h1>
-          <p className="text-text-secondary mt-1">{t('chores.description')}</p>
+          <h1 className="text-3xl font-bold text-text-primary tracking-tight flex items-center gap-3">
+            <CheckSquare className="h-8 w-8 text-primary" />
+            {t('chores.title')}
+          </h1>
+          <p className="text-text-secondary mt-1">
+            {t('chores.description')}
+          </p>
         </div>
         <button 
           onClick={() => setIsAdding(!isAdding)}

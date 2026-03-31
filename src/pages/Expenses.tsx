@@ -110,8 +110,13 @@ export default function Expenses() {
     <div className="max-w-4xl mx-auto space-y-8">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-text-primary tracking-tight">{t('expenses.title')}</h1>
-          <p className="text-text-secondary mt-1">{t('expenses.description')}</p>
+          <h1 className="text-3xl font-bold text-text-primary tracking-tight flex items-center gap-3">
+            <Receipt className="h-8 w-8 text-primary" />
+            {t('expenses.title')}
+          </h1>
+          <p className="text-text-secondary mt-1">
+            {t('expenses.description')}
+          </p>
         </div>
         <button 
           onClick={() => setIsAdding(!isAdding)}

@@ -271,8 +271,13 @@ export default function ShowerQueue() {
     <div className="max-w-4xl mx-auto space-y-8 p-4 md:p-8 pb-32">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-text-primary tracking-tight">{t('showerQueue.title')}</h1>
-          <p className="text-text-secondary mt-1">{t('showerQueue.description')}</p>
+          <h1 className="text-3xl font-bold text-text-primary tracking-tight flex items-center gap-3">
+            <Droplets className="h-8 w-8 text-primary" />
+            {t('showerQueue.title')}
+          </h1>
+          <p className="text-text-secondary mt-1">
+            {t('showerQueue.description')}
+          </p>
         </div>
         {myActiveSlot ? (
           <button

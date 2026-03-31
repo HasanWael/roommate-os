@@ -16,6 +16,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "showerQueue": "Shower Queue",
+    "trashTurn": "Trash Turn",
     "bills": "Bills",
     "chores": "Chores",
     "groceries": "Groceries",
@@ -62,14 +63,17 @@
     "noEvents": "No upcoming events",
     "noEventsDesc": "Your calendar is clear for now. Add some plans to keep everyone in the loop.",
     "showerQueue": "Shower Queue",
-    "trashTurn": "Trash Turn",
+    "nowShowering": "Now showering",
+    "minSlot": "min slot"
+  },
+  "trashTurn": {
     "trashTurnTitle": "Trash Duty",
     "currentTurn": "Current Turn",
     "rotationOrder": "Rotation Order",
     "markAsDone": "Mark as Done",
     "iThrewIt": "I Threw It",
     "away": "Away",
-    "available": "Available",
+    "available": "Back",
     "history": "History",
     "inTurn": "In-turn",
     "outOfTurn": "Out-of-turn",
@@ -79,8 +83,12 @@
     "nextPersonNotified": "Next person in rotation will be notified.",
     "trashSuccess": "Trash turn updated successfully!",
     "trashError": "Failed to update trash turn.",
-    "nowShowering": "Now showering",
-    "minSlot": "min slot"
+    "explanationTitle": "How it works",
+    "explanation1": "The rotation follows the order roommates joined the apartment.",
+    "explanation2": "When everyone has completed a turn, the cycle restarts automatically.",
+    "explanation3": "Only the person currently in turn can mark it as done.",
+    "explanation4": "If someone is away, the system automatically skips them in the rotation.",
+    "explanation5": "Out-of-turn throws are logged but do not change the current rotation order."
   },
   "settings": {
     "title": "Settings",

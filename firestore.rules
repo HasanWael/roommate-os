@@ -57,9 +57,18 @@ service cloud.firestore {
     match /apartments/{apartmentId} {
       allow create: if isAuthenticated();
       allow get: if isAuthenticated();
-      allow update: if isAuthenticated() && (isApartmentMember(apartmentId) || resource.data.createdBy == request.auth.uid || isGlobalAdmin());
+      allow update: if isAuthenticated() && (
+        isApartmentMember(apartmentId) || 
+        resource.data.createdBy == request.auth.uid || 
+        isGlobalAdmin()
+      );
       allow list: if isAuthenticated();
       allow delete: if isAuthenticated() && (resource.data.createdBy == request.auth.uid || isApartmentAdmin(apartmentId) || isGlobalAdmin());
+    }
+
+    match /trashHistory/{historyId} {
+      allow read: if isAuthenticated() && isApartmentMember(resource.data.apartmentId);
+      allow create: if isAuthenticated() && isApartmentMember(request.resource.data.apartmentId);
     }
 
     match /inviteCodes/{code} {

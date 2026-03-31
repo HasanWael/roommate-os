@@ -11,6 +11,7 @@ import Calendar from './pages/Calendar';
 import Members from './pages/Members';
 import Settings from './pages/Settings';
 import ShowerQueue from './pages/ShowerQueue';
+import TrashTurn from './pages/TrashTurn';
 import NotFound from './pages/NotFound';
 import AccessDenied from './pages/AccessDenied';
 import LoadingScreen from './components/LoadingScreen';
@@ -40,6 +41,7 @@ export default function App() {
           <Route path="groceries" element={<Groceries />} />
           <Route path="calendar" element={<Calendar />} />
           <Route path="shower-queue" element={<ShowerQueue />} />
+          <Route path="trash-turn" element={<TrashTurn />} />
           <Route path="members" element={<Members />} />
           <Route path="settings" element={<Settings />} />
         </Route>
