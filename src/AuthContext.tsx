@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
-import { User, onAuthStateChanged } from 'firebase/auth';
+import { User, onAuthStateChanged, getRedirectResult } from 'firebase/auth';
 import { auth, db } from './firebase';
 import { doc, getDoc, setDoc, updateDoc, collection, query, where, onSnapshot, getDocFromServer } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from './lib/firestore-error';
@@ -96,6 +96,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [apartmentId]);
 
   useEffect(() => {
+    // Handle redirect result for WebView/Native wrappers
+    const handleRedirect = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result?.user) {
+          console.log("Successfully signed in via redirect:", result.user.email);
+        }
+      } catch (error: any) {
+        // "missing initial state" is common in WebViews that clear sessionStorage on redirect
+        if (error.code === 'auth/missing-initial-state' || error.code === 'auth/invalid-credential') {
+          console.warn("Redirect state missing, this is common in some WebViews. User may need to try again.");
+        } else {
+          console.error("Error handling redirect result:", error);
+        }
+      }
+    };
+    handleRedirect();
+
     const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
       setUser(prevUser => {
         if (!prevUser && !currentUser) return null;
