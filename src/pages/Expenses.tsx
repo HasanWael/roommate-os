@@ -112,7 +112,7 @@ export default function Expenses() {
         <div>
           <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-2">
             <Receipt className="h-6 w-6 md:h-8 md:w-8 text-primary" />
-            <span className="pt-1">{t('expenses.title')}</span>
+            <span>{t('expenses.title')}</span>
           </h1>
           <p className="subheading mt-1 text-sm md:text-base">
             {t('expenses.description')}
@@ -157,7 +157,7 @@ export default function Expenses() {
             <label className="block text-sm font-medium text-text-secondary mb-2">{t('expenses.splitAmong')}</label>
             <div className="flex flex-wrap gap-3">
               {members.map(member => (
-                <label key={member.userId} className="flex items-center space-x-2 rtl:space-x-reverse cursor-pointer bg-gray-50 px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-100">
+                <label key={member.userId} className="flex items-center gap-2 cursor-pointer bg-gray-50 px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-100">
                   <input 
                     type="checkbox" 
                     checked={splitAmong.includes(member.userId)}
@@ -196,7 +196,7 @@ export default function Expenses() {
         <div className="divide-y divide-gray-100">
           {expenses.map((expense) => (
             <div key={expense.id} className="p-4 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between hover:bg-gray-50 transition-colors gap-4">
-              <div className="flex items-start space-x-3 md:space-x-4 rtl:space-x-reverse w-full">
+              <div className="flex items-start gap-3 md:gap-4 w-full">
                 <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden flex-shrink-0">
                   {(() => {
                     const payer = members.find(m => m.userId === expense.paidByUserId);
@@ -217,7 +217,7 @@ export default function Expenses() {
                   </p>
                   <div className="text-xs text-text-secondary mt-2">
                     {t('expenses.splitAmongPeople', { count: expense.splitAmong?.length || 1 })}
-                    <div className={`flex mt-1 ${i18n.language === 'ar' ? '-space-x-reverse' : ''} -space-x-1 md:-space-x-2`}>
+                    <div className={`flex mt-1 ${i18n.language === 'ar' ? 'flex-row-reverse space-x-reverse' : ''} -space-x-1 md:-space-x-2`}>
                       {expense.splitAmong?.map((userId: string) => {
                         const member = members.find(m => m.userId === userId);
                         return (

@@ -114,7 +114,7 @@ export default function Groceries() {
         <div>
           <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-2">
             <ShoppingCart className="h-6 w-6 md:h-8 md:w-8 text-primary" />
-            <span className="pt-1">{t('groceries.title')}</span>
+            <span>{t('groceries.title')}</span>
           </h1>
           <p className="subheading mt-1 text-sm md:text-base">
             {t('groceries.description')}
@@ -172,7 +172,7 @@ export default function Groceries() {
             const isCompleting = completingItems.has(item.id);
             return (
             <div key={item.id} className={`p-4 md:p-6 flex items-center justify-between transition-all duration-500 ${isCompleting ? 'bg-gray-50 opacity-60 scale-[0.99]' : 'hover:bg-gray-50'}`}>
-              <div className="flex items-center space-x-3 md:space-x-4 rtl:space-x-reverse min-w-0">
+              <div className="flex items-center gap-3 md:gap-4 min-w-0">
                 <button 
                   onClick={() => toggleItemStatus(item.id)}
                   className="h-6 w-6 md:h-8 md:w-8 rounded-full border-2 border-gray-300 hover:border-primary flex items-center justify-center transition-colors flex-shrink-0"

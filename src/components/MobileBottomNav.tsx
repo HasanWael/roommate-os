@@ -63,7 +63,7 @@ export default function MobileBottomNav() {
 
       {/* Bottom Navbar */}
       <nav 
-        className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 flex justify-around items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]"
+        className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 flex items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]"
         style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}
       >
         {mainTabs.map((tab) => (
@@ -71,7 +71,7 @@ export default function MobileBottomNav() {
             key={tab.name}
             to={tab.path}
             className={({ isActive }) =>
-              `relative flex flex-col items-center justify-center w-full pt-2 pb-1 transition-colors ${
+              `relative flex flex-col items-center justify-center flex-1 pt-2 pb-1 transition-colors ${
                 isActive ? 'text-primary' : 'text-slate-500 hover:text-slate-700'
               }`
             }
@@ -138,15 +138,15 @@ export default function MobileBottomNav() {
               </div>
               
               <div 
-                className="overflow-y-auto overscroll-y-none scrollbar-hide px-6 space-y-6"
+                className="overflow-y-auto overscroll-y-none scrollbar-hide px-6 flex flex-col gap-6"
                 style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom))' }}
               >
                 {/* Navigation */}
-                <div>
+                <div className="flex flex-col">
                   <h3 className="text-[0.75rem] uppercase text-slate-400 font-bold tracking-wider mb-3">{t('nav.navigation', 'Navigation')}</h3>
-                  <div className="space-y-2">
-                    <NavLink to="/calendar" onClick={() => setIsDrawerOpen(false)} className="flex items-center p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors">
-                      <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center mr-4 rtl:ml-4 rtl:mr-0 text-primary">
+                  <div className="flex flex-col gap-2">
+                    <NavLink to="/calendar" onClick={() => setIsDrawerOpen(false)} className="flex items-center p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0 text-primary">
                         <CalendarDays className="w-6 h-6" />
                       </div>
                       <div>
@@ -154,8 +154,8 @@ export default function MobileBottomNav() {
                         <div className="text-custom-xs text-slate-500">{t('calendar.description', 'Manage events')}</div>
                       </div>
                     </NavLink>
-                    <NavLink to="/chores" onClick={() => setIsDrawerOpen(false)} className="flex items-center p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors">
-                      <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center mr-4 rtl:ml-4 rtl:mr-0 text-primary">
+                    <NavLink to="/chores" onClick={() => setIsDrawerOpen(false)} className="flex items-center p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0 text-primary">
                         <CheckSquare className="w-6 h-6" />
                       </div>
                       <div>
@@ -169,11 +169,11 @@ export default function MobileBottomNav() {
                 <div className="h-px bg-slate-200 w-full" />
 
                 {/* Settings */}
-                <div>
+                <div className="flex flex-col">
                   <h3 className="text-[0.75rem] uppercase text-slate-400 font-bold tracking-wider mb-3">{t('nav.settings', 'Settings')}</h3>
-                  <div className="space-y-2">
-                    <NavLink to="/members" onClick={() => setIsDrawerOpen(false)} className="flex items-center p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors">
-                      <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center mr-4 rtl:ml-4 rtl:mr-0 text-slate-600">
+                  <div className="flex flex-col gap-2">
+                    <NavLink to="/members" onClick={() => setIsDrawerOpen(false)} className="flex items-center p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0 text-slate-600">
                         <Users className="w-6 h-6" />
                       </div>
                       <div>
@@ -181,8 +181,8 @@ export default function MobileBottomNav() {
                         <div className="text-custom-xs text-slate-500">{t('members.description', 'Manage roommates')}</div>
                       </div>
                     </NavLink>
-                    <NavLink to="/settings" onClick={() => setIsDrawerOpen(false)} className="flex items-center p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors">
-                      <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center mr-4 rtl:ml-4 rtl:mr-0 text-slate-600">
+                    <NavLink to="/settings" onClick={() => setIsDrawerOpen(false)} className="flex items-center p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0 text-slate-600">
                         <Settings className="w-6 h-6" />
                       </div>
                       <div>
@@ -190,8 +190,8 @@ export default function MobileBottomNav() {
                         <div className="text-custom-xs text-slate-500">{t('settings.description', 'App settings')}</div>
                       </div>
                     </NavLink>
-                    <button onClick={handleSwitchApartment} className="w-full flex items-center p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors text-left rtl:text-right">
-                      <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center mr-4 rtl:ml-4 rtl:mr-0 text-slate-600">
+                    <button onClick={handleSwitchApartment} className="w-full flex items-center p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors text-left rtl:text-right gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0 text-slate-600">
                         <Repeat className="w-6 h-6" />
                       </div>
                       <div>
@@ -205,9 +205,9 @@ export default function MobileBottomNav() {
                 <div className="h-px bg-slate-200 w-full" />
 
                 {/* Language */}
-                <div>
-                  <button onClick={toggleLanguage} className="w-full flex items-center p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors text-left rtl:text-right">
-                    <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center mr-4 rtl:ml-4 rtl:mr-0 text-primary">
+                <div className="flex flex-col">
+                  <button onClick={toggleLanguage} className="w-full flex items-center p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors text-left rtl:text-right gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0 text-primary">
                       <Globe className="w-6 h-6" />
                     </div>
                     <div className="flex-1">
@@ -223,9 +223,9 @@ export default function MobileBottomNav() {
                 <div className="h-px bg-slate-200 w-full" />
 
                 {/* Logout */}
-                <div>
-                  <button onClick={handleLogout} className="w-full flex items-center p-3 bg-red-50 rounded-2xl hover:bg-red-100 transition-colors text-left rtl:text-right">
-                    <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center mr-4 rtl:ml-4 rtl:mr-0 text-red-500">
+                <div className="flex flex-col">
+                  <button onClick={handleLogout} className="w-full flex items-center p-3 bg-red-50 rounded-2xl hover:bg-red-100 transition-colors text-left rtl:text-right gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0 text-red-500">
                       <LogOut className={`w-6 h-6 ${i18n.language === 'ar' ? 'rotate-180' : ''}`} />
                     </div>
                     <div>

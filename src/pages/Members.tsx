@@ -162,7 +162,7 @@ export default function Members() {
         <div className="divide-y divide-gray-100">
           {members.map((member) => (
             <div key={member.id} className="p-4 md:p-6 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-gray-50 transition-colors gap-4">
-              <div className="flex items-center space-x-3 md:space-x-4 rtl:space-x-reverse">
+              <div className="flex items-center gap-3 md:gap-4">
                 {member.user?.avatarUrl ? (
                   <img src={member.user.avatarUrl} alt="Avatar" className="h-10 w-10 md:h-12 md:w-12 rounded-full border border-gray-200" />
                 ) : (
@@ -181,7 +181,7 @@ export default function Members() {
                 </div>
               </div>
               
-              <div className="flex items-center justify-between sm:justify-end space-x-4 rtl:space-x-reverse">
+              <div className="flex items-center justify-between sm:justify-end gap-4">
                 <span className={`badge text-[10px] md:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${
                   member.role === 'admin' ? 'bg-orange-100 text-orange-700' : 'bg-gray-200 text-text-primary'
                 }`}>
@@ -189,7 +189,7 @@ export default function Members() {
                 </span>
                 
                 {isAdmin && member.userId !== user?.uid && (
-                  <div className="flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+                  <div className="flex items-center gap-1 md:gap-2">
                     <button
                       onClick={() => handleToggleRole(member.id, member.role)}
                       className="p-1.5 md:p-2 text-gray-400 hover:text-primary transition-colors rounded-lg hover:bg-gray-100"

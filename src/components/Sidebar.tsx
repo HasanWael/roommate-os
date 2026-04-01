@@ -32,8 +32,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   return (
     <aside className={`
-      fixed inset-y-0 left-0 z-50 w-64 bg-background border-r border-gray-200 flex-col transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:flex
-      ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+      fixed inset-y-0 left-0 rtl:right-0 rtl:left-auto z-50 w-64 bg-background border-r rtl:border-l rtl:border-r-0 border-gray-200 flex-col transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:flex
+      ${isOpen ? 'translate-x-0' : (i18n.language === 'ar' ? 'translate-x-full' : '-translate-x-full')}
       hidden lg:flex
     `}>
       <div className="p-6 flex justify-between items-center">
@@ -52,14 +52,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             to={item.path}
             onClick={onClose}
             className={({ isActive }) =>
-              `flex items-center px-4 py-3.5 text-sm font-bold rounded-2xl transition-all duration-200 ${
+              `flex items-center gap-3 px-4 py-3.5 text-sm font-bold rounded-2xl transition-all duration-200 ${
                 isActive
                   ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-[1.02]'
                   : 'text-text-secondary hover:bg-primary/5 hover:text-primary'
               }`
             }
           >
-            <item.icon className={`${i18n.language === 'ar' ? 'ml-3' : 'mr-3'} h-5 w-5`} />
+            <item.icon className="h-5 w-5" />
             {item.name}
           </NavLink>
         ))}
@@ -69,33 +69,33 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <NavLink 
           to="/members" 
           onClick={onClose}
-          className="flex items-center px-4 py-3 text-sm font-medium text-text-secondary hover:bg-gray-100 rounded-lg"
+          className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-text-secondary hover:bg-gray-100 rounded-lg"
         >
-          <Users className={`${i18n.language === 'ar' ? 'ml-3' : 'mr-3'} h-5 w-5`} />
+          <Users className="h-5 w-5" />
           {t('nav.members')}
         </NavLink>
         <NavLink 
           to="/settings" 
           onClick={onClose}
-          className="flex items-center px-4 py-3 text-sm font-medium text-text-secondary hover:bg-gray-100 rounded-lg"
+          className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-text-secondary hover:bg-gray-100 rounded-lg"
         >
-          <Settings className={`${i18n.language === 'ar' ? 'ml-3' : 'mr-3'} h-5 w-5`} />
+          <Settings className="h-5 w-5" />
           {t('nav.settings')}
         </NavLink>
         <NavLink 
           to="/tv" 
           target="_blank" 
           onClick={onClose}
-          className="flex items-center px-4 py-3 text-sm font-medium text-text-secondary hover:bg-gray-100 rounded-lg"
+          className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-text-secondary hover:bg-gray-100 rounded-lg"
         >
-          <Tv className={`${i18n.language === 'ar' ? 'ml-3' : 'mr-3'} h-5 w-5`} />
+          <Tv className="h-5 w-5" />
           {t('nav.tvMode')}
         </NavLink>
         <button 
           onClick={handleSwitchApartment}
-          className="w-full flex items-center px-4 py-3 text-sm font-medium text-text-secondary hover:bg-gray-100 rounded-lg transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-text-secondary hover:bg-gray-100 rounded-lg transition-colors"
         >
-          <Repeat className={`${i18n.language === 'ar' ? 'ml-3' : 'mr-3'} h-5 w-5`} />
+          <Repeat className="h-5 w-5" />
           {t('nav.switchApartment')}
         </button>
         <div className="md:hidden pt-2">

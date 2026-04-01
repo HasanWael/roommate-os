@@ -152,7 +152,7 @@ export default function Dashboard() {
             {t('dashboard.statusText1')} <span className="font-semibold text-text-primary">{apartment?.name || t('dashboard.yourApartment')}</span> {t('dashboard.statusText2')}
           </p>
         </div>
-        <div className="flex -space-x-3 rtl:space-x-reverse">
+        <div className="flex gap-3 rtl:flex-row-reverse">
           {members.slice(0, 5).map((member) => (
             <div 
               key={member.userId} 

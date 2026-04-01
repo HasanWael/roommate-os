@@ -103,7 +103,7 @@ export default function Calendar() {
         <div>
           <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-2">
             <CalendarDays className="h-6 w-6 md:h-8 md:w-8 text-primary" />
-            <span className="pt-1">{t('calendar.title')}</span>
+            <span>{t('calendar.title')}</span>
           </h1>
           <p className="subheading mt-1 text-sm md:text-base">
             {t('calendar.description')}
@@ -186,7 +186,7 @@ export default function Calendar() {
         <div className="divide-y divide-gray-100">
           {events.map((event) => (
             <div key={event.id} className="p-4 md:p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
-              <div className="flex items-center space-x-3 md:space-x-6 rtl:space-x-reverse min-w-0">
+              <div className="flex items-center gap-3 md:gap-6 min-w-0">
                 <div className="text-center flex-shrink-0">
                   <p className="text-[10px] md:text-xs font-bold text-text-secondary uppercase tracking-wider mb-0.5 md:mb-1">
                     {event.startDatetime ? format(new Date(event.startDatetime), 'MMM', { locale: dateLocale }) : ''}
@@ -197,13 +197,13 @@ export default function Calendar() {
                 </div>
                 <div className="min-w-0">
                   <h3 className="font-bold text-text-primary text-base md:text-lg truncate">{event.title}</h3>
-                  <div className="flex flex-col sm:flex-row sm:items-center mt-1 sm:space-x-2 rtl:sm:space-x-reverse gap-1 sm:gap-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center mt-1 sm:gap-2 gap-1 sm:gap-0">
                     <p className="text-xs md:text-sm text-text-secondary flex items-center">
                       <Clock className={`h-3 w-3 md:h-4 md:w-4 ${i18n.language === 'ar' ? 'ml-1' : 'mr-1'}`} />
                       {event.startDatetime ? format(new Date(event.startDatetime), 'h:mm a', { locale: dateLocale }) : ''}
                     </p>
                     {event.assignedToUserId && (
-                      <div className={`flex items-center space-x-1 rtl:space-x-reverse sm:border-l sm:pl-2 rtl:sm:pl-0 rtl:sm:pr-2 sm:border-gray-200`}>
+                      <div className={`flex items-center gap-1 sm:border-l sm:pl-2 rtl:sm:pl-0 rtl:sm:pr-2 sm:border-gray-200`}>
                         <div className="h-3 w-3 md:h-4 md:w-4 rounded-full bg-primary text-white flex items-center justify-center text-[6px] md:text-[8px] font-bold overflow-hidden flex-shrink-0">
                           {(() => {
                             const assigned = members.find(m => m.userId === event.assignedToUserId);

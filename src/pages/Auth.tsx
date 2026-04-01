@@ -39,7 +39,7 @@ function ApartmentCard({ membership, onSelect }: { membership: any, onSelect: ()
     >
       <h3 className="font-bold text-text-primary group-hover:text-primary transition-colors">
         {loading ? (
-          <span className="flex items-center space-x-2 rtl:space-x-reverse">
+          <span className="flex items-center gap-2">
             <span className="h-4 w-24 bg-gray-100 animate-pulse rounded" />
           </span>
         ) : (
@@ -256,7 +256,7 @@ export default function Auth() {
           
           <button 
             onClick={handleLogin}
-            className="w-full bg-text-primary hover:bg-black text-white font-bold py-4 rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center space-x-3 rtl:space-x-reverse text-lg"
+            className="w-full bg-text-primary hover:bg-black text-white font-bold py-4 rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-3 text-lg"
           >
             <img src="https://www.google.com/favicon.ico" className="h-5 w-5" alt="Google" />
             <span>{t('auth.continueWithGoogle')}</span>
@@ -275,7 +275,7 @@ export default function Auth() {
       <div className="w-full max-w-6xl">
         <header className="flex justify-between items-center mb-16">
           <h1 className="text-3xl font-black text-primary tracking-tighter">{t('auth.title')}</h1>
-          <div className="flex items-center space-x-4 rtl:space-x-reverse bg-white p-2 pr-4 rtl:pr-2 rtl:pl-4 rounded-full shadow-sm border border-gray-100">
+          <div className="flex items-center gap-4 bg-white p-2 pr-4 rtl:pr-2 rtl:pl-4 rounded-full shadow-sm border border-gray-100">
             <img src={user.photoURL || ''} alt="Avatar" className="h-10 w-10 rounded-full ring-2 ring-primary/10" />
             <span className="text-sm font-bold text-text-primary">{user.displayName}</span>
             <button 

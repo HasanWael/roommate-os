@@ -130,7 +130,7 @@ export default function TrashTurn() {
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-text-primary tracking-tight flex items-center gap-2">
             <Trash2 className="h-6 w-6 md:h-8 md:w-8 text-primary" />
-            <span className="pt-1">{t('trashTurn.trashTurnTitle')}</span>
+            <span>{t('trashTurn.trashTurnTitle')}</span>
           </h1>
           <p className="text-text-secondary mt-1 text-sm md:text-base">
             {t('trashTurn.nextPersonNotified')}

@@ -137,7 +137,7 @@ export default function Settings() {
               <label className="block text-[10px] md:text-xs font-bold text-text-primary uppercase tracking-wider mb-2">
                 {t('settings.appLanguage')}
               </label>
-              <div className="flex items-center space-x-2 rtl:space-x-reverse">
+              <div className="flex items-center gap-2">
                 <LanguageSwitcher className="bg-gray-50 border border-gray-200 px-3 md:px-4 py-2 text-sm" />
               </div>
             </div>
@@ -154,7 +154,7 @@ export default function Settings() {
               <label className="block text-[10px] md:text-xs font-bold text-text-primary uppercase tracking-wider mb-2">
                 {t('settings.inviteCode')}
               </label>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:space-x-2 rtl:sm:space-x-reverse">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-2">
                 <code className="w-full sm:w-auto bg-gray-100 px-4 py-2 rounded-lg font-mono text-base md:text-lg text-center sm:text-left">{apartment.inviteCode}</code>
                 <button
                   onClick={() => {
@@ -183,7 +183,7 @@ export default function Settings() {
               <p className="text-xs md:text-sm text-text-secondary mb-4">
                 {t('settings.hotWaterBufferDesc')}
               </p>
-              <div className="flex items-center space-x-2 rtl:space-x-reverse">
+              <div className="flex items-center gap-2">
                 <input
                   type="number"
                   min="0"

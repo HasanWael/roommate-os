@@ -113,7 +113,7 @@ export default function TVMode() {
                   <p className="text-3xl font-bold text-white/40 uppercase tracking-widest mb-12">{t('tvMode.authRequired')}</p>
                   <button 
                     onClick={() => loginWithGoogle()}
-                    className="bg-white text-black font-bold py-6 px-12 rounded-3xl text-2xl transition-all hover:scale-105 active:scale-95 shadow-2xl flex items-center justify-center space-x-4 rtl:space-x-reverse mx-auto"
+                    className="bg-white text-black font-bold py-6 px-12 rounded-3xl text-2xl transition-all hover:scale-105 active:scale-95 shadow-2xl flex items-center justify-center gap-4 mx-auto"
                   >
                     <img src="https://www.google.com/favicon.ico" className="h-8 w-8" alt="Google" />
                     <span>{t('tvMode.login')}</span>
@@ -158,7 +158,7 @@ export default function TVMode() {
                   )}
                   
                   <div className="pt-12 border-t border-gray-800">
-                    <div className="flex items-center justify-center space-x-4 rtl:space-x-reverse">
+                    <div className="flex items-center justify-center gap-4">
                       <img src={user.photoURL || ''} className="h-12 w-12 rounded-full border-2 border-primary/30" alt="User" />
                       <span className="text-xl font-bold text-gray-400">{user.displayName}</span>
                       <button onClick={() => logout()} className={`text-danger text-lg font-bold uppercase tracking-widest ${isRTL ? 'mr-4' : 'ml-4'} hover:underline`}>{t('tvMode.logout')}</button>

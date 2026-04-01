@@ -12,9 +12,11 @@
     "unknown": "Unknown",
     "roommate": "Roommate",
     "newUser": "New User",
-    "apartment": "Apartment"
+    "apartment": "Apartment",
+    "more": "More"
   },
   "nav": {
+    "home": "Home",
     "dashboard": "Dashboard",
     "showerQueue": "Shower Queue",
     "trashTurn": "Trash Turn",

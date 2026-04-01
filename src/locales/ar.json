@@ -12,9 +12,11 @@
     "unknown": "غير معروف",
     "roommate": "زميل السكن",
     "newUser": "مستخدم جديد",
-    "apartment": "شقة"
+    "apartment": "شقة",
+    "more": "المزيد"
   },
   "nav": {
+    "home": "الرئيسية",
     "dashboard": "لوحة القيادة",
     "showerQueue": "طابور الاستحمام",
     "trashTurn": "نوبة القمامة",
