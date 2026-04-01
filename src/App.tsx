@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import Layout from './components/Layout';
@@ -19,9 +20,20 @@ import { useAuth } from './AuthContext';
 
 export default function App() {
   const { user, loading, apartmentId } = useAuth();
-  console.log('App rendering, user:', !!user, 'loading:', loading, 'apartmentId:', apartmentId);
+  const [minLoading, setMinLoading] = useState(true);
 
-  if (loading) {
+  useEffect(() => {
+    // Ensure splash screen shows for at least 2.5 seconds
+    const timer = setTimeout(() => {
+      setMinLoading(false);
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  console.log('App rendering, user:', !!user, 'loading:', loading, 'minLoading:', minLoading, 'apartmentId:', apartmentId);
+
+  if (loading || minLoading) {
     return <LoadingScreen message="Loading Roommate OS..." />;
   }
 

@@ -211,7 +211,7 @@ export default function Dashboard() {
             <div className="p-3 bg-info-light rounded-2xl border border-info-light">
               <CheckSquare className="h-6 w-6 md:h-8 md:w-8 text-info-dark" />
             </div>
-            <span className="badge bg-info-light text-info-dark text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 md:py-1.5 rounded-full uppercase tracking-widest">
+            <span className="badge bg-info-light text-info-dark text-[8px] md:text-[10px] font-bold px-2 md:px-3 py-1 md:py-1.5 rounded-full uppercase tracking-widest">
               {pendingChores.length} {t('dashboard.active')}
             </span>
           </div>
@@ -278,7 +278,7 @@ export default function Dashboard() {
             <div className="p-3 bg-success-light rounded-2xl border border-success-light">
               <ShoppingCart className="h-6 w-6 md:h-8 md:w-8 text-success-dark" />
             </div>
-            <span className="badge bg-success-light text-success-dark text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 md:py-1.5 rounded-full uppercase tracking-widest">
+            <span className="badge bg-success-light text-success-dark text-[8px] md:text-[10px] font-bold px-2 md:px-3 py-1 md:py-1.5 rounded-full uppercase tracking-widest">
               {neededGroceries.length} {t('dashboard.items')}
             </span>
           </div>

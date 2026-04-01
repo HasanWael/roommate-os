@@ -114,7 +114,7 @@ export default function Groceries() {
         <div>
           <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-2">
             <ShoppingCart className="h-6 w-6 md:h-8 md:w-8 text-primary" />
-            <span>{t('groceries.title')}</span>
+            <span className="">{t('groceries.title')}</span>
           </h1>
           <p className="subheading mt-1 text-sm md:text-base">
             {t('groceries.description')}
@@ -162,7 +162,7 @@ export default function Groceries() {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-4 md:p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
           <h2 className="font-bold text-text-primary text-sm md:text-base">{t('groceries.neededItems')}</h2>
-          <div className="text-xs md:text-sm font-medium text-text-secondary">
+          <div className="text-[10px] md:text-xs font-medium text-text-secondary">
             {t('groceries.total')} <span className="text-text-primary font-bold">{groceries.filter(g => g.status === 'needed').length}</span>
           </div>
         </div>

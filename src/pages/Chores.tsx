@@ -131,7 +131,7 @@ export default function Chores() {
         <div>
           <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-2">
             <CheckSquare className="h-6 w-6 md:h-8 md:w-8 text-primary" />
-            <span>{t('chores.title')}</span>
+            <span className="">{t('chores.title')}</span>
           </h1>
           <p className="subheading mt-1 text-sm md:text-base">
             {t('chores.description')}
