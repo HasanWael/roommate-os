@@ -279,7 +279,7 @@ export default function ShowerQueue() {
         <div>
           <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-2">
             <Droplets className="h-6 w-6 md:h-8 md:w-8 text-primary" />
-            {t('showerQueue.title')}
+            <span className="pt-1">{t('showerQueue.title')}</span>
           </h1>
           <p className="subheading mt-1 text-sm md:text-base">
             {t('showerQueue.description')}

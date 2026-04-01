@@ -114,7 +114,7 @@ export default function Groceries() {
         <div>
           <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-2">
             <ShoppingCart className="h-6 w-6 md:h-8 md:w-8 text-primary" />
-            {t('groceries.title')}
+            <span className="pt-1">{t('groceries.title')}</span>
           </h1>
           <p className="subheading mt-1 text-sm md:text-base">
             {t('groceries.description')}

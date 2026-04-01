@@ -24,7 +24,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
       <div className="flex items-center">
         <button 
           onClick={onMenuClick}
-          className={`md:hidden ${i18n.language === 'ar' ? 'ml-4' : 'mr-4'} text-gray-500 hover:text-gray-700`}
+          className={`hidden lg:hidden ${i18n.language === 'ar' ? 'ml-4' : 'mr-4'} text-gray-500 hover:text-gray-700`}
         >
           <Menu className="h-6 w-6" />
         </button>

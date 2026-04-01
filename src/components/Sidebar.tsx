@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Receipt, CheckSquare, ShoppingCart, CalendarDays, Megaphone, Users, Tv, X, LogOut, Repeat, Settings, Droplets, Trash2 } from 'lucide-react';
+import { Home, Receipt, CheckSquare, ShoppingCart, CalendarDays, Megaphone, Users, Tv, X, LogOut, Repeat, Settings, Droplets, Trash2 } from 'lucide-react';
 import { useAuth } from '../AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +15,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { t, i18n } = useTranslation();
   
   const navItems = [
-    { name: t('nav.dashboard'), path: '/dashboard', icon: LayoutDashboard },
+    { name: t('nav.home', 'Home'), path: '/dashboard', icon: Home },
     { name: t('nav.showerQueue'), path: '/shower-queue', icon: Droplets },
     { name: t('nav.trashTurn'), path: '/trash-turn', icon: Trash2 },
     { name: t('nav.bills'), path: '/expenses', icon: Receipt },
@@ -32,14 +32,15 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   return (
     <aside className={`
-      fixed inset-y-0 left-0 z-50 w-64 bg-background border-r border-gray-200 flex-col transition-transform duration-300 ease-in-out md:relative md:translate-x-0 md:flex
+      fixed inset-y-0 left-0 z-50 w-64 bg-background border-r border-gray-200 flex-col transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:flex
       ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+      hidden lg:flex
     `}>
       <div className="p-6 flex justify-between items-center">
         <div>
           <p className="text-xl font-black text-text-primary tracking-tighter">{t('app.name')}</p>
         </div>
-        <button onClick={onClose} className="md:hidden text-gray-400 hover:text-primary transition-colors">
+        <button onClick={onClose} className="lg:hidden text-gray-400 hover:text-primary transition-colors">
           <X className="h-6 w-6" />
         </button>
       </div>

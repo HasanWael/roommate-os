@@ -181,7 +181,7 @@ export default function Dashboard() {
         <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 flex flex-col transform transition-transform hover:scale-[1.01]">
           <div className="flex justify-between items-start mb-6">
             <div className="p-3 bg-warning-light rounded-2xl border border-warning-light">
-              <Receipt className="h-8 w-8 text-warning-dark" />
+              <Receipt className="h-6 w-6 md:h-8 md:w-8 text-warning-dark" />
             </div>
             <span className="badge bg-warning-light text-warning-dark text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 md:py-1.5 rounded-full uppercase tracking-widest">
               {expenses.length} {t('dashboard.pending')}
@@ -209,7 +209,7 @@ export default function Dashboard() {
         <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 flex flex-col transform transition-transform hover:scale-[1.01]">
           <div className="flex justify-between items-start mb-6">
             <div className="p-3 bg-info-light rounded-2xl border border-info-light">
-              <CheckSquare className="h-8 w-8 text-info-dark" />
+              <CheckSquare className="h-6 w-6 md:h-8 md:w-8 text-info-dark" />
             </div>
             <span className="badge bg-info-light text-info-dark text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 md:py-1.5 rounded-full uppercase tracking-widest">
               {pendingChores.length} {t('dashboard.active')}
@@ -276,7 +276,7 @@ export default function Dashboard() {
         <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 flex flex-col transform transition-transform hover:scale-[1.01]">
           <div className="flex justify-between items-start mb-6">
             <div className="p-3 bg-success-light rounded-2xl border border-success-light">
-              <ShoppingCart className="h-8 w-8 text-success-dark" />
+              <ShoppingCart className="h-6 w-6 md:h-8 md:w-8 text-success-dark" />
             </div>
             <span className="badge bg-success-light text-success-dark text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 md:py-1.5 rounded-full uppercase tracking-widest">
               {neededGroceries.length} {t('dashboard.items')}

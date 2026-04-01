@@ -103,7 +103,7 @@ export default function Calendar() {
         <div>
           <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-2">
             <CalendarDays className="h-6 w-6 md:h-8 md:w-8 text-primary" />
-            {t('calendar.title')}
+            <span className="pt-1">{t('calendar.title')}</span>
           </h1>
           <p className="subheading mt-1 text-sm md:text-base">
             {t('calendar.description')}

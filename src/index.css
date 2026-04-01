@@ -8,18 +8,18 @@
   --page-max-width: 72rem;
   
   /* Font Sizes */
-  --text-body: 16px;
+  --text-body: 22px;
   --text-body-md: 18px;
   
-  --text-h1: 1.125rem;
+  --text-h1: 1.5rem;
   --text-h1-md: 1.25rem;
   --text-h1-lg: 1.65rem;
   
-  --text-h2: 1.1rem;
+  --text-h2: 1.475rem;
   --text-h2-md: 1.125rem;
   --text-h2-lg: 1.35rem;
   
-  --text-h3: 0.9rem;
+  --text-h3: 1.275rem;
   --text-h3-md: 1.2rem;
   --text-h3-lg: 1.225rem;
 
@@ -112,13 +112,33 @@ html[dir="rtl"] h1, html[dir="rtl"] h2, html[dir="rtl"] h3, html[dir="rtl"] h4, 
   font-family: var(--font-arabic);
 }
 
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+}
+
+@media (max-width: 1023px) {
+  html, body, .overflow-y-auto, .overflow-x-auto, .overflow-auto {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+  html::-webkit-scrollbar, body::-webkit-scrollbar, .overflow-y-auto::-webkit-scrollbar, .overflow-x-auto::-webkit-scrollbar, .overflow-auto::-webkit-scrollbar {
+    display: none !important;
+  }
+}
+
 @layer components {
   .page-container {
     @apply max-w-[var(--page-max-width)] mx-auto px-4;
   }
 
   .badge {
-    @apply inline-flex items-center justify-center leading-none;
+    @apply inline-flex items-center justify-center leading-normal pt-[1px];
   }
 }
 
