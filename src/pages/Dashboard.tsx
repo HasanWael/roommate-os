@@ -139,7 +139,7 @@ export default function Dashboard() {
   if (loading) return <LoadingScreen message={t('dashboard.loading')} />;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
+    <div className="page-container space-y-8">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-text-primary tracking-tight">
@@ -176,7 +176,7 @@ export default function Dashboard() {
 
       <DashboardShowerWidget />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {/* Bills Card */}
         <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 flex flex-col transform transition-transform hover:scale-[1.01]">
           <div className="flex justify-between items-start mb-6">
@@ -187,7 +187,7 @@ export default function Dashboard() {
               {expenses.length} {t('dashboard.pending')}
             </span>
           </div>
-          <h3 className="text-xl md:text-2xl font-bold mb-1 text-text-primary">{t('dashboard.billsTitle')}</h3>
+          <h3 className="text-lg md:text-xl font-semibold mb-1 text-text-primary">{t('dashboard.billsTitle')}</h3>
           <p className="text-text-secondary text-xs md:text-sm mb-6 md:mb-8">{t('dashboard.totalOutstanding')}: <span className="font-bold text-text-primary">EGP {formatCurrency(expenses.reduce((sum, e) => sum + e.amount, 0), 2)}</span></p>
           
           <div className="mt-auto space-y-4">
@@ -215,7 +215,7 @@ export default function Dashboard() {
               {pendingChores.length} {t('dashboard.active')}
             </span>
           </div>
-          <h3 className="text-xl md:text-2xl font-bold mb-1 text-text-primary">{t('dashboard.choresTitle')}</h3>
+          <h3 className="text-lg md:text-xl font-semibold mb-1 text-text-primary">{t('dashboard.choresTitle')}</h3>
           <p className="text-text-secondary text-xs md:text-sm mb-4 md:mb-6">{t('dashboard.nextUp')}: <span className="font-bold text-text-primary">{nextUpText}</span></p>
           
           <div className="space-y-3 mb-6 flex-1">
@@ -282,7 +282,7 @@ export default function Dashboard() {
               {neededGroceries.length} {t('dashboard.items')}
             </span>
           </div>
-          <h3 className="text-xl md:text-2xl font-bold mb-1 text-text-primary">{t('dashboard.groceriesTitle')}</h3>
+          <h3 className="text-lg md:text-xl font-semibold mb-1 text-text-primary">{t('dashboard.groceriesTitle')}</h3>
           <p className="text-text-secondary text-xs md:text-sm mb-4 md:mb-6">{neededGroceries.length} {t('dashboard.itemsNeeded')}</p>
           
           <ul className="space-y-3 mb-6 flex-1">
@@ -336,11 +336,11 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {/* Schedule */}
-        <div className="lg:col-span-3 bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100">
+        <div className="md:col-span-2 lg:col-span-3 bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100">
           <div className="flex justify-between items-center mb-6 md:mb-8">
-            <h3 className="text-xl md:text-2xl font-bold text-text-primary">{t('dashboard.upcomingEvents')}</h3>
+            <h3 className="text-lg md:text-xl font-semibold text-text-primary">{t('dashboard.upcomingEvents')}</h3>
             <button className="text-[10px] md:text-sm font-bold text-primary hover:text-primary-dark transition-colors flex items-center uppercase">
               {t('dashboard.fullCalendar')}
               <CalendarDays className={`${i18n.language === 'ar' ? 'mr-2' : 'ml-2'} h-4 w-4`} />
@@ -353,7 +353,7 @@ export default function Dashboard() {
                 <div className="text-xs font-bold text-primary uppercase tracking-widest mb-2 bg-primary/10 inline-block px-2 py-1 rounded">
                   {new Date(event.startDatetime).toLocaleDateString(i18n.language === 'ar' ? 'ar-EG' : 'en-US', { weekday: 'short', day: 'numeric', month: 'short' })}
                 </div>
-                <h4 className="font-bold text-text-primary text-lg group-hover:text-primary transition-colors">{event.title}</h4>
+                <h4 className="font-semibold text-text-primary text-base group-hover:text-primary transition-colors">{event.title}</h4>
                 <p className="text-sm text-text-secondary flex items-center mt-1">
                   <span className={`w-2 h-2 rounded-full bg-primary ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`}></span>
                   {new Date(event.startDatetime).toLocaleTimeString(i18n.language === 'ar' ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' })}

@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "روميت أو إس"
+    "name": "Roommate OS"
   },
   "common": {
     "delete": "حذف",
@@ -295,7 +295,7 @@
     "linkCopied": "تم نسخ رابط الدعوة!"
   },
   "auth": {
-    "title": "نظام الشركاء",
+    "title": "Roommate OS",
     "subtitle": "العمود الفقري الرقمي لمساحة المعيشة المشتركة الخاصة بك.",
     "continueWithGoogle": "المتابعة باستخدام Google",
     "secureRealtime": "آمن • في الوقت الفعلي • تعاوني",

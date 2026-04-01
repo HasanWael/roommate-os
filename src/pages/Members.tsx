@@ -112,7 +112,7 @@ export default function Members() {
   if (loading) return <LoadingScreen message={t('common.loading')} />;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
+    <div className="page-container space-y-6 md:space-y-8">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-text-primary tracking-tight">{t('members.title')}</h1>

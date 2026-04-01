@@ -274,10 +274,10 @@ export default function ShowerQueue() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 md:space-y-8 p-4 md:p-8 pb-32">
+    <div className="page-container space-y-8">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-2">
             <Droplets className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             {t('showerQueue.title')}
           </h1>
@@ -288,17 +288,17 @@ export default function ShowerQueue() {
         {myActiveSlot ? (
           <button
             onClick={() => handleCancel(myActiveSlot.id)}
-            className="w-full sm:w-auto bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-medium flex items-center justify-center transition-colors shadow-sm text-sm md:text-base"
+            className="w-full sm:w-auto bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors shadow-sm text-sm md:text-base"
           >
-            <X className={`h-4 w-4 md:h-5 md:w-5 ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+            <X className="h-4 w-4 md:h-5 md:w-5" />
             {t('showerQueue.cancelSlot')}
           </button>
         ) : (
           <button
             onClick={() => setIsModalOpen(true)}
-            className="w-full sm:w-auto bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center transition-colors shadow-sm text-sm md:text-base"
+            className="w-full sm:w-auto bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors shadow-sm text-sm md:text-base"
           >
-            <Plus className={`h-4 w-4 md:h-5 md:w-5 ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+            <Plus className="h-4 w-4 md:h-5 md:w-5" />
             {t('showerQueue.joinQueue')}
           </button>
         )}

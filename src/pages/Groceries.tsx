@@ -109,10 +109,10 @@ export default function Groceries() {
   if (loading) return <LoadingScreen message={t('dashboard.loading')} />;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
+    <div className="page-container space-y-6 md:space-y-8">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-2">
             <ShoppingCart className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             {t('groceries.title')}
           </h1>
@@ -122,9 +122,9 @@ export default function Groceries() {
         </div>
         <button 
           onClick={() => setIsAdding(!isAdding)}
-          className="w-full sm:w-auto bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center transition-colors text-sm md:text-base"
+          className="w-full sm:w-auto bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors text-sm md:text-base"
         >
-          <Plus className={`h-4 w-4 md:h-5 md:w-5 ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+          <Plus className="h-4 w-4 md:h-5 md:w-5" />
           {isAdding ? t('groceries.cancel') : t('groceries.addItem')}
         </button>
       </header>

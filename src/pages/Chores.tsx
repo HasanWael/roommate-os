@@ -126,10 +126,10 @@ export default function Chores() {
   const dateLocale = i18n.language === 'ar' ? ar : enUS;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
+    <div className="page-container space-y-6 md:space-y-8">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-2">
             <CheckSquare className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             {t('chores.title')}
           </h1>
@@ -139,16 +139,16 @@ export default function Chores() {
         </div>
         <button 
           onClick={() => setIsAdding(!isAdding)}
-          className="w-full sm:w-auto bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center transition-colors text-sm md:text-base"
+          className="w-full sm:w-auto bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors text-sm md:text-base"
         >
-          <Plus className={`h-4 w-4 md:h-5 md:w-5 ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+          <Plus className="h-4 w-4 md:h-5 md:w-5" />
           {isAdding ? t('chores.cancel') : t('chores.addChore')}
         </button>
       </header>
 
       {isAdding && (
-        <form onSubmit={handleAddChore} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-wrap gap-4 items-end">
-          <div className="flex-1 min-w-[200px]">
+        <form onSubmit={handleAddChore} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+          <div className="md:col-span-2 lg:col-span-2">
             <label className="block text-sm font-medium text-text-secondary mb-1">{t('chores.choreTitle')}</label>
             <input 
               type="text" 
@@ -159,7 +159,7 @@ export default function Chores() {
               required
             />
           </div>
-          <div className="w-48">
+          <div>
             <label className="block text-sm font-medium text-text-secondary mb-1">{t('chores.assignTo')}</label>
             <select
               value={assignedToUserId}
@@ -185,15 +185,17 @@ export default function Chores() {
               required
             />
           </div>
-          <button type="submit" className="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors">
-            {t('chores.save')}
-          </button>
+          <div className="md:col-span-2 lg:col-span-4 flex justify-end mt-2">
+            <button type="submit" className="w-full md:w-auto bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors">
+              {t('chores.save')}
+            </button>
+          </div>
         </form>
       )}
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-4 md:p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-          <h2 className="font-bold text-text-primary text-sm md:text-base">{t('chores.assignedChores')}</h2>
+          <h2 className="font-semibold text-text-primary text-xs md:text-sm">{t('chores.assignedChores')}</h2>
           <div className="text-xs md:text-sm font-medium text-text-secondary">
             {t('chores.pending')}: <span className="text-text-primary font-bold">{chores.filter(c => c.status === 'pending').length}</span>
           </div>
@@ -226,7 +228,7 @@ export default function Chores() {
                   })()}
                 </div>
                 <div className="min-w-0">
-                  <h3 className={`font-bold text-base md:text-lg truncate transition-all duration-500 ${isCompleting || chore.status === 'completed' ? 'text-gray-400 line-through' : 'text-text-primary'}`}>
+                  <h3 className={`font-semibold text-sm md:text-base truncate transition-all duration-500 ${isCompleting || chore.status === 'completed' ? 'text-gray-400 line-through' : 'text-text-primary'}`}>
                     {chore.title}
                   </h3>
                   <p className={`text-xs md:text-sm truncate transition-all duration-500 ${isCompleting ? 'text-gray-400' : 'text-text-secondary'}`}>

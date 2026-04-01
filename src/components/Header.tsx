@@ -28,7 +28,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
         >
           <Menu className="h-6 w-6" />
         </button>
-        <h1 className="text-2xl font-black text-primary tracking-tighter">{apartment?.name || t('app.name')}</h1>
+        <h1 className="text-xl font-bold text-primary tracking-tighter">{apartment?.name || t('app.name')}</h1>
       </div>
 
       <div className="flex items-center space-x-6 rtl:space-x-reverse">

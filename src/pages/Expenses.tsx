@@ -107,10 +107,10 @@ export default function Expenses() {
   const dateLocale = i18n.language === 'ar' ? ar : enUS;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
+    <div className="page-container space-y-6 md:space-y-8">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-2">
             <Receipt className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             {t('expenses.title')}
           </h1>
@@ -120,42 +120,40 @@ export default function Expenses() {
         </div>
         <button 
           onClick={() => setIsAdding(!isAdding)}
-          className="w-full sm:w-auto bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center transition-colors text-sm md:text-base"
+          className="w-full sm:w-auto bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors text-sm md:text-base"
         >
-          <Plus className={`h-4 w-4 md:h-5 md:w-5 ${i18n.language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+          <Plus className="h-4 w-4 md:h-5 md:w-5" />
           {isAdding ? t('expenses.cancel') : t('expenses.addExpense')}
         </button>
       </header>
 
       {isAdding && (
-        <form onSubmit={handleAddExpense} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-4">
-          <div className="flex gap-4 items-end">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-text-secondary mb-1">{t('expenses.descriptionLabel')}</label>
-              <input 
-                type="text" 
-                value={newExpenseTitle}
-                onChange={(e) => setNewExpenseTitle(e.target.value)}
-                className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                placeholder={t('expenses.descriptionPlaceholder')}
-                required
-              />
-            </div>
-            <div className="w-32">
-              <label className="block text-sm font-medium text-text-secondary mb-1">{t('expenses.amountLabel')}</label>
-              <input 
-                type="number" 
-                step="0.01"
-                min="0"
-                value={newExpenseAmount}
-                onChange={(e) => setNewExpenseAmount(e.target.value)}
-                className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                required
-              />
-            </div>
+        <form onSubmit={handleAddExpense} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-text-secondary mb-1">{t('expenses.descriptionLabel')}</label>
+            <input 
+              type="text" 
+              value={newExpenseTitle}
+              onChange={(e) => setNewExpenseTitle(e.target.value)}
+              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              placeholder={t('expenses.descriptionPlaceholder')}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-1">{t('expenses.amountLabel')}</label>
+            <input 
+              type="number" 
+              step="0.01"
+              min="0"
+              value={newExpenseAmount}
+              onChange={(e) => setNewExpenseAmount(e.target.value)}
+              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              required
+            />
           </div>
           
-          <div>
+          <div className="md:col-span-3">
             <label className="block text-sm font-medium text-text-secondary mb-2">{t('expenses.splitAmong')}</label>
             <div className="flex flex-wrap gap-3">
               {members.map(member => (
@@ -179,8 +177,8 @@ export default function Expenses() {
             </div>
           </div>
 
-          <div className="flex justify-end mt-2">
-            <button type="submit" className="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors">
+          <div className="md:col-span-3 flex justify-end mt-2">
+            <button type="submit" className="w-full md:w-auto bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors">
               {t('expenses.saveExpense')}
             </button>
           </div>
@@ -189,7 +187,7 @@ export default function Expenses() {
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-4 md:p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-          <h2 className="font-bold text-text-primary text-sm md:text-base">{t('expenses.recentExpenses')}</h2>
+          <h2 className="font-semibold text-text-primary text-xs md:text-sm">{t('expenses.recentExpenses')}</h2>
           <div className="text-xs md:text-sm font-medium text-text-secondary">
             {t('expenses.totalPending')} <span className="text-danger font-bold">{i18n.language === 'ar' ? 'ج.م' : 'EGP'} {formatCurrency(totalPending, 2)}</span>
           </div>
@@ -197,8 +195,8 @@ export default function Expenses() {
         
         <div className="divide-y divide-gray-100">
           {expenses.map((expense) => (
-            <div key={expense.id} className="p-4 md:p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
-              <div className="flex items-center space-x-3 md:space-x-4 rtl:space-x-reverse">
+            <div key={expense.id} className="p-4 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between hover:bg-gray-50 transition-colors gap-4">
+              <div className="flex items-start space-x-3 md:space-x-4 rtl:space-x-reverse w-full">
                 <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden flex-shrink-0">
                   {(() => {
                     const payer = members.find(m => m.userId === expense.paidByUserId);
@@ -208,22 +206,22 @@ export default function Expenses() {
                     return <Receipt className="h-5 w-5 md:h-6 md:w-6 text-primary" />;
                   })()}
                 </div>
-                <div className="min-w-0">
-                  <h3 className="font-bold text-text-primary text-base md:text-lg truncate">{expense.title}</h3>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold text-text-primary text-sm md:text-base truncate">{expense.title}</h3>
                   <p className="text-xs md:text-sm text-text-secondary truncate">
-                    {expense.createdAt ? format(expense.createdAt.toDate(), 'MMM d, yyyy', { locale: dateLocale }) : t('expenses.justNow')} • {t('expenses.paidBy')} {(() => {
+                    {t('expenses.paidBy')} {(() => {
                       const payer = members.find(m => m.userId === expense.paidByUserId);
                       if (payer?.user?.fullName) return payer.user.fullName;
                       return expense.paidBy === 'Roommate' ? t('common.roommate') : expense.paidBy;
-                    })()}
+                    })()} • {expense.createdAt ? format(expense.createdAt.toDate(), 'MMM d, yyyy', { locale: dateLocale }) : t('expenses.justNow')}
                   </p>
-                  <div className="text-[10px] md:text-xs text-text-secondary mt-1 flex items-center gap-1">
+                  <div className="text-xs text-text-secondary mt-2">
                     {t('expenses.splitAmongPeople', { count: expense.splitAmong?.length || 1 })}
-                    <div className={`flex ${i18n.language === 'ar' ? '-space-x-reverse' : ''} -space-x-1.5 md:-space-x-2 mx-1`}>
+                    <div className={`flex mt-1 ${i18n.language === 'ar' ? '-space-x-reverse' : ''} -space-x-1 md:-space-x-2`}>
                       {expense.splitAmong?.map((userId: string) => {
                         const member = members.find(m => m.userId === userId);
                         return (
-                          <div key={userId} className="h-4 w-4 md:h-5 md:w-5 rounded-full border border-white bg-primary text-[6px] md:text-[8px] text-white flex items-center justify-center overflow-hidden" title={member?.user?.fullName || t('common.unknown')}>
+                          <div key={userId} className="h-5 w-5 md:h-6 md:w-6 rounded-full border border-white bg-primary text-[8px] md:text-[10px] text-white flex items-center justify-center overflow-hidden" title={member?.user?.fullName || t('common.unknown')}>
                             {member?.user?.avatarUrl ? (
                               <img src={member.user.avatarUrl} alt={member.user.fullName || t('common.unknown')} className="h-full w-full object-cover" />
                             ) : (
@@ -237,19 +235,19 @@ export default function Expenses() {
                 </div>
               </div>
               
-              <div className="flex items-center gap-2 md:gap-6 ml-2 rtl:ml-0 rtl:mr-2">
-                <div className={`text-${i18n.language === 'ar' ? 'left' : 'right'} flex-shrink-0`}>
+              <div className="flex items-center justify-between w-full md:w-auto md:justify-end gap-4 md:border-t-0 md:pt-0">
+                <div className="text-left md:text-right flex-shrink-0">
                   <div className="font-bold text-lg md:text-xl text-text-primary">{i18n.language === 'ar' ? 'ج.م' : 'EGP'} {formatCurrency(expense.amount, 2)}</div>
-                  <div className={`text-[10px] md:text-sm text-text-secondary mt-0.5 md:mt-1 flex items-center justify-${i18n.language === 'ar' ? 'start' : 'end'} space-x-1 rtl:space-x-reverse`}>
-                    <Circle className="h-3 w-3 md:h-4 md:w-4 text-orange-500" /><span className="text-orange-600 font-medium">{t('expenses.pending')}</span>
+                  <div className="text-xs text-orange-600 font-medium flex items-center space-x-1 rtl:space-x-reverse">
+                    <Circle className="h-3 w-3" /><span>{t('expenses.pending')}</span>
                   </div>
                 </div>
                 <button 
                   onClick={() => confirmDelete(expense.id)}
-                  className="text-gray-400 hover:text-red-500 transition-colors p-1 md:p-2"
+                  className="text-gray-400 hover:text-red-500 transition-colors p-2"
                   title={t('expenses.deleteExpense')}
                 >
-                  <Trash2 className="h-4 w-4 md:h-5 md:w-5" />
+                  <Trash2 className="h-5 w-5" />
                 </button>
               </div>
             </div>

@@ -125,7 +125,7 @@ export default function TrashTurn() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 md:space-y-8 p-4 md:p-8 pb-32">
+    <div className="page-container space-y-8">
       <header className="flex justify-between items-center">
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-text-primary tracking-tight flex items-center gap-3">
