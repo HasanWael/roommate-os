@@ -31,7 +31,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
         <h1 className="text-xl font-bold text-primary tracking-tighter">{apartment?.name || t('app.name')}</h1>
       </div>
 
-      <div className="flex items-center space-x-6 rtl:space-x-reverse">
+      <div className="flex items-center gap-4 md:gap-6">
         <div className="relative hidden md:block">
           <Search className={`absolute ${i18n.language === 'ar' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400`} />
           <input
@@ -41,7 +41,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
           />
         </div>
         
-        <div className="flex items-center space-x-2 rtl:space-x-reverse">
+        <div className="flex items-center gap-2">
           <LanguageSwitcher className="hidden md:flex" />
           <button className="p-2 text-gray-500 hover:text-primary hover:bg-primary/5 rounded-xl transition-all relative">
             <Bell className="h-5 w-5" />
@@ -49,9 +49,9 @@ export default function Header({ onMenuClick }: HeaderProps) {
           </button>
         </div>
         
-        <div className="h-10 w-[1px] bg-gray-200 mx-2 hidden md:block"></div>
+        <div className="h-10 w-[1px] bg-gray-200 hidden md:block"></div>
 
-        <div className="flex items-center space-x-3 rtl:space-x-reverse">
+        <div className="flex items-center gap-3">
           {user?.photoURL ? (
             <img src={user.photoURL} alt="Avatar" className="h-10 w-10 rounded-full ring-2 ring-primary/10" />
           ) : (

@@ -48,24 +48,24 @@ export default function MobileBottomNav() {
         <button 
           onClick={() => setIsDrawerOpen(true)}
           className="pointer-events-auto flex flex-col items-center justify-center bg-white/80 backdrop-blur-md shadow-sm border border-gray-200/50 text-slate-500 hover:text-primary transition-colors"
-          style={{ borderRadius: '1rem', padding: '0.5rem 1.5rem' }}
+          style={{ borderRadius: '1rem', padding: '0.35rem 1.25rem' }}
         >
-          <div className="w-8 h-1 bg-slate-300 rounded-full mb-1" />
-          <span className="text-[0.7rem] font-bold uppercase tracking-wider">{t('common.more', 'More')}</span>
+          <div className="w-6 h-[3px] bg-slate-300 rounded-full mb-0.5" />
+          <span className="text-[0.6rem] font-bold uppercase tracking-wider">{t('common.more', 'More')}</span>
         </button>
       </div>
 
       {/* Bottom Navbar */}
       <nav 
         className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 flex justify-around items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]"
-        style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))', paddingTop: '0.5rem' }}
+        style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}
       >
         {mainTabs.map((tab) => (
           <NavLink
             key={tab.name}
             to={tab.path}
             className={({ isActive }) =>
-              `relative flex flex-col items-center justify-center w-full space-y-1 transition-colors ${
+              `relative flex flex-col items-center justify-center w-full pt-2 pb-1 transition-colors ${
                 isActive ? 'text-primary' : 'text-slate-500 hover:text-slate-700'
               }`
             }
@@ -82,13 +82,13 @@ export default function MobileBottomNav() {
                   }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
-                  <tab.icon className="w-6 h-6" />
+                  <tab.icon className="icon-custom-nav" />
                 </motion.div>
-                <span className="text-[0.7rem] font-semibold text-center leading-none mt-1">{tab.name}</span>
+                <span className="text-custom-nav font-semibold text-center leading-none mt-1">{tab.name}</span>
                 {isActive && (
                   <motion.div
                     layoutId="activeTabIndicator"
-                    className="absolute -top-2 w-8 h-1 bg-primary rounded-b-full"
+                    className="absolute top-0 w-8 h-1 bg-primary rounded-b-full"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
@@ -142,8 +142,8 @@ export default function MobileBottomNav() {
                         <CalendarDays className="w-6 h-6" />
                       </div>
                       <div>
-                        <div className="font-bold text-slate-800">{t('nav.calendar', 'Calendar')}</div>
-                        <div className="text-xs text-slate-500">{t('calendar.description', 'Manage events')}</div>
+                        <div className="font-bold text-slate-800 text-custom-sm">{t('nav.calendar', 'Calendar')}</div>
+                        <div className="text-custom-xs text-slate-500">{t('calendar.description', 'Manage events')}</div>
                       </div>
                     </NavLink>
                     <NavLink to="/chores" onClick={() => setIsDrawerOpen(false)} className="flex items-center p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors">
@@ -151,8 +151,8 @@ export default function MobileBottomNav() {
                         <CheckSquare className="w-6 h-6" />
                       </div>
                       <div>
-                        <div className="font-bold text-slate-800">{t('nav.chores', 'Chores')}</div>
-                        <div className="text-xs text-slate-500">{t('chores.description', 'Manage chores')}</div>
+                        <div className="font-bold text-slate-800 text-custom-sm">{t('nav.chores', 'Chores')}</div>
+                        <div className="text-custom-xs text-slate-500">{t('chores.description', 'Manage chores')}</div>
                       </div>
                     </NavLink>
                   </div>
@@ -169,8 +169,8 @@ export default function MobileBottomNav() {
                         <Users className="w-6 h-6" />
                       </div>
                       <div>
-                        <div className="font-bold text-slate-800">{t('nav.members', 'Members')}</div>
-                        <div className="text-xs text-slate-500">{t('members.description', 'Manage roommates')}</div>
+                        <div className="font-bold text-slate-800 text-custom-sm">{t('nav.members', 'Members')}</div>
+                        <div className="text-custom-xs text-slate-500">{t('members.description', 'Manage roommates')}</div>
                       </div>
                     </NavLink>
                     <NavLink to="/settings" onClick={() => setIsDrawerOpen(false)} className="flex items-center p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors">
@@ -178,8 +178,8 @@ export default function MobileBottomNav() {
                         <Settings className="w-6 h-6" />
                       </div>
                       <div>
-                        <div className="font-bold text-slate-800">{t('nav.settings', 'Settings')}</div>
-                        <div className="text-xs text-slate-500">{t('settings.description', 'App settings')}</div>
+                        <div className="font-bold text-slate-800 text-custom-sm">{t('nav.settings', 'Settings')}</div>
+                        <div className="text-custom-xs text-slate-500">{t('settings.description', 'App settings')}</div>
                       </div>
                     </NavLink>
                     <button onClick={handleSwitchApartment} className="w-full flex items-center p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors text-left rtl:text-right">
@@ -187,8 +187,8 @@ export default function MobileBottomNav() {
                         <Repeat className="w-6 h-6" />
                       </div>
                       <div>
-                        <div className="font-bold text-slate-800">{t('nav.switchApartment', 'Switch Apartment')}</div>
-                        <div className="text-xs text-slate-500">{t('nav.switchApartmentDesc', 'Change active space')}</div>
+                        <div className="font-bold text-slate-800 text-custom-sm">{t('nav.switchApartment', 'Switch Apartment')}</div>
+                        <div className="text-custom-xs text-slate-500">{t('nav.switchApartmentDesc', 'Change active space')}</div>
                       </div>
                     </button>
                   </div>
@@ -203,8 +203,8 @@ export default function MobileBottomNav() {
                       <Globe className="w-6 h-6" />
                     </div>
                     <div className="flex-1">
-                      <div className="font-bold text-slate-800">{t('settings.appLanguage', 'Language')}</div>
-                      <div className="text-xs text-slate-500">{i18n.language === 'en' ? 'English' : 'العربية'}</div>
+                      <div className="font-bold text-slate-800 text-custom-sm">{t('settings.appLanguage', 'Language')}</div>
+                      <div className="text-custom-xs text-slate-500">{i18n.language === 'en' ? 'English' : 'العربية'}</div>
                     </div>
                     <div className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-lg">
                       {i18n.language === 'en' ? 'AR' : 'EN'}
@@ -221,8 +221,8 @@ export default function MobileBottomNav() {
                       <LogOut className={`w-6 h-6 ${i18n.language === 'ar' ? 'rotate-180' : ''}`} />
                     </div>
                     <div>
-                      <div className="font-bold text-red-600">{t('header.logout', 'Logout')}</div>
-                      <div className="text-xs text-red-400">{t('nav.logoutDesc', 'Sign out of your account')}</div>
+                      <div className="font-bold text-red-600 text-custom-sm">{t('header.logout', 'Logout')}</div>
+                      <div className="text-custom-xs text-red-400">{t('nav.logoutDesc', 'Sign out of your account')}</div>
                     </div>
                   </button>
                 </div>
