@@ -45,14 +45,20 @@ export default function MobileBottomNav() {
         className="fixed left-0 right-0 flex justify-center z-40 pointer-events-none"
         style={{ bottom: 'calc(65px + env(safe-area-inset-bottom))' }}
       >
-        <button 
+        <motion.button 
           onClick={() => setIsDrawerOpen(true)}
           className="pointer-events-auto flex flex-col items-center justify-center bg-white/80 backdrop-blur-md shadow-sm border border-gray-200/50 text-slate-500 hover:text-primary transition-colors"
           style={{ borderRadius: '1rem', padding: '0.35rem 1.25rem' }}
+          animate={{ y: [0, -4, 0] }}
+          transition={{ 
+            duration: 2, 
+            repeat: Infinity, 
+            ease: "easeInOut" 
+          }}
         >
           <div className="w-6 h-[3px] bg-slate-300 rounded-full mb-0.5" />
           <span className="text-[0.6rem] font-bold uppercase tracking-wider">{t('common.more', 'More')}</span>
-        </button>
+        </motion.button>
       </div>
 
       {/* Bottom Navbar */}
@@ -71,20 +77,22 @@ export default function MobileBottomNav() {
             }
           >
             {({ isActive }) => (
-              <motion.div
-                whileTap={{ scale: 0.85 }}
-                className="flex flex-col items-center justify-center w-full"
-              >
+              <>
                 <motion.div
-                  animate={{ 
-                    y: isActive ? -2 : 0,
-                    scale: isActive ? 1.1 : 1
-                  }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  whileTap={{ scale: 0.85 }}
+                  className="flex flex-col items-center justify-center w-full"
                 >
-                  <tab.icon className="icon-custom-nav" />
+                  <motion.div
+                    animate={{ 
+                      y: isActive ? -2 : 0,
+                      scale: isActive ? 1.1 : 1
+                    }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  >
+                    <tab.icon className="icon-custom-nav" />
+                  </motion.div>
+                  <span className="text-custom-nav font-semibold text-center leading-none mt-1">{tab.name}</span>
                 </motion.div>
-                <span className="text-custom-nav font-semibold text-center leading-none mt-1">{tab.name}</span>
                 {isActive && (
                   <motion.div
                     layoutId="activeTabIndicator"
@@ -92,7 +100,7 @@ export default function MobileBottomNav() {
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
-              </motion.div>
+              </>
             )}
           </NavLink>
         ))}
