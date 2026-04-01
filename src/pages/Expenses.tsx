@@ -238,7 +238,7 @@ export default function Expenses() {
               <div className="flex items-center justify-between w-full md:w-auto md:justify-end gap-4 md:border-t-0 md:pt-0">
                 <div className="text-left md:text-right flex-shrink-0">
                   <div className="font-bold text-lg md:text-xl text-text-primary">{i18n.language === 'ar' ? 'ج.م' : 'EGP'} {formatCurrency(expense.amount, 2)}</div>
-                  <div className="text-xs text-orange-600 font-medium flex items-center space-x-1 rtl:space-x-reverse">
+                  <div className="badge text-xs text-orange-600 font-medium flex items-center gap-1">
                     <Circle className="h-3 w-3" /><span>{t('expenses.pending')}</span>
                   </div>
                 </div>

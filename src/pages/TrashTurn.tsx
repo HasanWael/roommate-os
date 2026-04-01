@@ -128,7 +128,7 @@ export default function TrashTurn() {
     <div className="page-container space-y-8">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-text-primary tracking-tight flex items-center gap-3">
+          <h1 className="text-xl md:text-2xl font-bold text-text-primary tracking-tight flex items-center gap-2">
             <Trash2 className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             {t('trashTurn.trashTurnTitle')}
           </h1>
@@ -244,7 +244,7 @@ export default function TrashTurn() {
                             {member.user?.fullName}
                           </p>
                           {isCurrent && (
-                            <span className="text-[8px] md:text-[10px] bg-success text-white px-1 md:px-1.5 py-0.5 rounded-md uppercase font-black tracking-tighter">
+                            <span className="badge text-[8px] md:text-[10px] bg-success text-white px-1.5 py-0.5 rounded-md uppercase font-black tracking-tighter">
                               {t('dashboard.active')}
                             </span>
                           )}
@@ -293,7 +293,7 @@ export default function TrashTurn() {
                       {item.createdAt ? format(item.createdAt.toDate(), 'MMM d, h:mm a') : '...'}
                     </p>
                   </div>
-                  <span className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full font-black text-[8px] md:text-[10px] uppercase tracking-tighter flex-shrink-0 ${
+                  <span className={`badge px-2 md:px-3 py-0.5 md:py-1 rounded-full font-black text-[8px] md:text-[10px] uppercase tracking-tighter flex-shrink-0 ${
                     item.isOutOfTurn 
                       ? 'bg-gray-100 text-gray-500' 
                       : 'bg-success/10 text-success-dark'

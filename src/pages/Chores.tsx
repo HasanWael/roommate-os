@@ -238,7 +238,7 @@ export default function Chores() {
               </div>
               
               <div className="flex items-center gap-2 md:gap-4 ml-2 rtl:ml-0 rtl:mr-2">
-                <span className={`text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-full uppercase tracking-wider transition-all duration-500 flex-shrink-0 ${
+                <span className={`badge text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-full uppercase tracking-wider transition-all duration-500 flex-shrink-0 ${
                   isCompleting || chore.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-text-primary'
                 }`}>
                   {isCompleting ? (t('chores.completing') as string) : (t(`chores.${chore.status}`, chore.status) as string)}

@@ -207,7 +207,7 @@ export default function Groceries() {
               </div>
               
               <div className="flex items-center gap-2 md:gap-4 ml-2 rtl:ml-0 rtl:mr-2">
-                <span className={`text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-full uppercase tracking-wider transition-all duration-500 flex-shrink-0 ${
+                <span className={`badge text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-full uppercase tracking-wider transition-all duration-500 flex-shrink-0 ${
                   isCompleting || item.status === 'purchased' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                 }`}>
                   {isCompleting ? t('groceries.purchasing') : (item.status === 'purchased' ? t('groceries.purchased') : t('groceries.needed'))}

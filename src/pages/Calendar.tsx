@@ -221,7 +221,7 @@ export default function Calendar() {
               </div>
               
               <div className="flex items-center gap-2 md:gap-4 ml-2 rtl:ml-0 rtl:mr-2">
-                <span className="text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 bg-gray-200 text-text-primary rounded-full uppercase tracking-wider flex-shrink-0">
+                <span className="badge text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 bg-gray-200 text-text-primary rounded-full uppercase tracking-wider flex-shrink-0">
                   {t(`calendar.${event.eventType}`)}
                 </span>
                 <button 

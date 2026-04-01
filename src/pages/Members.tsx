@@ -182,7 +182,7 @@ export default function Members() {
               </div>
               
               <div className="flex items-center justify-between sm:justify-end space-x-4 rtl:space-x-reverse">
-                <span className={`text-[10px] md:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${
+                <span className={`badge text-[10px] md:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${
                   member.role === 'admin' ? 'bg-orange-100 text-orange-700' : 'bg-gray-200 text-text-primary'
                 }`}>
                   {t(`members.role_${member.role}`)}
