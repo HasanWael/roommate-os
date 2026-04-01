@@ -65,7 +65,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
           </div>
         </div>
 
-        <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-danger hover:bg-danger/5 rounded-xl transition-all" title={t('header.logout')}>
+        <button onClick={handleLogout} className="hidden md:block p-2 text-gray-400 hover:text-danger hover:bg-danger/5 rounded-xl transition-all" title={t('header.logout')}>
           <LogOut className={`h-5 w-5 ${i18n.language === 'ar' ? 'rotate-180' : ''}`} />
         </button>
       </div>

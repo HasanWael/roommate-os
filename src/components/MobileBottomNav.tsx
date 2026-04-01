@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Home, Droplets, Trash2, ShoppingCart, Receipt, CalendarDays, CheckSquare, Users, Settings, Repeat, Globe } from 'lucide-react';
+import { Home, Droplets, Trash2, ShoppingCart, Receipt, CalendarDays, CheckSquare, Users, Settings, Repeat, Globe, LogOut } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../AuthContext';
+import { logout } from '../firebase';
 
 export default function MobileBottomNav() {
   const { t, i18n } = useTranslation();
@@ -22,6 +23,12 @@ export default function MobileBottomNav() {
   const handleSwitchApartment = () => {
     setApartmentId(null);
     setIsDrawerOpen(false);
+    navigate('/auth');
+  };
+
+  const handleLogout = async () => {
+    setIsDrawerOpen(false);
+    await logout();
     navigate('/auth');
   };
 
@@ -123,7 +130,7 @@ export default function MobileBottomNav() {
               </div>
               
               <div 
-                className="overflow-y-auto scrollbar-hide px-6 space-y-6"
+                className="overflow-y-auto overscroll-y-none scrollbar-hide px-6 space-y-6"
                 style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom))' }}
               >
                 {/* Navigation */}
@@ -201,6 +208,21 @@ export default function MobileBottomNav() {
                     </div>
                     <div className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-lg">
                       {i18n.language === 'en' ? 'AR' : 'EN'}
+                    </div>
+                  </button>
+                </div>
+
+                <div className="h-px bg-slate-200 w-full" />
+
+                {/* Logout */}
+                <div>
+                  <button onClick={handleLogout} className="w-full flex items-center p-3 bg-red-50 rounded-2xl hover:bg-red-100 transition-colors text-left rtl:text-right">
+                    <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center mr-4 rtl:ml-4 rtl:mr-0 text-red-500">
+                      <LogOut className={`w-6 h-6 ${i18n.language === 'ar' ? 'rotate-180' : ''}`} />
+                    </div>
+                    <div>
+                      <div className="font-bold text-red-600">{t('header.logout', 'Logout')}</div>
+                      <div className="text-xs text-red-400">{t('nav.logoutDesc', 'Sign out of your account')}</div>
                     </div>
                   </button>
                 </div>
