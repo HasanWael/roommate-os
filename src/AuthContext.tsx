@@ -110,6 +110,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } else {
           console.error("Error handling redirect result:", error);
         }
+      } finally {
+        // Always clear the intent flag
+        localStorage.removeItem('google_login_intent');
       }
     };
     handleRedirect();

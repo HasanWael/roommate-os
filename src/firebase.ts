@@ -15,11 +15,16 @@ setPersistence(auth, browserLocalPersistence).catch(err => {
 });
 
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 export const loginWithGoogle = async () => {
   try {
+    // Save intent to localStorage (more stable than sessionStorage in WebViews)
+    localStorage.setItem('google_login_intent', 'true');
+    
     // Try popup first
     const result = await signInWithPopup(auth, googleProvider);
+    localStorage.removeItem('google_login_intent');
     return result.user;
   } catch (error: any) {
     // If popup is blocked or not supported (common in WebViews/Native wrappers), fall back to redirect
@@ -28,10 +33,12 @@ export const loginWithGoogle = async () => {
       try {
         await signInWithRedirect(auth, googleProvider);
       } catch (redirectError) {
+        localStorage.removeItem('google_login_intent');
         console.error("Error signing in with redirect", redirectError);
         throw redirectError;
       }
     } else {
+      localStorage.removeItem('google_login_intent');
       console.error("Error signing in with Google", error);
       throw error;
     }

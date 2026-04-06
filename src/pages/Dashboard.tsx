@@ -29,7 +29,13 @@ export default function Dashboard() {
     if (!apartmentId) return;
 
     // Fetch Expenses
-    const qExpenses = query(collection(db, 'expenses'), where('apartmentId', '==', apartmentId), orderBy('createdAt', 'desc'), limit(5));
+    const qExpenses = query(
+      collection(db, 'expenses'), 
+      where('apartmentId', '==', apartmentId),
+      where('involvedUsers', 'array-contains', user?.uid),
+      orderBy('createdAt', 'desc'), 
+      limit(5)
+    );
     const unsubExpenses = onSnapshot(qExpenses, (snapshot) => {
       setExpenses(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
     }, (error) => {
@@ -136,6 +142,57 @@ export default function Dashboard() {
 
   const neededGroceries = groceries.filter(g => g.status !== 'purchased');
 
+  const getRawBalances = () => {
+    const balances: Record<string, number> = {};
+    members.forEach(m => balances[m.userId] = 0);
+
+    expenses.forEach(exp => {
+      const payers = exp.paidBy || (exp.paidByUserId ? { [exp.paidByUserId]: exp.amount } : {});
+      
+      Object.entries(payers).forEach(([uid, amt]) => {
+        if (balances[uid] !== undefined) {
+          balances[uid] += (amt as number);
+        }
+      });
+
+      const settledBy = exp.settledBy || [];
+
+      if (exp.splits && Object.keys(exp.splits).length > 0) {
+        Object.entries(exp.splits).forEach(([userId, amount]) => {
+          if (balances[userId] !== undefined) {
+            balances[userId] -= (amount as number);
+            if (settledBy.includes(userId)) {
+              balances[userId] += (amount as number);
+              Object.entries(payers).forEach(([payerUid, payerAmt]) => {
+                if (balances[payerUid] !== undefined) {
+                  balances[payerUid] -= (amount as number) * ((payerAmt as number) / exp.amount);
+                }
+              });
+            }
+          }
+        });
+      } else if (exp.splitAmong && exp.splitAmong.length > 0) {
+        const splitAmount = exp.amount / exp.splitAmong.length;
+        exp.splitAmong.forEach((userId: string) => {
+          if (balances[userId] !== undefined) {
+            balances[userId] -= splitAmount;
+            if (settledBy.includes(userId)) {
+              balances[userId] += splitAmount;
+              Object.entries(payers).forEach(([payerUid, payerAmt]) => {
+                if (balances[payerUid] !== undefined) {
+                  balances[payerUid] -= splitAmount * ((payerAmt as number) / exp.amount);
+                }
+              });
+            }
+          }
+        });
+      }
+    });
+    return balances;
+  };
+
+  const myBalance = user ? (getRawBalances()[user.uid] || 0) : 0;
+
   if (loading) return <LoadingScreen message={t('dashboard.loading')} />;
 
   return (
@@ -188,15 +245,30 @@ export default function Dashboard() {
             </span>
           </div>
           <h3 className="text-lg md:text-xl font-semibold mb-1 text-text-primary">{t('dashboard.billsTitle')}</h3>
-          <p className="text-text-secondary text-xs md:text-sm mb-6 md:mb-8">{t('dashboard.totalOutstanding')}: <span className="font-bold text-text-primary">EGP {formatCurrency(expenses.reduce((sum, e) => sum + e.amount, 0), 2)}</span></p>
+          <p className="text-text-secondary text-xs md:text-sm mb-6 md:mb-8">
+            {myBalance < -0.01 ? t('expenses.youOwe') : myBalance > 0.01 ? t('expenses.youAreOwed') : t('dashboard.totalOutstanding')}: 
+            <span className={`font-bold ml-1 ${myBalance < -0.01 ? 'text-danger' : myBalance > 0.01 ? 'text-success' : 'text-text-primary'}`}>
+              EGP {formatCurrency(Math.abs(myBalance), 2)}
+            </span>
+          </p>
           
           <div className="mt-auto space-y-4">
-            {expenses.slice(0, 2).map(expense => (
-              <div key={expense.id} className="flex justify-between items-center text-sm bg-warning-light/30 p-3 rounded-xl border border-warning-light/50">
-                <span className="font-medium text-text-primary">{expense.title}</span>
-                <span className="font-bold text-warning-dark">EGP {formatCurrency(expense.amount, 2)}</span>
-              </div>
-            ))}
+            {expenses.slice(0, 2).map(expense => {
+              const isPayer = expense.paidByUserId === user?.uid || (expense.paidBy && expense.paidBy[user?.uid || '']);
+              const mySplit = expense.splits ? (expense.splits[user?.uid || ''] || 0) : (expense.splitAmong?.includes(user?.uid) ? expense.amount / expense.splitAmong.length : 0);
+              const displayAmount = expense.isSettlement 
+                ? expense.amount 
+                : (isPayer ? expense.amount : mySplit);
+                
+              return (
+                <div key={expense.id} className="flex justify-between items-center text-sm bg-warning-light/30 p-3 rounded-xl border border-warning-light/50">
+                  <span className="font-medium text-text-primary">{expense.title}</span>
+                  <span className={`font-bold ${expense.isSettlement ? 'text-success' : 'text-warning-dark'}`}>
+                    {expense.isSettlement && isPayer ? '+' : ''}EGP {formatCurrency(displayAmount, 2)}
+                  </span>
+                </div>
+              );
+            })}
             {expenses.length === 0 && <p className="text-sm text-success font-bold">{t('dashboard.allBillsPaid')}</p>}
           </div>
 

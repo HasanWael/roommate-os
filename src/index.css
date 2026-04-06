@@ -9,30 +9,30 @@
   
   /* Font Sizes */
   --text-body: 22px;
-  --text-body-md: 18px;
+  --text-body-md: 14px;
   
-  --text-sm: 16px;
-  --text-sm-md: 14px;
+  --text-sm: 14px;
+  --text-sm-md: 12px;
 
-  --text-xs: 14px;
-  --text-xs-md: 12px;
+  --text-xs: 12px;
+  --text-xs-md: 10px;
   
   --text-nav: 10px;
-  --text-nav-md: 12px;
+  --text-nav-md: 10px;
   
-  --icon-nav: 20px;
-  --icon-nav-md: 24px;
+  --icon-nav: 18px;
+  --icon-nav-md: 22px;
   
-  --text-h1: 1.5rem;
-  --text-h1-md: 1.25rem;
+  --text-h1: 1.4rem;
+  --text-h1-md: 1.15rem;
   --text-h1-lg: 1.65rem;
   
-  --text-h2: 1.475rem;
-  --text-h2-md: 1.125rem;
-  --text-h2-lg: 1.35rem;
+  --text-h2: 1.35rem;
+  --text-h2-md: 1.1rem;
+  --text-h2-lg: 1.2rem;
   
   --text-h3: 1.275rem;
-  --text-h3-md: 1.2rem;
+  --text-h3-md: 1.025rem;
   --text-h3-lg: 1.225rem;
 
   /* Font Weights */
