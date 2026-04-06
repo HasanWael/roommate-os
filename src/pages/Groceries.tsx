@@ -112,11 +112,11 @@ export default function Groceries() {
     <div className="page-container space-y-6 md:space-y-8">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl md:text-3xl font-extrabold text-text-primary tracking-tight flex items-center gap-2">
+          <h1 className="text-lg md:text-3xl font-extrabold text-text-primary tracking-tight flex items-center gap-2">
             <ShoppingCart className="h-5 w-5 md:h-8 md:w-8 text-primary" />
             <span className="">{t('groceries.title')}</span>
           </h1>
-          <p className="subheading mt-1 text-xs md:text-base">
+          <p className="subheading mt-1 text-[10px] md:text-base">
             {t('groceries.description')}
           </p>
         </div>
@@ -162,9 +162,6 @@ export default function Groceries() {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-4 md:p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
           <h2 className="font-bold text-text-primary text-sm md:text-base">{t('groceries.neededItems')}</h2>
-          <div className="text-[10px] md:text-xs font-medium text-text-secondary">
-            {t('groceries.total')} <span className="text-text-primary font-bold">{groceries.filter(g => g.status === 'needed').length}</span>
-          </div>
         </div>
         
         <div className="divide-y divide-gray-100">
@@ -194,7 +191,7 @@ export default function Groceries() {
                   })()}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className={`font-bold text-sm md:text-lg break-words transition-all duration-500 ${isCompleting || item.status === 'purchased' ? 'text-gray-400 line-through' : 'text-text-primary'}`}>
+                  <h3 className={`font-bold text-xs md:text-lg break-words transition-all duration-500 ${isCompleting || item.status === 'purchased' ? 'text-gray-400 line-through' : 'text-text-primary'}`}>
                     {item.name}
                   </h3>
                   <p className={`text-[10px] md:text-sm break-words transition-all duration-500 ${isCompleting ? 'text-gray-400' : 'text-text-secondary'}`}>

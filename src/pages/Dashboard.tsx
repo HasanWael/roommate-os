@@ -24,6 +24,7 @@ export default function Dashboard() {
   const [completingGroceries, setCompletingGroceries] = useState<Set<string>>(new Set());
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [completingBills, setCompletingBills] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!apartmentId) return;
@@ -125,6 +126,36 @@ export default function Dashboard() {
     }, 600);
   };
 
+  const markBillAsPaid = async (expenseId: string) => {
+    if (completingBills.has(expenseId)) return;
+    
+    setCompletingBills(prev => new Set(prev).add(expenseId));
+    
+    setTimeout(async () => {
+      try {
+        const expenseRef = doc(db, 'expenses', expenseId);
+        const expense = expenses.find(e => e.id === expenseId);
+        if (expense && user) {
+          const settledBy = expense.settledBy || [];
+          if (!settledBy.includes(user.uid)) {
+            await updateDoc(expenseRef, {
+              settledBy: [...settledBy, user.uid],
+              updatedAt: serverTimestamp()
+            });
+          }
+        }
+      } catch (error) {
+        handleFirestoreError(error, OperationType.UPDATE, `expenses/${expenseId}`);
+      } finally {
+        setCompletingBills(prev => {
+          const next = new Set(prev);
+          next.delete(expenseId);
+          return next;
+        });
+      }
+    }, 600);
+  };
+
   const pendingChores = chores.filter(c => c.status === 'pending')
     .sort((a, b) => {
       if (!a.dueDate) return 1;
@@ -195,8 +226,23 @@ export default function Dashboard() {
 
   const myBalance = user ? (getRawBalances()[user.uid] || 0) : 0;
 
-  const displayedExpenses = expenses.filter(e => !e.involvedUsers || e.involvedUsers.includes(user?.uid));
-  const nonSettlementExpenses = displayedExpenses.filter(e => !e.isSettlement);
+  const myPendingBills = expenses.filter(expense => {
+    if (expense.isSettlement) return false;
+    
+    // Am I involved in the split?
+    const amIInSplit = expense.splits ? (expense.splits[user?.uid || ''] !== undefined) : (expense.splitAmong?.includes(user?.uid));
+    if (!amIInSplit) return false;
+
+    // Did I already settle this?
+    const haveISettled = expense.settledBy?.includes(user?.uid);
+    if (haveISettled) return false;
+
+    // Did I pay for this entirely?
+    const didIPay = expense.paidByUserId === user?.uid || (expense.paidBy && Object.keys(expense.paidBy).includes(user?.uid || ''));
+    if (didIPay) return false;
+
+    return true;
+  });
 
   if (loading) return <LoadingScreen message={t('dashboard.loading')} />;
 
@@ -246,7 +292,7 @@ export default function Dashboard() {
               <Receipt className="h-5 w-5 md:h-8 md:w-8 text-warning-dark" />
             </div>
             <span className="badge bg-warning-light text-warning-dark text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 md:py-1.5 rounded-full uppercase tracking-widest">
-              {nonSettlementExpenses.length} {t('dashboard.pending')}
+              {myPendingBills.length} {t('dashboard.pending')}
             </span>
           </div>
           <h3 className="text-base md:text-xl font-semibold mb-1 text-text-primary">{t('dashboard.billsTitle')}</h3>
@@ -258,17 +304,37 @@ export default function Dashboard() {
           </p>
           
           <div className="mt-auto space-y-3 md:space-y-4">
-            {nonSettlementExpenses.slice(0, 2).map(expense => {
+            {myPendingBills.slice(0, 3).map(expense => {
+              const mySplit = expense.splits ? (expense.splits[user?.uid || ''] || 0) : (expense.amount / (expense.splitAmong?.length || 1));
+              const isCompleting = completingBills.has(expense.id);
+              
               return (
-                <div key={expense.id} className="flex justify-between items-center text-xs md:text-sm bg-warning-light/30 p-2.5 md:p-3 rounded-xl border border-warning-light/50">
-                  <span className="font-medium text-text-primary truncate mr-2">{expense.title}</span>
-                  <span className="font-bold whitespace-nowrap text-warning-dark">
-                    EGP {formatCurrency(expense.amount, 2)}
+                <div 
+                  key={expense.id} 
+                  className={`flex justify-between items-center text-xs md:text-sm bg-warning-light/30 p-2.5 md:p-3 rounded-xl border border-warning-light/50 transition-all duration-500 ${isCompleting ? 'opacity-0 translate-x-4' : 'opacity-100 translate-x-0'}`}
+                >
+                  <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+                    <button 
+                      onClick={() => markBillAsPaid(expense.id)}
+                      className="flex-shrink-0 text-warning-dark hover:text-warning transition-colors"
+                    >
+                      {isCompleting ? (
+                        <CheckCircle2 className="h-4 w-4 md:h-5 md:w-5 text-success" />
+                      ) : (
+                        <Circle className="h-4 w-4 md:h-5 md:w-5" />
+                      )}
+                    </button>
+                    <span className={`font-medium text-text-primary truncate transition-all duration-500 ${isCompleting ? 'line-through text-text-secondary' : ''}`}>
+                      {expense.title}
+                    </span>
+                  </div>
+                  <span className={`font-bold whitespace-nowrap text-warning-dark ml-2 transition-all duration-500 ${isCompleting ? 'opacity-50' : ''}`}>
+                    EGP {formatCurrency(mySplit, 2)}
                   </span>
                 </div>
               );
             })}
-            {nonSettlementExpenses.length === 0 && <p className="text-xs md:text-sm text-success font-bold">{t('dashboard.allBillsPaid')}</p>}
+            {myPendingBills.length === 0 && <p className="text-xs md:text-sm text-success font-bold">{t('dashboard.allBillsPaid')}</p>}
           </div>
 
           <Link to="/expenses" className="w-full block text-center bg-gray-50 text-text-primary hover:bg-gray-100 font-bold py-2.5 md:py-3 rounded-xl md:rounded-2xl text-xs md:text-sm transition-all shadow-sm active:scale-95 mt-4 md:mt-6 uppercase">

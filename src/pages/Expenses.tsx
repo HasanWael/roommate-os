@@ -338,11 +338,11 @@ export default function Expenses() {
     <div className="page-container space-y-6 md:space-y-8">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl md:text-3xl font-extrabold text-text-primary tracking-tight flex items-center gap-2">
+          <h1 className="text-lg md:text-3xl font-extrabold text-text-primary tracking-tight flex items-center gap-2">
             <Receipt className="h-5 w-5 md:h-8 md:w-8 text-primary" />
             <span className="">{t('expenses.title')}</span>
           </h1>
-          <p className="subheading mt-1 text-xs md:text-base">
+          <p className="subheading mt-1 text-[10px] md:text-base">
             {t('expenses.description')}
           </p>
         </div>
@@ -629,8 +629,8 @@ export default function Expenses() {
                   })()}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-semibold text-text-primary text-xs md:text-base truncate">{expense.title}</h3>
-                  <div className="text-[10px] md:text-sm text-text-secondary flex items-center flex-wrap gap-1 mt-0.5">
+                  <h3 className="font-semibold text-text-primary text-[11px] md:text-base truncate">{expense.title}</h3>
+                  <div className="text-[9px] md:text-sm text-text-secondary flex items-center flex-wrap gap-1 mt-0.5">
                     <span>{t('expenses.paidBy')}</span>
                     {(() => {
                       if (expense.paidBy && typeof expense.paidBy === 'object' && Object.keys(expense.paidBy).length > 1) {
@@ -686,7 +686,7 @@ export default function Expenses() {
               
               <div className="flex items-center justify-between w-full md:w-auto md:justify-end gap-4 md:border-t-0 md:pt-0">
                 <div className="text-left md:text-right flex-shrink-0">
-                  <div className="font-bold text-lg md:text-xl text-text-primary">
+                  <div className="font-bold text-sm md:text-xl text-text-primary">
                     {i18n.language === 'ar' ? 'ج.م' : 'EGP'} {
                       expense.isSettlement 
                         ? formatCurrency(expense.amount, 2)

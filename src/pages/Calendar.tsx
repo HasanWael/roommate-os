@@ -101,11 +101,11 @@ export default function Calendar() {
     <div className="page-container space-y-6 md:space-y-8">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl md:text-3xl font-extrabold text-text-primary tracking-tight flex items-center gap-2">
+          <h1 className="text-lg md:text-3xl font-extrabold text-text-primary tracking-tight flex items-center gap-2">
             <CalendarDays className="h-5 w-5 md:h-8 md:w-8 text-primary" />
             <span className="">{t('calendar.title')}</span>
           </h1>
-          <p className="subheading mt-1 text-xs md:text-base">
+          <p className="subheading mt-1 text-[10px] md:text-base">
             {t('calendar.description')}
           </p>
         </div>
@@ -191,12 +191,12 @@ export default function Calendar() {
                   <p className="text-[10px] md:text-xs font-bold text-text-secondary uppercase tracking-wider mb-0.5 md:mb-1">
                     {event.startDatetime ? format(new Date(event.startDatetime), 'MMM', { locale: dateLocale }) : ''}
                   </p>
-                  <p className="text-lg md:text-3xl font-bold text-text-primary">
+                  <p className="text-base md:text-3xl font-bold text-text-primary">
                     {event.startDatetime ? format(new Date(event.startDatetime), 'd', { locale: dateLocale }) : ''}
                   </p>
                 </div>
                 <div className="min-w-0">
-                  <h3 className="font-bold text-text-primary text-sm md:text-lg truncate">{event.title}</h3>
+                  <h3 className="font-bold text-text-primary text-xs md:text-lg truncate">{event.title}</h3>
                   <div className="flex flex-col sm:flex-row sm:items-center mt-1 sm:gap-2 gap-1 sm:gap-0">
                     <p className="text-[10px] md:text-sm text-text-secondary flex items-center">
                       <Clock className={`h-3 w-3 md:h-4 md:w-4 ${i18n.language === 'ar' ? 'ml-1' : 'mr-1'}`} />
