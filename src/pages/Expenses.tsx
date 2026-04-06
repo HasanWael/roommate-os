@@ -160,7 +160,6 @@ export default function Expenses() {
     const q = query(
       collection(db, 'expenses'),
       where('apartmentId', '==', apartmentId),
-      where('involvedUsers', 'array-contains', user?.uid),
       orderBy('createdAt', 'desc')
     );
 
@@ -468,11 +467,11 @@ export default function Expenses() {
                   <div 
                     key={member.userId} 
                     onClick={() => toggleSplitMember(member.userId)}
-                    className={`flex items-center justify-between px-4 py-3 rounded-xl border transition-all cursor-pointer ${
+                    className={`flex flex-col sm:flex-row sm:items-center justify-between px-4 py-3 rounded-xl border transition-all cursor-pointer gap-3 sm:gap-0 ${
                       isSelected ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200 opacity-60 hover:opacity-100'
                     }`}
                   >
-                    <div className="flex items-center gap-3 flex-1">
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
                       <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden ${isSelected ? 'bg-primary text-white' : 'bg-gray-300 text-gray-600'}`}>
                         {member.user?.avatarUrl ? (
                           <img src={member.user.avatarUrl} alt={member.user.fullName} className="h-full w-full object-cover" />
@@ -491,28 +490,31 @@ export default function Expenses() {
                           initial={{ opacity: 0, width: 0 }}
                           animate={{ opacity: 1, width: 'auto' }}
                           exit={{ opacity: 0, width: 0 }}
-                          className="flex items-center gap-2 overflow-hidden"
+                          className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-2 overflow-hidden"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <input
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={splitValues[member.userId] || ''}
-                            onChange={(e) => setSplitValues(prev => ({ ...prev, [member.userId]: e.target.value }))}
-                            placeholder="0.00"
-                            className="w-24 p-2 text-sm border border-blue-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-right bg-white"
-                            required={true}
-                          />
-                          <span className="text-sm font-medium text-blue-800">
-                            {splitMode === 'PERCENTAGE' ? '%' : (i18n.language === 'ar' ? 'ج.م' : 'EGP')}
-                          </span>
+                          <span className="text-xs text-text-secondary sm:hidden">{t('expenses.amountLabel')}</span>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              value={splitValues[member.userId] || ''}
+                              onChange={(e) => setSplitValues(prev => ({ ...prev, [member.userId]: e.target.value }))}
+                              placeholder="0.00"
+                              className="w-24 p-2 text-sm border border-blue-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-right bg-white"
+                              required={true}
+                            />
+                            <span className="text-sm font-medium text-blue-800">
+                              {splitMode === 'PERCENTAGE' ? '%' : (i18n.language === 'ar' ? 'ج.م' : 'EGP')}
+                            </span>
+                          </div>
                         </motion.div>
                       )}
                     </AnimatePresence>
                     
                     {isSelected && splitMode === 'EQUAL' && (
-                      <div className="text-sm font-medium text-blue-800">
+                      <div className="text-sm font-medium text-blue-800 w-full sm:w-auto text-right">
                         {i18n.language === 'ar' ? 'ج.م' : 'EGP'} {formatCurrency((parseFloat(newExpenseAmount) || 0) / (splitAmong.length || 1), 2)}
                       </div>
                     )}
@@ -566,7 +568,7 @@ export default function Expenses() {
               if (!fromMember || !toMember) return null;
               
               return (
-                <div key={idx} className="flex items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-100 gap-4 sm:gap-0">
                   <div className="flex items-center gap-3">
                     <div className="flex -space-x-2">
                       <div className="h-8 w-8 rounded-full border-2 border-white bg-red-100 text-red-600 flex items-center justify-center text-xs font-bold z-10 overflow-hidden">
@@ -576,18 +578,18 @@ export default function Expenses() {
                         {toMember.user?.avatarUrl ? <img src={toMember.user.avatarUrl} alt="" className="h-full w-full object-cover" /> : (toMember.user?.fullName?.charAt(0) || '?')}
                       </div>
                     </div>
-                    <div className="text-sm">
+                    <div className="text-sm flex flex-wrap items-center gap-1">
                       <span className="font-semibold text-text-primary">{fromMember.user?.fullName}</span>
-                      <span className="text-text-secondary mx-1">{t('expenses.owes')}</span>
+                      <span className="text-text-secondary">{t('expenses.owes')}</span>
                       <span className="font-semibold text-text-primary">{toMember.user?.fullName}</span>
-                      <div className="font-bold text-primary mt-0.5">
+                      <div className="font-bold text-primary w-full sm:w-auto sm:ml-2 mt-1 sm:mt-0">
                         {i18n.language === 'ar' ? 'ج.م' : 'EGP'} {formatCurrency(debt.amount, 2)}
                       </div>
                     </div>
                   </div>
                   <button
                     onClick={() => setSettleModalData(debt)}
-                    className="bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                    className="w-full sm:w-auto bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                   >
                     {t('expenses.settleUp')}
                   </button>
@@ -607,7 +609,7 @@ export default function Expenses() {
         </div>
         
         <div className="divide-y divide-gray-100">
-          {expenses.map((expense) => (
+          {expenses.filter(e => !e.involvedUsers || e.involvedUsers.includes(user?.uid) || e.paidByUserId === user?.uid).map((expense) => (
             <div key={expense.id} className="p-4 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between hover:bg-gray-50 transition-colors gap-4">
               <div className="flex items-start gap-3 md:gap-4 w-full">
                 <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden flex-shrink-0">
@@ -624,17 +626,31 @@ export default function Expenses() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="font-semibold text-text-primary text-sm md:text-base truncate">{expense.title}</h3>
-                  <p className="text-xs md:text-sm text-text-secondary truncate">
-                    {t('expenses.paidBy')} {(() => {
+                  <div className="text-xs md:text-sm text-text-secondary flex items-center flex-wrap gap-1 mt-0.5">
+                    <span>{t('expenses.paidBy')}</span>
+                    {(() => {
                       if (expense.paidBy && Object.keys(expense.paidBy).length > 1) {
-                        return t('expenses.paidByMultiple');
+                        return (
+                          <span className="flex items-center -space-x-1 ml-1">
+                            {Object.keys(expense.paidBy).map(uid => {
+                              const payer = members.find(m => m.userId === uid);
+                              return (
+                                <span key={uid} className="h-5 w-5 rounded-full border border-white bg-primary text-white flex items-center justify-center text-[8px] overflow-hidden" title={payer?.user?.fullName}>
+                                  {payer?.user?.avatarUrl ? <img src={payer.user.avatarUrl} className="h-full w-full object-cover" /> : payer?.user?.fullName?.charAt(0) || '?'}
+                                </span>
+                              );
+                            })}
+                          </span>
+                        );
                       }
                       const payerId = expense.paidByUserId || (expense.paidBy ? Object.keys(expense.paidBy)[0] : null);
                       const payer = members.find(m => m.userId === payerId);
-                      if (payer?.user?.fullName) return payer.user.fullName;
-                      return expense.paidBy === 'Roommate' ? t('common.roommate') : expense.paidByUserId;
-                    })()} • {expense.createdAt ? format(expense.createdAt.toDate(), 'MMM d, yyyy', { locale: dateLocale }) : t('expenses.justNow')}
-                  </p>
+                      if (payer?.user?.fullName) return <span className="font-medium text-text-primary ml-1 truncate max-w-[100px] md:max-w-[150px]">{payer.user.fullName}</span>;
+                      return <span className="font-medium text-text-primary ml-1 truncate max-w-[100px] md:max-w-[150px]">{expense.paidBy === 'Roommate' ? t('common.roommate') : expense.paidByUserId}</span>;
+                    })()} 
+                    <span className="mx-1">•</span> 
+                    <span>{expense.createdAt ? format(expense.createdAt.toDate(), 'MMM d, yyyy', { locale: dateLocale }) : t('expenses.justNow')}</span>
+                  </div>
                   <div className="text-xs text-text-secondary mt-2">
                     {expense.isSettlement ? (
                       <span className="text-green-600 font-medium">{t('expenses.settlement')}</span>
@@ -725,7 +741,7 @@ export default function Expenses() {
       {/* Settlement Modal */}
       {settleModalData && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+          <div className="bg-white rounded-2xl p-5 md:p-6 max-w-sm w-[95%] shadow-xl">
             <h3 className="text-lg font-bold text-text-primary mb-4">{t('expenses.settlementConfirmTitle')}</h3>
             <p className="text-text-secondary mb-6 leading-relaxed">
               {t('expenses.settlementConfirmMessage', {
@@ -734,16 +750,16 @@ export default function Expenses() {
                 to: members.find(m => m.userId === settleModalData.to)?.user?.fullName || 'Unknown'
               })}
             </p>
-            <div className="flex justify-end gap-3">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
               <button
                 onClick={() => setSettleModalData(null)}
-                className="px-4 py-2 text-text-secondary hover:bg-gray-100 rounded-lg font-medium transition-colors"
+                className="w-full sm:w-auto px-4 py-2 text-text-secondary hover:bg-gray-100 rounded-lg font-medium transition-colors"
               >
                 {t('common.cancel')}
               </button>
               <button
                 onClick={handleSettleUp}
-                className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-blue-600 transition-colors"
+                className="w-full sm:w-auto px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-blue-600 transition-colors"
               >
                 {t('expenses.settleUp')}
               </button>

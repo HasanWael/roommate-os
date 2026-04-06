@@ -32,9 +32,7 @@ export default function Dashboard() {
     const qExpenses = query(
       collection(db, 'expenses'), 
       where('apartmentId', '==', apartmentId),
-      where('involvedUsers', 'array-contains', user?.uid),
-      orderBy('createdAt', 'desc'), 
-      limit(5)
+      orderBy('createdAt', 'desc')
     );
     const unsubExpenses = onSnapshot(qExpenses, (snapshot) => {
       setExpenses(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
@@ -193,6 +191,8 @@ export default function Dashboard() {
 
   const myBalance = user ? (getRawBalances()[user.uid] || 0) : 0;
 
+  const displayedExpenses = expenses.filter(e => !e.involvedUsers || e.involvedUsers.includes(user?.uid));
+
   if (loading) return <LoadingScreen message={t('dashboard.loading')} />;
 
   return (
@@ -241,7 +241,7 @@ export default function Dashboard() {
               <Receipt className="h-6 w-6 md:h-8 md:w-8 text-warning-dark" />
             </div>
             <span className="badge bg-warning-light text-warning-dark text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 md:py-1.5 rounded-full uppercase tracking-widest">
-              {expenses.length} {t('dashboard.pending')}
+              {displayedExpenses.length} {t('dashboard.pending')}
             </span>
           </div>
           <h3 className="text-lg md:text-xl font-semibold mb-1 text-text-primary">{t('dashboard.billsTitle')}</h3>
@@ -253,7 +253,7 @@ export default function Dashboard() {
           </p>
           
           <div className="mt-auto space-y-4">
-            {expenses.slice(0, 2).map(expense => {
+            {displayedExpenses.slice(0, 2).map(expense => {
               const isPayer = expense.paidByUserId === user?.uid || (expense.paidBy && expense.paidBy[user?.uid || '']);
               const mySplit = expense.splits ? (expense.splits[user?.uid || ''] || 0) : (expense.splitAmong?.includes(user?.uid) ? expense.amount / expense.splitAmong.length : 0);
               const displayAmount = expense.isSettlement 
@@ -269,7 +269,7 @@ export default function Dashboard() {
                 </div>
               );
             })}
-            {expenses.length === 0 && <p className="text-sm text-success font-bold">{t('dashboard.allBillsPaid')}</p>}
+            {displayedExpenses.length === 0 && <p className="text-sm text-success font-bold">{t('dashboard.allBillsPaid')}</p>}
           </div>
 
           <Link to="/expenses" className="w-full block text-center bg-gray-50 text-text-primary hover:bg-gray-100 font-bold py-3 rounded-2xl text-sm transition-all shadow-sm active:scale-95 mt-6 uppercase">
