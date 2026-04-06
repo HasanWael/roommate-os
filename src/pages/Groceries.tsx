@@ -112,11 +112,11 @@ export default function Groceries() {
     <div className="page-container space-y-6 md:space-y-8">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-2">
-            <ShoppingCart className="h-6 w-6 md:h-8 md:w-8 text-primary" />
+          <h1 className="text-xl md:text-3xl font-extrabold text-text-primary tracking-tight flex items-center gap-2">
+            <ShoppingCart className="h-5 w-5 md:h-8 md:w-8 text-primary" />
             <span className="">{t('groceries.title')}</span>
           </h1>
-          <p className="subheading mt-1 text-sm md:text-base">
+          <p className="subheading mt-1 text-xs md:text-base">
             {t('groceries.description')}
           </p>
         </div>
@@ -193,11 +193,11 @@ export default function Groceries() {
                     return <ShoppingCart className="h-4 w-4 md:h-5 md:w-5 text-gray-400" />;
                   })()}
                 </div>
-                <div className="min-w-0">
-                  <h3 className={`font-bold text-base md:text-lg truncate transition-all duration-500 ${isCompleting || item.status === 'purchased' ? 'text-gray-400 line-through' : 'text-text-primary'}`}>
+                <div className="min-w-0 flex-1">
+                  <h3 className={`font-bold text-sm md:text-lg break-words transition-all duration-500 ${isCompleting || item.status === 'purchased' ? 'text-gray-400 line-through' : 'text-text-primary'}`}>
                     {item.name}
                   </h3>
-                  <p className={`text-[10px] md:text-sm truncate transition-all duration-500 ${isCompleting ? 'text-gray-400' : 'text-text-secondary'}`}>
+                  <p className={`text-[10px] md:text-sm break-words transition-all duration-500 ${isCompleting ? 'text-gray-400' : 'text-text-secondary'}`}>
                     {t('groceries.qty')} {item.quantity} • {t('groceries.addedBy')} {(() => {
                       const adder = members.find(m => m.userId === item.addedByUserId);
                       return adder?.user?.fullName || item.addedBy;

@@ -101,11 +101,11 @@ export default function Calendar() {
     <div className="page-container space-y-6 md:space-y-8">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-2">
-            <CalendarDays className="h-6 w-6 md:h-8 md:w-8 text-primary" />
+          <h1 className="text-xl md:text-3xl font-extrabold text-text-primary tracking-tight flex items-center gap-2">
+            <CalendarDays className="h-5 w-5 md:h-8 md:w-8 text-primary" />
             <span className="">{t('calendar.title')}</span>
           </h1>
-          <p className="subheading mt-1 text-sm md:text-base">
+          <p className="subheading mt-1 text-xs md:text-base">
             {t('calendar.description')}
           </p>
         </div>
@@ -176,29 +176,29 @@ export default function Calendar() {
       )}
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-4 md:p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-          <h2 className="font-bold text-text-primary text-sm md:text-base">{t('calendar.upcomingEvents')}</h2>
-          <div className="text-xs md:text-sm font-medium text-text-secondary">
+        <div className="p-3 md:p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+          <h2 className="font-bold text-text-primary text-xs md:text-base">{t('calendar.upcomingEvents')}</h2>
+          <div className="text-[10px] md:text-sm font-medium text-text-secondary">
             {t('calendar.total')} <span className="text-text-primary font-bold">{events.length}</span>
           </div>
         </div>
         
         <div className="divide-y divide-gray-100">
           {events.map((event) => (
-            <div key={event.id} className="p-4 md:p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
+            <div key={event.id} className="p-3 md:p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
               <div className="flex items-center gap-3 md:gap-6 min-w-0">
                 <div className="text-center flex-shrink-0">
                   <p className="text-[10px] md:text-xs font-bold text-text-secondary uppercase tracking-wider mb-0.5 md:mb-1">
                     {event.startDatetime ? format(new Date(event.startDatetime), 'MMM', { locale: dateLocale }) : ''}
                   </p>
-                  <p className="text-xl md:text-3xl font-bold text-text-primary">
+                  <p className="text-lg md:text-3xl font-bold text-text-primary">
                     {event.startDatetime ? format(new Date(event.startDatetime), 'd', { locale: dateLocale }) : ''}
                   </p>
                 </div>
                 <div className="min-w-0">
-                  <h3 className="font-bold text-text-primary text-base md:text-lg truncate">{event.title}</h3>
+                  <h3 className="font-bold text-text-primary text-sm md:text-lg truncate">{event.title}</h3>
                   <div className="flex flex-col sm:flex-row sm:items-center mt-1 sm:gap-2 gap-1 sm:gap-0">
-                    <p className="text-xs md:text-sm text-text-secondary flex items-center">
+                    <p className="text-[10px] md:text-sm text-text-secondary flex items-center">
                       <Clock className={`h-3 w-3 md:h-4 md:w-4 ${i18n.language === 'ar' ? 'ml-1' : 'mr-1'}`} />
                       {event.startDatetime ? format(new Date(event.startDatetime), 'h:mm a', { locale: dateLocale }) : ''}
                     </p>
@@ -221,7 +221,7 @@ export default function Calendar() {
               </div>
               
               <div className="flex items-center gap-2 md:gap-4 ml-2 rtl:ml-0 rtl:mr-2">
-                <span className="badge text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 bg-gray-200 text-text-primary rounded-full uppercase tracking-wider flex-shrink-0">
+                <span className="badge text-[8px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 bg-gray-200 text-text-primary rounded-full uppercase tracking-wider flex-shrink-0">
                   {t(`calendar.${event.eventType}`)}
                 </span>
                 <button 

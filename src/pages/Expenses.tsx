@@ -38,11 +38,12 @@ export default function Expenses() {
     members.forEach(m => balances[m.userId] = 0);
 
     expenses.forEach(exp => {
-      const payers = exp.paidBy || (exp.paidByUserId ? { [exp.paidByUserId]: exp.amount } : {});
+      const expAmount = parseFloat(exp.amount as any) || 0;
+      const payers = exp.paidBy || (exp.paidByUserId ? { [exp.paidByUserId]: expAmount } : {});
       
       Object.entries(payers).forEach(([uid, amt]) => {
         if (balances[uid] !== undefined) {
-          balances[uid] += (amt as number);
+          balances[uid] += parseFloat(amt as any) || 0;
         }
       });
 
@@ -50,28 +51,31 @@ export default function Expenses() {
 
       if (exp.splits && Object.keys(exp.splits).length > 0) {
         Object.entries(exp.splits).forEach(([userId, amount]) => {
+          const splitAmt = parseFloat(amount as any) || 0;
           if (balances[userId] !== undefined) {
-            balances[userId] -= (amount as number);
+            balances[userId] -= splitAmt;
             if (settledBy.includes(userId)) {
-              balances[userId] += (amount as number);
+              balances[userId] += splitAmt;
               Object.entries(payers).forEach(([payerUid, payerAmt]) => {
-                if (balances[payerUid] !== undefined) {
-                  balances[payerUid] -= (amount as number) * ((payerAmt as number) / exp.amount);
+                const pAmt = parseFloat(payerAmt as any) || 0;
+                if (balances[payerUid] !== undefined && expAmount > 0) {
+                  balances[payerUid] -= splitAmt * (pAmt / expAmount);
                 }
               });
             }
           }
         });
       } else if (exp.splitAmong && exp.splitAmong.length > 0) {
-        const splitAmount = exp.amount / exp.splitAmong.length;
+        const splitAmount = expAmount / exp.splitAmong.length;
         exp.splitAmong.forEach((userId: string) => {
           if (balances[userId] !== undefined) {
             balances[userId] -= splitAmount;
             if (settledBy.includes(userId)) {
               balances[userId] += splitAmount;
               Object.entries(payers).forEach(([payerUid, payerAmt]) => {
-                if (balances[payerUid] !== undefined) {
-                  balances[payerUid] -= splitAmount * ((payerAmt as number) / exp.amount);
+                const pAmt = parseFloat(payerAmt as any) || 0;
+                if (balances[payerUid] !== undefined && expAmount > 0) {
+                  balances[payerUid] -= splitAmount * (pAmt / expAmount);
                 }
               });
             }
@@ -334,11 +338,11 @@ export default function Expenses() {
     <div className="page-container space-y-6 md:space-y-8">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight flex items-center gap-2">
-            <Receipt className="h-6 w-6 md:h-8 md:w-8 text-primary" />
+          <h1 className="text-xl md:text-3xl font-extrabold text-text-primary tracking-tight flex items-center gap-2">
+            <Receipt className="h-5 w-5 md:h-8 md:w-8 text-primary" />
             <span className="">{t('expenses.title')}</span>
           </h1>
-          <p className="subheading mt-1 text-sm md:text-base">
+          <p className="subheading mt-1 text-xs md:text-base">
             {t('expenses.description')}
           </p>
         </div>
@@ -558,38 +562,38 @@ export default function Expenses() {
 
       {calculateBalances().length > 0 && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
-          <div className="p-4 md:p-6 border-b border-gray-100 bg-gray-50">
-            <h2 className="font-semibold text-text-primary text-sm md:text-base">{t('expenses.balances')}</h2>
+          <div className="p-3 md:p-6 border-b border-gray-100 bg-gray-50">
+            <h2 className="font-semibold text-text-primary text-xs md:text-base">{t('expenses.balances')}</h2>
           </div>
-          <div className="p-4 md:p-6 flex flex-col gap-4">
+          <div className="p-3 md:p-6 flex flex-col gap-3 md:gap-4">
             {calculateBalances().map((debt, idx) => {
               const fromMember = members.find(m => m.userId === debt.from);
               const toMember = members.find(m => m.userId === debt.to);
               if (!fromMember || !toMember) return null;
               
               return (
-                <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-100 gap-4 sm:gap-0">
-                  <div className="flex items-center gap-3">
+                <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-50 p-3 md:p-4 rounded-xl border border-gray-100 gap-3 sm:gap-0">
+                  <div className="flex items-center gap-2 md:gap-3">
                     <div className="flex -space-x-2">
-                      <div className="h-8 w-8 rounded-full border-2 border-white bg-red-100 text-red-600 flex items-center justify-center text-xs font-bold z-10 overflow-hidden">
+                      <div className="h-6 w-6 md:h-8 md:w-8 rounded-full border-2 border-white bg-red-100 text-red-600 flex items-center justify-center text-[10px] md:text-xs font-bold z-10 overflow-hidden">
                         {fromMember.user?.avatarUrl ? <img src={fromMember.user.avatarUrl} alt="" className="h-full w-full object-cover" /> : (fromMember.user?.fullName?.charAt(0) || '?')}
                       </div>
-                      <div className="h-8 w-8 rounded-full border-2 border-white bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold z-0 overflow-hidden">
+                      <div className="h-6 w-6 md:h-8 md:w-8 rounded-full border-2 border-white bg-green-100 text-green-600 flex items-center justify-center text-[10px] md:text-xs font-bold z-0 overflow-hidden">
                         {toMember.user?.avatarUrl ? <img src={toMember.user.avatarUrl} alt="" className="h-full w-full object-cover" /> : (toMember.user?.fullName?.charAt(0) || '?')}
                       </div>
                     </div>
-                    <div className="text-sm flex flex-wrap items-center gap-1">
+                    <div className="text-xs md:text-sm flex flex-wrap items-center gap-1">
                       <span className="font-semibold text-text-primary">{fromMember.user?.fullName}</span>
                       <span className="text-text-secondary">{t('expenses.owes')}</span>
                       <span className="font-semibold text-text-primary">{toMember.user?.fullName}</span>
-                      <div className="font-bold text-primary w-full sm:w-auto sm:ml-2 mt-1 sm:mt-0">
+                      <div className="font-bold text-primary w-full sm:w-auto sm:ml-2 mt-0.5 sm:mt-0">
                         {i18n.language === 'ar' ? 'ج.م' : 'EGP'} {formatCurrency(debt.amount, 2)}
                       </div>
                     </div>
                   </div>
                   <button
                     onClick={() => setSettleModalData(debt)}
-                    className="w-full sm:w-auto bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                    className="w-full sm:w-auto bg-primary/10 text-primary hover:bg-primary/20 px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors"
                   >
                     {t('expenses.settleUp')}
                   </button>
@@ -601,41 +605,41 @@ export default function Expenses() {
       )}
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-4 md:p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-          <h2 className="font-semibold text-text-primary text-xs md:text-sm">{t('expenses.recentExpenses')}</h2>
-          <div className="text-xs md:text-sm font-medium text-text-secondary">
+        <div className="p-3 md:p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+          <h2 className="font-semibold text-text-primary text-xs md:text-base">{t('expenses.recentExpenses')}</h2>
+          <div className="text-[10px] md:text-sm font-medium text-text-secondary">
             {t('expenses.totalPending')} <span className="text-danger font-bold">{i18n.language === 'ar' ? 'ج.م' : 'EGP'} {formatCurrency(totalPending, 2)}</span>
           </div>
         </div>
         
         <div className="divide-y divide-gray-100">
           {expenses.filter(e => !e.involvedUsers || e.involvedUsers.includes(user?.uid) || e.paidByUserId === user?.uid).map((expense) => (
-            <div key={expense.id} className="p-4 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between hover:bg-gray-50 transition-colors gap-4">
-              <div className="flex items-start gap-3 md:gap-4 w-full">
-                <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden flex-shrink-0">
+            <div key={expense.id} className="p-3 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between hover:bg-gray-50 transition-colors gap-3 md:gap-4">
+              <div className="flex items-start gap-2.5 md:gap-4 w-full">
+                <div className="h-8 w-8 md:h-12 md:w-12 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden flex-shrink-0">
                   {(() => {
                     if (expense.isSettlement) {
-                      return <CheckCircle2 className="h-5 w-5 md:h-6 md:w-6 text-green-500" />;
+                      return <CheckCircle2 className="h-4 w-4 md:h-6 md:w-6 text-green-500" />;
                     }
                     const payer = members.find(m => m.userId === expense.paidByUserId);
                     if (payer?.user?.avatarUrl) {
                       return <img src={payer.user.avatarUrl} alt={expense.paidBy === 'Roommate' ? t('common.roommate') : expense.paidBy} className="h-full w-full object-cover" />;
                     }
-                    return <Receipt className="h-5 w-5 md:h-6 md:w-6 text-primary" />;
+                    return <Receipt className="h-4 w-4 md:h-6 md:w-6 text-primary" />;
                   })()}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-semibold text-text-primary text-sm md:text-base truncate">{expense.title}</h3>
-                  <div className="text-xs md:text-sm text-text-secondary flex items-center flex-wrap gap-1 mt-0.5">
+                  <h3 className="font-semibold text-text-primary text-xs md:text-base truncate">{expense.title}</h3>
+                  <div className="text-[10px] md:text-sm text-text-secondary flex items-center flex-wrap gap-1 mt-0.5">
                     <span>{t('expenses.paidBy')}</span>
                     {(() => {
-                      if (expense.paidBy && Object.keys(expense.paidBy).length > 1) {
+                      if (expense.paidBy && typeof expense.paidBy === 'object' && Object.keys(expense.paidBy).length > 1) {
                         return (
                           <span className="flex items-center -space-x-1 ml-1">
                             {Object.keys(expense.paidBy).map(uid => {
                               const payer = members.find(m => m.userId === uid);
                               return (
-                                <span key={uid} className="h-5 w-5 rounded-full border border-white bg-primary text-white flex items-center justify-center text-[8px] overflow-hidden" title={payer?.user?.fullName}>
+                                <span key={uid} className="h-5 w-5 md:h-6 md:w-6 rounded-full border border-white bg-primary text-white flex items-center justify-center text-[8px] md:text-[10px] overflow-hidden" title={payer?.user?.fullName || uid}>
                                   {payer?.user?.avatarUrl ? <img src={payer.user.avatarUrl} className="h-full w-full object-cover" /> : payer?.user?.fullName?.charAt(0) || '?'}
                                 </span>
                               );
@@ -643,10 +647,10 @@ export default function Expenses() {
                           </span>
                         );
                       }
-                      const payerId = expense.paidByUserId || (expense.paidBy ? Object.keys(expense.paidBy)[0] : null);
+                      const payerId = expense.paidByUserId || (expense.paidBy && typeof expense.paidBy === 'object' ? Object.keys(expense.paidBy)[0] : null);
                       const payer = members.find(m => m.userId === payerId);
                       if (payer?.user?.fullName) return <span className="font-medium text-text-primary ml-1 truncate max-w-[100px] md:max-w-[150px]">{payer.user.fullName}</span>;
-                      return <span className="font-medium text-text-primary ml-1 truncate max-w-[100px] md:max-w-[150px]">{expense.paidBy === 'Roommate' ? t('common.roommate') : expense.paidByUserId}</span>;
+                      return <span className="font-medium text-text-primary ml-1 truncate max-w-[100px] md:max-w-[150px]">{typeof expense.paidBy === 'string' ? (expense.paidBy === 'Roommate' ? t('common.roommate') : expense.paidBy) : expense.paidByUserId}</span>;
                     })()} 
                     <span className="mx-1">•</span> 
                     <span>{expense.createdAt ? format(expense.createdAt.toDate(), 'MMM d, yyyy', { locale: dateLocale }) : t('expenses.justNow')}</span>
@@ -741,9 +745,9 @@ export default function Expenses() {
       {/* Settlement Modal */}
       {settleModalData && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-5 md:p-6 max-w-sm w-[95%] shadow-xl">
-            <h3 className="text-lg font-bold text-text-primary mb-4">{t('expenses.settlementConfirmTitle')}</h3>
-            <p className="text-text-secondary mb-6 leading-relaxed">
+          <div className="bg-white rounded-2xl p-4 md:p-6 max-w-sm w-[90%] md:w-[95%] shadow-xl">
+            <h3 className="text-base md:text-lg font-bold text-text-primary mb-3 md:mb-4">{t('expenses.settlementConfirmTitle')}</h3>
+            <p className="text-sm md:text-base text-text-secondary mb-5 md:mb-6 leading-relaxed">
               {t('expenses.settlementConfirmMessage', {
                 amount: `${i18n.language === 'ar' ? 'ج.م' : 'EGP'} ${formatCurrency(settleModalData.amount, 2)}`,
                 from: members.find(m => m.userId === settleModalData.from)?.user?.fullName || 'Unknown',
@@ -753,13 +757,13 @@ export default function Expenses() {
             <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
               <button
                 onClick={() => setSettleModalData(null)}
-                className="w-full sm:w-auto px-4 py-2 text-text-secondary hover:bg-gray-100 rounded-lg font-medium transition-colors"
+                className="w-full sm:w-auto px-4 py-2 text-sm md:text-base text-text-secondary hover:bg-gray-100 rounded-lg font-medium transition-colors"
               >
                 {t('common.cancel')}
               </button>
               <button
                 onClick={handleSettleUp}
-                className="w-full sm:w-auto px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-blue-600 transition-colors"
+                className="w-full sm:w-auto px-4 py-2 text-sm md:text-base bg-primary text-white rounded-lg font-medium hover:bg-blue-600 transition-colors"
               >
                 {t('expenses.settleUp')}
               </button>
